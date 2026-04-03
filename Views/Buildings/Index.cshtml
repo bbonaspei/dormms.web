@@ -1,0 +1,52 @@
+﻿@model IEnumerable<DormMS.Web.Models.Building>
+
+<div class="row align-items-center page-header-area px-2">
+    <div class="col-md-8 text-start">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 2.2rem; letter-spacing: -1.5px;">
+            Campus <span style="color: #6366f1;">Infrastructure.</span>
+        </h1>
+        <p class="text-muted small fw-medium">Global management of physical dormitory blocks and facility status.</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a asp-action="Create" class="btn-premium text-decoration-none">
+            <i class="bi bi-plus-lg"></i> Register New Building
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 px-2">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="stat-card-new">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="icon-box icon-blue">
+                        <i class="bi bi-building-fill"></i>
+                    </div>
+                    <!-- YENİ: Duruma göre Yeşil veya Kırmızı Rozet -->
+                    <span class="@(item.status == "Active" ? "badge-active" : "badge-inactive")">
+                        @item.status
+                    </span>
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="fw-bold mb-1" style="color: #1e293b;">@item.buildingName</h4>
+                    <p class="text-muted small fw-bold text-uppercase">Code: @item.buildingCode</p>
+                </div>
+
+                <div class="p-3 rounded-4 mb-4" style="background: #f8fafc; border: 1px solid rgba(0,0,0,0.02);">
+                    <p class="small text-muted mb-2"><i class="bi bi-geo-alt-fill me-1"></i> @item.address</p>
+                    <div class="d-flex gap-3">
+                        <div><span class="small fw-bold text-muted">LEVELS:</span> <b style="color:#6366f1;">@item.totalFloors</b></div>
+                        <div><span class="small fw-bold text-muted">ELEVATOR:</span> <b style="color:#10b981;">@(item.hasElevator ? "YES" : "NO")</b></div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-auto">
+                    <a href="#" class="btn-card-edit w-100 text-decoration-none">Update Configuration</a>
+                    <button class="btn-card-delete border-0"><i class="bi bi-trash3-fill"></i></button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

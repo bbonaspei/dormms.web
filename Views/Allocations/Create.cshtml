@@ -1,0 +1,87 @@
+﻿@model DormMS.Web.Models.Allocation
+
+<div class="container-fluid px-5" style="position: relative; min-height: 85vh;">
+
+    <!-- 1. GERİ BUTONU: Sol üstte, hizalı -->
+    <div style="position: absolute; left: 0; top: 15px;">
+        <a asp-action="Index" class="btn-back-premium text-decoration-none">
+            <i class="bi bi-arrow-left"></i> BACK TO PLACEMENTS
+        </a>
+    </div>
+
+    <!-- 2. SAYFA BAŞLIĞI: Navbar'dan uzaklaştırıldı (margin-top: 80px) -->
+    <div class="text-center" style="margin-top: 80px; margin-bottom: 60px;">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3.5rem; letter-spacing: -3px; line-height: 1;">
+            Unit <span style="color: #6366f1;">Allocation.</span>
+        </h1>
+        <p class="text-muted mt-2">Finalize student residency by assigning a dedicated campus unit.</p>
+    </div>
+
+    <!-- 3. FORM KARTI -->
+    <div class="stat-card-new p-5" style="max-width: 850px; margin: 0 auto; border: 1px solid rgba(0,0,0,0.02) !important;">
+        <form asp-action="Create">
+            <div class="row g-4 text-start">
+
+                <!-- Target Student -->
+                <div class="col-md-12">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Target Student</label>
+                        <select asp-for="studentId" class="dorm-input-premium" asp-items="ViewBag.studentId">
+                            <option value="" disabled selected>Select a student from registry...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Assign to Room -->
+                <div class="col-md-12">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Unit Assignment</label>
+                        <select asp-for="roomId" class="dorm-input-premium" asp-items="ViewBag.roomId">
+                            <option value="" disabled selected>Select an available unit...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Lease Dates -->
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Lease Start Date</label>
+                        <input asp-for="startDate" type="date" class="dorm-input-premium" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Expected End Date</label>
+                        <input asp-for="endDate" type="date" class="dorm-input-premium" />
+                    </div>
+                </div>
+
+                <!-- Deposit -->
+                <div class="col-md-12">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Security Deposit ($)</label>
+                        <input asp-for="securityDeposit" class="dorm-input-premium" placeholder="e.g. 500.00" />
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- BUTONLAR -->
+            <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top" style="border-color: #f1f5f9 !important;">
+                <a asp-action="Index" class="btn-discard-premium text-decoration-none">
+                    DISCARD CHANGES
+                </a>
+                <button type="submit" class="btn-premium">
+                    <i class="bi bi-shield-check me-2"></i> Finalize Allocation
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

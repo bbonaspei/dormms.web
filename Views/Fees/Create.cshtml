@@ -1,0 +1,53 @@
+﻿@model DormMS.Web.Models.Fee
+
+<div class="container-fluid px-5" style="position: relative;">
+    <div style="position: absolute; left: 0; top: 15px;">
+        <a asp-action="Index" class="btn-back-premium text-decoration-none">
+            <i class="bi bi-arrow-left"></i> BACK TO FEES
+        </a>
+    </div>
+
+    <div class="text-center mb-5" style="margin-top: 80px;">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2px;">
+            New Fee <span style="color: #8b5cf6;">Definition.</span>
+        </h1>
+        <p class="text-muted">Set up a new billing category for the dormitory system.</p>
+    </div>
+
+    <div class="stat-card-new p-5" style="max-width: 700px; margin: 0 auto;">
+        <form asp-action="Create">
+            <div class="row g-4 text-start">
+                <div class="col-md-12">
+                    <label class="label-premium">Fee Name (e.g. Monthly Rent)</label>
+                    <input asp-for="feeName" class="dorm-input-premium" placeholder="Enter title" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">Standard Amount ($)</label>
+                    <input asp-for="amount" class="dorm-input-premium" placeholder="0.00" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">Category</label>
+                    <select asp-for="feeCategory" class="dorm-input-premium">
+                        <option value="Housing">Housing</option>
+                        <option value="Service">Service</option>
+                        <option value="Penalty">Penalty</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <label class="switch-inline">
+                        <input asp-for="isRecurring" type="checkbox" checked />
+                        <div class="slider-round"></div>
+                        <span class="label-premium m-0">Recurring Monthly</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
+                <a asp-action="Index" class="btn-discard-premium text-decoration-none">DISCARD</a>
+                <button type="submit" class="btn-premium" style="background:var(--primary-grad) !important;">
+                    Create Fee Type
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

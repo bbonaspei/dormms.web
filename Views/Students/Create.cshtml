@@ -1,0 +1,92 @@
+﻿@model DormMS.Web.Models.Student
+
+<div class="container-fluid px-5" style="position: relative;">
+    <!-- Geri Butonu -->
+    <div style="position: absolute; left: 0; top: 15px;">
+        <a asp-action="Index" class="btn-back-premium text-decoration-none">
+            <i class="bi bi-arrow-left"></i> BACK TO DIRECTORY
+        </a>
+    </div>
+
+    <div class="text-center mb-5" style="margin-top: 80px;">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2px;">
+            Resident <span style="color: #10b981;">Enrollment.</span>
+        </h1>
+        <p class="text-muted">Register a new student and configure their academic profile.</p>
+    </div>
+
+    <div class="stat-card-new p-5" style="max-width: 1000px; margin: 0 auto;">
+        <form asp-action="Create">
+            <div class="row g-4 text-start">
+
+                <!-- BÖLÜM 1: KİŞİSEL BİLGİLER -->
+                <div class="col-12"><h5 class="fw-bold border-bottom pb-2">Personal Identity</h5></div>
+
+                <div class="col-md-4">
+                    <label class="label-premium">First Name</label>
+                    <input name="firstName" class="dorm-input-premium" placeholder="John" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="label-premium">Last Name</label>
+                    <input name="lastName" class="dorm-input-premium" placeholder="Doe" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="label-premium">Gender</label>
+                    <select asp-for="gender" class="dorm-input-premium">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <label class="label-premium">Email Address</label>
+                    <input name="email" type="email" class="dorm-input-premium" placeholder="student@university.edu" required />
+                </div>
+
+                <!-- BÖLÜM 2: AKADEMİK BİLGİLER -->
+                <div class="col-12 mt-5"><h5 class="fw-bold border-bottom pb-2">Academic Profile</h5></div>
+
+                <div class="col-md-6">
+                    <label class="label-premium">University Student ID (Okul No)</label>
+                    <input asp-for="studentId" class="dorm-input-premium" placeholder="e.g. 20241050" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">University Name</label>
+                    <input asp-for="university" class="dorm-input-premium" placeholder="Harvard University" />
+                </div>
+                <div class="col-md-8">
+                    <label class="label-premium">Course / Department</label>
+                    <input asp-for="course" class="dorm-input-premium" placeholder="Computer Science" />
+                </div>
+                <div class="col-md-4">
+                    <label class="label-premium">Year of Study</label>
+                    <select asp-for="yearOfStudy" class="dorm-input-premium">
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+
+                <!-- BÖLÜM 3: ACİL DURUM -->
+                <div class="col-12 mt-5"><h5 class="fw-bold border-bottom pb-2">Emergency Protocol</h5></div>
+                <div class="col-md-6">
+                    <label class="label-premium">Contact Person Name</label>
+                    <input asp-for="emergencyContactName" class="dorm-input-premium" />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">Emergency Phone</label>
+                    <input asp-for="emergencyContactPhone" class="dorm-input-premium" />
+                </div>
+
+            </div>
+
+            <!-- BUTONLAR -->
+            <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                <a asp-action="Index" class="btn-discard-premium text-decoration-none">DISCARD</a>
+                <button type="submit" class="btn-premium" style="background:linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;">
+                    Complete Enrollment
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

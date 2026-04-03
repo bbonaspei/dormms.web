@@ -1,0 +1,48 @@
+﻿@model DormMS.Web.Models.Building
+
+<div class="container-fluid px-5">
+    <!-- Geri Butonu (Premium Tasarım) -->
+    <div class="mb-5 pt-3">
+        <a asp-action="Index" class="btn-back-premium text-decoration-none">
+            <i class="bi bi-arrow-left"></i> BACK TO INFRASTRUCTURE
+        </a>
+    </div>
+
+    <div class="text-center mb-5">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2px;">
+            Register <span style="color: #6366f1;">Building.</span>
+        </h1>
+        <p class="text-muted">Initialize a new campus block in the system.</p>
+    </div>
+
+    <!-- Form Kartı -->
+    <div class="form-card-premium" style="max-width: 700px; margin: 0 auto;">
+        <form asp-action="Create">
+            <div class="row g-4">
+                <div class="col-md-12">
+                    <label class="label-premium">Building Name</label>
+                    <input asp-for="buildingName" class="dorm-input-premium" placeholder="e.g. North Block" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="label-premium">Total Floors</label>
+                    <input asp-for="totalFloors" type="number" min="1" class="dorm-input-premium" placeholder="1" />
+                </div>
+
+                <!-- YENİ: Yan yana duran modern Switch -->
+                <div class="col-md-6 d-flex align-items-end pb-3 px-3">
+                    <label class="switch-inline">
+                        <input asp-for="hasElevator" type="checkbox" />
+                        <div class="slider-round"></div>
+                        <span class="label-premium m-0">Elevator Access</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
+                <a asp-action="Index" class="btn-discard-premium text-decoration-none">DISCARD</a>
+                <button type="submit" class="btn-premium">Complete Registration</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+﻿@model DormMS.Web.Models.Room
+
+<div class="container-fluid px-5">
+    <!-- Back Navigation (Daha solda ve aşağıda) -->
+    <div class="mb-5 pt-3">
+        <a asp-action="Index" class="btn-back-premium text-decoration-none">
+            <i class="bi bi-arrow-left"></i> BACK TO INVENTORY
+        </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3.2rem; letter-spacing: -2px;">
+            Register <span style="color: #6366f1;">New Unit.</span>
+        </h1>
+        <p class="text-muted">Initialize a high-end residential space in the system.</p>
+    </div>
+
+    <!-- Premium Form Card -->
+    <div class="form-card-premium">
+        <form asp-action="Create">
+            <div class="row">
+
+                <div class="col-md-12">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Unit Number / Door Label</label>
+                        <input asp-for="roomNumber" class="dorm-input-premium" placeholder="e.g. 101-A" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Building Assignment</label>
+                        <select asp-for="buildingId" class="dorm-input-premium" asp-items="ViewBag.buildingId">
+                            <option value="">Select Building...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Classification</label>
+                        <select asp-for="roomTypeId" class="dorm-input-premium" asp-items="ViewBag.roomTypeId">
+                            <option value="">Select Type...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Floor Level</label>
+                        <!-- min="0" ile negatif engellendi -->
+                        <input asp-for="floorNumber" type="number" min="0" class="dorm-input-premium" placeholder="1" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Max Capacity</label>
+                        <!-- min="1" ile negatif engellendi -->
+                        <input asp-for="capacity" type="number" min="1" class="dorm-input-premium" placeholder="1" required />
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top" style="border-color: #f1f5f9 !important;">
+                <a asp-action="Index" class="btn-discard-premium text-decoration-none">
+                    DISCARD CHANGES
+                </a>
+                <button type="submit" class="btn-premium">
+                    <i class="bi bi-shield-check me-2"></i> Complete Registration
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

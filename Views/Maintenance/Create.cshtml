@@ -1,0 +1,92 @@
+﻿@model DormMS.Web.Models.MaintenanceRequest
+
+<div class="container-fluid px-5" style="position: relative; min-height: 85vh;">
+
+    <!-- 1. GERİ BUTONU: Sol üstte, hizalı -->
+    <div style="position: absolute; left: 0; top: 15px;">
+        <a asp-action="Index" class="btn-back-premium text-decoration-none">
+            <i class="bi bi-arrow-left"></i> BACK TO LOGS
+        </a>
+    </div>
+
+    <!-- 2. SAYFA BAŞLIĞI: Rose Accent -->
+    <div class="text-center" style="margin-top: 80px; margin-bottom: 60px;">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3.5rem; letter-spacing: -3px; line-height: 1;">
+            Issue <span style="color: #f43f5e;">Reporting.</span>
+        </h1>
+        <p class="text-muted mt-2">Formalize facility maintenance requests for institutional tracking.</p>
+    </div>
+
+    <!-- 3. FORM KARTI -->
+    <div class="stat-card-new p-5" style="max-width: 850px; margin: 0 auto; border: 1px solid rgba(0,0,0,0.02) !important;">
+        <form asp-action="Create">
+            <div class="row g-4 text-start">
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium" style="color:#f43f5e;">Reporting Resident</label>
+                        <select asp-for="studentId" class="dorm-input-premium" asp-items="ViewBag.studentId">
+                            <option value="">Select student...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium" style="color:#f43f5e;">Affected Unit (Room)</label>
+                        <select asp-for="roomId" class="dorm-input-premium" asp-items="ViewBag.roomId">
+                            <option value="">Select room...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium" style="color:#f43f5e;">Classification</label>
+                        <select asp-for="issueCategory" class="dorm-input-premium">
+                            <option value="Electrical">Electrical</option>
+                            <option value="Plumbing">Plumbing</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium" style="color:#f43f5e;">Urgency Level</label>
+                        <select asp-for="priority" class="dorm-input-premium">
+                            <option value="Low">Low Priority</option>
+                            <option value="Medium">Medium Priority</option>
+                            <option value="High">High Priority</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium" style="color:#f43f5e;">Issue Description</label>
+                        <textarea asp-for="description" class="dorm-input-premium textarea-fix" rows="4" placeholder="Detail the problem here..."></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 4. BUTONLAR: Premium Rose ve Discard -->
+            <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top" style="border-color: #f1f5f9 !important;">
+                <a asp-action="Index" class="btn-discard-premium text-decoration-none">
+                    DISCARD REQUEST
+                </a>
+                <button type="submit" class="btn-premium-rose">
+                    <i class="bi bi-megaphone-fill"></i> Broadcast Request
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

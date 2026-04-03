@@ -1,0 +1,50 @@
+﻿@model IEnumerable<DormMS.Web.Models.RoomType>
+
+<div class="row align-items-center page-header-area px-2">
+    <div class="col-md-8 text-start">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 2.2rem; letter-spacing: -1.5px;">
+            Room <span style="color: #8b5cf6;">Classifications.</span>
+        </h1>
+        <p class="text-muted small fw-medium">Define pricing, capacity, and luxury standards for dormitory units.</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a asp-action="Create" class="btn-premium text-decoration-none">+ New Category</a>
+    </div>
+</div>
+
+<div class="row g-4 px-2">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="stat-card-new h-100" style="border-left: 5px solid #8b5cf6 !important;">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div style="width:45px; height:45px; background:rgba(139, 92, 246, 0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#8b5cf6; font-size:20px;">
+                        <i class="bi bi-tags-fill"></i>
+                    </div>
+                    <span class="badge-active">PROFITABLE</span>
+                </div>
+                <h4 class="fw-bold mb-1">@item.typeName</h4>
+                <p class="text-muted small mb-4">@item.description</p>
+
+                <div class="p-3 rounded-4 mb-4" style="background: #f8fafc;">
+                    <div class="row text-center">
+                        <div class="col-4 border-end">
+                            <small class="text-muted d-block font-weight-bold" style="font-size:10px;">CAPACITY</small>
+                            <b style="color:#6366f1;">@item.capacity</b>
+                        </div>
+                        <div class="col-4 border-end">
+                            <small class="text-muted d-block font-weight-bold" style="font-size:10px;">BEDS</small>
+                            <b style="color:#10b981;">@item.bedCount</b>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted d-block font-weight-bold" style="font-size:10px;">BATH</small>
+                            <b style="color:#f59e0b;">@(item.hasBathroom ? "YES" : "NO")</b>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="fw-black text-end" style="color:#8b5cf6; letter-spacing:-1px;">$@item.basePrice<small class="fs-6 text-muted fw-normal">/mo</small></h3>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,40 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using DormMS.Web.Interfaces;
+using DormMS.Web.Models;
+
+namespace DormMS.Web.Services
+{
+    public class BuildingService : IBuildingService
+    {
+        private readonly IBuildingRepository _repo;
+        private readonly IAuditService _audit; // YENİ: Denetim servisi eklendi
+
+        // Constructor güncellendi: Artık Audit servisini de içeri alıyor
+        public BuildingService(IBuildingRepository repo, IAuditService audit)
+        {
+            _repo = repo;
+            _audit = audit;
+        }
+
+        public async Task<IEnumerable<Building>> GetBuildingsListAsync() => await _repo.GetAllAsync();
+
+        public async Task CreateBuildingAsync(Building building)
+        {
+            // 1. Binayı varsayılan olarak aktif yap
+            building.status = "Active";
+
+            // 2. Binayı veritabanına kaydet
+            await _repo.AddAsync(building);
+
+            // 3. KRİTİK ADIM: Yapılan işlemi Audit tablosuna otomatik logla
+            // Hoca sorduğunda: "Sistemde izlenebilirliği (traceability) sağlamak için her CREATE işlemini logluyoruz" dersin.
+            await _audit.LogActionAsync(
+                "CREATE",           // Yapılan işlem türü
+                "Building",         // Hangi tabloda yapıldı
+                building.id,        // Değişen kaydın ID'si
+                null,               // Eski değer (yeni kayıt olduğu için null)
+                building.buildingName // Yeni değer (Eklenen binanın adı)
+            );
+        }
+    }
+}

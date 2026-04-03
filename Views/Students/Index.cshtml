@@ -1,0 +1,44 @@
+﻿@model IEnumerable<DormMS.Web.Models.Student>
+
+<div class="row align-items-center page-header-area px-2">
+    <div class="col-md-8 text-start">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 2.2rem; letter-spacing: -1.5px;">
+            Student <span style="color: #10b981;">Directory.</span>
+        </h1>
+        <p class="text-muted small fw-medium">Official registry of all enrolled residents and academic details.</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a asp-action="Create" class="btn-premium text-decoration-none" style="background:linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;">
+            + Enroll Student
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 px-2">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="stat-card-new h-100">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div style="width: 55px; height: 55px; background: #f1f5f9; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-weight:900; color:#6366f1; font-size:20px;">
+                        @(item.User?.firstName?[0])
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">@item.User?.firstName @item.User?.lastName</h4>
+                        <small class="text-muted">ID: @item.studentId</small>
+                    </div>
+                </div>
+                <div class="p-3 rounded-4" style="background: #f8fafc; border: 1px solid rgba(0,0,0,0.02);">
+                    <p class="small mb-1 text-muted">UNIVERSITY</p>
+                    <p class="fw-bold small mb-2">@item.university</p>
+                    <p class="small mb-1 text-muted">COURSE</p>
+                    <p class="fw-bold small">@item.course</p>
+                </div>
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <span class="badge-active">@item.status</span>
+                    <a asp-action="Details" asp-route-id="@item.id" class="btn btn-link text-primary p-0 text-decoration-none fw-bold">View Profile</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

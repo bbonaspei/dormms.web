@@ -1,0 +1,31 @@
+﻿@model IEnumerable<DormMS.Web.Models.Fee>
+
+<div class="row align-items-center page-header-area px-2">
+    <div class="col-md-8 text-start">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 2.5rem; letter-spacing: -2px;">
+            Fee <span style="color: #8b5cf6;">Structure.</span>
+        </h1>
+        <p class="text-muted">Define institutional billing categories and standard rates.</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a asp-action="Create" class="btn-premium text-decoration-none" style="background:linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%) !important;">
+            + Create Fee Type
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 px-2">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4">
+            <div class="stat-card-new" style="border-top: 5px solid #8b5cf6 !important;">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h4 class="fw-bold m-0">@item.feeName</h4>
+                    <span class="badge-active">@(item.isRecurring ? "MONTHLY" : "ONE-TIME")</span>
+                </div>
+                <h2 class="fw-black" style="color: #8b5cf6;">$@item.amount</h2>
+                <p class="small text-muted mt-2">Category: @item.feeCategory</p>
+            </div>
+        </div>
+    }
+</div>

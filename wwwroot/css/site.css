@@ -1,0 +1,414 @@
+/* --- DORMMS FOUNDATION & NOISE --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --primary-grad: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --bg-base: #f4f7fa;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --cyan: #00f5d4;
+    --amber: #f59e0b;
+    --indigo: #6366f1;
+    --purple: #a855f7;
+}
+
+/* GLOBAL RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif !important;
+    text-decoration: none !important;
+    border: none !important;
+    outline: none !important;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-dark);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        opacity: 0.25;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+/* --- LOGIN PAGE STYLES (DOKUNULMADI) --- */
+.login-page-body {
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%), radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.15), transparent 40%), #f8fafc !important;
+}
+
+.premium-login-card {
+    background: #ffffff !important;
+    border-radius: 28px !important;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.15) !important;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+}
+
+.login-card-header {
+    background: var(--primary-grad);
+    padding: 40px 20px;
+    text-align: center;
+    color: white;
+}
+
+.login-card-body {
+    padding: 40px 35px;
+}
+
+.login-input-pro {
+    width: 100%;
+    height: 52px;
+    background: #f1f5f9 !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 0 18px !important;
+    font-size: 0.95rem;
+    color: #1e293b !important;
+    transition: 0.3s;
+    outline: none;
+}
+
+    .login-input-pro:focus {
+        border-color: #6366f1 !important;
+        background: white !important;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+    }
+
+.login-label-pro {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-check-input {
+    border: 1.5px solid #cbd5e1 !important;
+    background-color: #fff !important;
+    cursor: pointer;
+    width: 1.15em;
+    height: 1.15em;
+    border-radius: 6px !important;
+}
+
+    .form-check-input:checked {
+        background-color: #6366f1 !important;
+        border-color: #6366f1 !important;
+    }
+
+.btn-login-pro {
+    background: #1e293b !important;
+    color: white !important;
+    padding: 16px 25px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    width: 100%;
+    cursor: pointer;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+}
+
+    .btn-login-pro:hover {
+        background: #0f172a !important;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(15, 23, 42, 0.25);
+    }
+
+.login-info-box {
+    background: rgba(245, 158, 11, 0.05);
+    border: 1px solid rgba(245, 158, 11, 0.1) !important;
+    padding: 12px;
+    border-radius: 10px;
+    color: #b45309;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 25px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* --- 3. GLOBAL MESH BACKGROUND --- */
+.mesh-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    animation: move 25s infinite alternate;
+}
+
+.blob-1 {
+    width: 700px;
+    height: 700px;
+    background: var(--indigo);
+    top: -10%;
+    left: -10%;
+}
+
+.blob-2 {
+    width: 600px;
+    height: 600px;
+    background: var(--cyan);
+    bottom: -10%;
+    right: 5%;
+    animation-delay: -5s;
+}
+
+.blob-3 {
+    width: 500px;
+    height: 500px;
+    background: var(--amber);
+    top: 30%;
+    right: 20%;
+    animation-delay: -10s;
+}
+
+@keyframes move {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(150px, 100px);
+    }
+}
+
+/* --- 4. LANDING PAGE COMPONENTS (FIXED) --- */
+.nav-link-landing {
+    color: #475569 !important;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 20px !important;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+    .nav-link-landing:hover {
+        background: rgba(99, 102, 241, 0.08);
+        color: var(--indigo) !important;
+    }
+
+/* 3D Mockup Fix */
+.floating-ui-mockup {
+    background: white;
+    border-radius: 30px;
+    padding: 12px;
+    box-shadow: 0 50px 100px rgba(0,0,0,0.1);
+    transform: perspective(1000px) rotateY(-15deg) rotateX(5deg);
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    animation: floatingUI 6s ease-in-out infinite;
+    height: 500px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.mockup-image-fill {
+    width: 100%;
+    height: 100% !important;
+    border-radius: 20px;
+    object-fit: cover;
+}
+
+@keyframes floatingUI {
+    0%, 100% {
+        transform: perspective(1000px) rotateY(-15deg) translateY(0);
+    }
+
+    50% {
+        transform: perspective(1000px) rotateY(-15deg) translateY(-20px);
+    }
+}
+
+/* --- ROOM CARD FIXED (TAMÝR EDÝLDÝ) --- */
+.room-card-premium {
+    min-width: 320px;
+    height: 520px;
+    background: white !important;
+    border-radius: 35px !important;
+    padding: 0 !important;
+    transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
+}
+
+    .room-card-premium:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 30px 60px rgba(99, 102, 241, 0.15) !important;
+    }
+
+.room-image-frame {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+    .room-image-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: 0.5s;
+    }
+
+    .room-image-frame:hover img {
+        transform: scale(1.1);
+    }
+
+/* Kartýn alt metin alaný (Kaymalarý önler) */
+.room-card-body-premium {
+    padding: 25px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ýçeriði kart içine yayar */
+}
+
+/* --- 5. CONTACT SECTION FIXED (TAMÝR EDÝLDÝ) --- */
+.contact-card-premium {
+    background: #1e293b !important; /* Koyu Slate Arka Plan */
+    color: white !important;
+    border-radius: 40px !important;
+    padding: 60px !important;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+}
+
+/* --- BUTTONS --- */
+.btn-vibrant-cyan {
+    background: var(--cyan);
+    color: #000 !important;
+    border-radius: 100px !important;
+    padding: 15px 40px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 10px 25px rgba(0, 245, 212, 0.3) !important;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+    .btn-vibrant-cyan:hover {
+        transform: scale(1.05) translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0, 245, 212, 0.5) !important;
+    }
+
+.btn-ghost-premium {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border: 2px solid #1e293b !important;
+    border-radius: 100px !important;
+    padding: 15px 40px !important;
+    font-weight: 700 !important;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+    .btn-ghost-premium:hover {
+        background: transparent !important;
+        color: #1e293b !important;
+    }
+
+.slider-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--indigo);
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 100;
+    transition: 0.3s;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);
+}
+
+    .slider-nav-btn:hover {
+        background: var(--indigo);
+        color: white;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+.btn-prev {
+    left: 0;
+}
+
+.btn-next {
+    right: 0;
+}
+
+.modal-content-premium {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 35px !important;
+    overflow: hidden;
+}
+
+.gallery-img-full {
+    width: 100%;
+    border-radius: 25px;
+}
+
+/* SLIDER WRAPPER */
+.room-slider-wrapper {
+    position: relative;
+    width: 100%;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    padding: 0 60px;
+    margin-bottom: 50px;
+}
+
+.room-slider-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 40px;
+    padding: 40px 0;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+    .room-slider-container::-webkit-scrollbar {
+        display: none;
+    }

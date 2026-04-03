@@ -1,0 +1,43 @@
+﻿@model IEnumerable<DormMS.Web.Models.Payment>
+
+<div class="row align-items-center page-header-area px-2">
+    <div class="col-md-8 text-start">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px;">
+            Financial <span style="color: #8b5cf6;">Ledger.</span>
+        </h1>
+        <p class="text-muted small fw-medium">Real-time auditing of institutional revenue and student transactions.</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="#" class="btn-premium text-decoration-none" style="background: var(--primary-grad) !important;">
+            <i class="bi bi-download me-2"></i> Export Report
+        </a>
+    </div>
+</div>
+
+<div class="stat-card-new p-0 overflow-hidden" style="border:none !important; background: white;">
+    <table class="table table-hover mb-0">
+        <thead style="background: #f8fafc;">
+            <tr class="small text-muted fw-bold">
+                <th class="p-4">REFERENCE</th>
+                <th class="p-4">RESIDENT</th>
+                <th class="p-4">METHOD</th>
+                <th class="p-4">DATE</th>
+                <th class="p-4 text-end">AMOUNT</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="p-4"><code class="fw-bold" style="color:#6366f1;">@item.paymentReference</code></td>
+                    <td class="p-4 fw-bold">@item.Student?.User?.firstName @item.Student?.User?.lastName</td>
+                    <td class="p-4">
+                        <span class="badge rounded-pill" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; padding: 6px 12px;">@item.paymentMethod</span>
+                    </td>
+                    <td class="p-4 text-muted">@item.paymentDate.ToString("dd MMM yyyy")</td>
+                    <td class="p-4 text-end fw-black text-dark" style="font-size: 1.1rem;">$@item.amount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

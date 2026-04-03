@@ -1,0 +1,49 @@
+﻿@model IEnumerable<DormMS.Web.Models.MaintenanceRequest>
+
+<div class="row align-items-center page-header-area px-2">
+    <div class="col-md-8 text-start">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 2.5rem; letter-spacing: -2px;">
+            Service <span style="color: #f43f5e;">Backlog.</span>
+        </h1>
+        <p class="text-muted">Tracking facility maintenance, repairs, and infrastructure requests.</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a asp-action="Create" class="btn-premium text-decoration-none" style="background:linear-gradient(135deg, #f43f5e 0%, #ec4899 100%) !important;">
+            + New Request
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 px-2">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="stat-card-new h-100" style="border-left: 5px solid #f43f5e !important;">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div style="width:40px; height:40px; background:rgba(244, 63, 94, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#f43f5e;">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                    <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800;">@item.priority.ToUpper()</span>
+                </div>
+
+                <h5 class="fw-bold mb-1">@item.issueCategory Issue</h5>
+                <p class="small text-muted mb-3">@item.description</p>
+
+                <div class="p-3 rounded-4 mb-4" style="background: #f8fafc;">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small fw-bold text-muted">ROOM</span>
+                        <span class="small fw-bold">@item.Room?.roomNumber</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="small fw-bold text-muted">STATUS</span>
+                        <span class="small fw-bold" style="color: #f43f5e;">@item.status</span>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button class="btn btn-light fw-bold" style="border-radius:12px; font-size: 0.85rem;">Update Status</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
