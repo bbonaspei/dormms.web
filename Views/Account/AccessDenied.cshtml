@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container py-5 mt-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="info-section-card p-5 shadow-lg border-0" style="border-radius: 35px; background: rgba(255,255,255,0.7); backdrop-filter: blur(20px);">
+                <div class="mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle" style="width: 100px; height: 100px; font-size: 40px;">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                </div>
+                
+                <h1 style="color: #1e293b; font-weight: 900; font-size: 2.5rem; letter-spacing: -2px;">
+                    Restricted <span class="text-danger">Sector.</span>
+                </h1>
+                
+                <p class="text-muted fw-bold mt-4 px-4">
+                    Your current clearance level does not allow access to this protocol. Please contact your system administrator if you believe this is an error.
+                </p>
+                
+                <div class="mt-5 d-flex gap-3 justify-content-center">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-dark rounded-pill px-5 py-3 fw-bold shadow-sm">
+                        Go to Dashboard
+                    </a>
+                    <a asp-controller="Home" asp-action="Landing" class="btn btn-outline-secondary rounded-pill px-5 py-3 fw-bold">
+                        Exit Portal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-danger-subtle { background-color: #fef2f2 !important; }
+</style>

@@ -9,5 +9,6 @@ namespace DormMS.Web.Interfaces
         Task<IEnumerable<Payment>> GetAllTransactionsAsync();
         Task<IEnumerable<StudentFee>> GetOutstandingDuesAsync(int studentId);
         Task<bool> ProcessPaymentAsync(Payment payment, int feeId);
+        Task SyncStudentChargesAsync(int studentId);
     }
 }

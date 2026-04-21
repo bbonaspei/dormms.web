@@ -1,43 +1,418 @@
-﻿@model IEnumerable<DormMS.Web.Models.Payment>
+﻿@using DormMS.Web.Models
+@model IEnumerable<Payment>
 
-<div class="row align-items-center page-header-area px-2">
-    <div class="col-md-8 text-start">
-        <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px;">
-            Financial <span style="color: #8b5cf6;">Ledger.</span>
-        </h1>
-        <p class="text-muted small fw-medium">Real-time auditing of institutional revenue and student transactions.</p>
-    </div>
-    <div class="col-md-4 text-end">
-        <a href="#" class="btn-premium text-decoration-none" style="background: var(--primary-grad) !important;">
-            <i class="bi bi-download me-2"></i> Export Report
-        </a>
+@{
+    ViewData["Title"] = ViewBag.IsStudent == true ? "My Account" : "Financial Ledger";
+}
+
+<style>
+    .btn-capsule-white {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 100px !important;
+        color: #5c6d83 !important;
+        padding: 10px 24px !important;
+        font-weight: 700 !important;
+        font-size: 0.8rem !important;
+        text-transform: uppercase !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        transition: 0.3s !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03) !important;
+        text-decoration: none !important;
+        line-height: 1 !important;
+    }
+    .btn-capsule-white:hover {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08) !important;
+        transform: translateY(-2px) !important;
+        color: #334155 !important;
+    }
+    .text-indigo {
+        color: #6366f1 !important;
+    }
+    .text-slate-800 {
+        color: #1e293b !important;
+    }
+</style>
+
+<div class="container-fluid px-lg-5 mt-5">
+
+    @if (ViewBag.IsStudent == true)
+    {
+        <!-- ÖĞRENCİ ÖZEL GÖRÜNÜMÜ - CLEAN & SOLID DESIGN -->
+        <div class="row align-items-center mb-5">
+            <div class="col-md-7">
+                <h1 style="color: #0f172a; font-weight: 950; font-size: 3.5rem; letter-spacing: -3px; margin: 0;">
+                    Financial <span style="color: #6366f1;">Hub.</span>
+                </h1>
+                <p class="text-secondary fw-bold mt-2 fs-5">Track your housing investments and settlement history.</p>
+            </div>
+            <div class="col-md-5">
+                <!-- SOLID BALANCE CARD -->
+                <div class="card p-4 shadow-lg border-0 bg-white" 
+                     style="border-radius: 35px; border-bottom: 5px solid #6366f1 !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-indigo-subtle text-indigo rounded-pill px-3 py-1 fw-900" style="font-size: 11px; letter-spacing: 0.5px;">NET ACCOUNT BALANCE</span>
+                        <i class="bi bi-shield-lock-fill text-success fs-5"></i>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <h2 class="fw-900 m-0 text-dark" style="font-size: 3.2rem; letter-spacing: -2px;">$@(((decimal)ViewBag.TotalBalance).ToString("N2"))</h2>
+                        <span class="text-muted fw-bold">USD</span>
+                    </div>
+                    <div class="mt-3 fs-6 text-muted fw-bold">Next due in: <span class="text-indigo">@(ViewBag.PendingFees != null && ((List<StudentFee>)ViewBag.PendingFees).Any() ? ((List<StudentFee>)ViewBag.PendingFees).First().dueDate.ToString("dd MMM") : "N/A")</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. BEKLEYEN ÖDEMELER (PENDING DUES) - SOLID TABLE -->
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <h4 class="fw-900 m-0 text-dark">Active Charges <span class="badge bg-danger text-white rounded-pill ms-2" style="font-size: 12px;">ACTION REQUIRED</span></h4>
+                @if (ViewBag.PendingFees != null && ((List<StudentFee>)ViewBag.PendingFees).Any())
+                {
+                    var firstFee = ((List<StudentFee>)ViewBag.PendingFees).First();
+                    <button class="btn-capsule-white px-5 py-3" 
+                            onclick="showPaymentModal(@firstFee.id, '@firstFee.amount.ToString("N2")', '@firstFee.Fee?.feeName')">
+                        <i class="bi bi-credit-card-2-front me-2"></i>Pay Online
+                    </button>
+                }
+            </div>
+            
+            <div class="card shadow border-0 bg-white" style="border-radius: 25px; overflow: hidden;">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light" style="border-bottom: 2px solid #f1f5f9;">
+                            <tr class="small text-muted fw-900 text-uppercase" style="letter-spacing: 1px;">
+                                <th class="ps-4 py-4">Financial Item</th>
+                                <th class="py-4">Deadline</th>
+                                <th class="py-4 text-center">Security Status</th>
+                                <th class="pe-4 py-4 text-end">Due Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.PendingFees != null && ((List<StudentFee>)ViewBag.PendingFees).Any())
+                            {
+                                foreach (var fee in (List<StudentFee>)ViewBag.PendingFees)
+                                {
+                                    <tr style="border-bottom: 1px solid #f8fafc;">
+                                        <td class="ps-4 py-4">
+                                            <div class="fw-900 text-slate-800 fs-5">@fee.Fee?.feeName</div>
+                                            <div class="text-indigo fw-bold" style="font-size: 11px;">REFERENCE #@fee.id.ToString("D5")</div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="icon-box-sm bg-light rounded-2" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center;"><i class="bi bi-calendar-event text-primary"></i></div>
+                                                <div class="fw-bold @(fee.dueDate < DateTime.Now ? "text-danger" : "text-dark")">
+                                                    @fee.dueDate.ToString("dd MMM, yyyy")
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark border rounded-pill px-3 py-1 fw-bold" style="font-size: 9px;">
+                                                SEC-@((fee.id * 7).ToString("X4"))
+                                            </span>
+                                        </td>
+                                        <td class="pe-4 text-end">
+                                            <div class="fw-900 text-dark fs-4">$@fee.amount.ToString("N2")</div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted fw-bold">
+                                        <div class="mb-3 text-success"><i class="bi bi-patch-check-fill display-4"></i></div>
+                                        Excellent! Your account is currently balanced.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ÖDEME GEÇMİŞİ (ARCHIVE & RECEIPTS) - SOLID ARCHIVE -->
+        <div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-900 m-0 text-dark">Electronic History</h4>
+                    <p class="text-muted small m-0 fw-bold">Verified logs of your previous engagements.</p>
+                </div>
+                <button class="btn-capsule-white px-5 py-2" type="button" data-bs-toggle="collapse" data-bs-target="#archiveCollapse" aria-expanded="false">
+                    <i class="bi bi-clock-history me-2"></i> View Full History
+                </button>
+            </div>
+            
+            <div class="collapse" id="archiveCollapse">
+                <div class="card shadow border-0 bg-white" style="border-radius: 25px; overflow: hidden;">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="bg-light">
+                                <tr class="small text-muted fw-900 text-uppercase" style="letter-spacing: 1px;">
+                                    <th class="ps-4 py-3">Closing Reference</th>
+                                    <th class="py-3">Closure Date</th>
+                                    <th class="py-3 text-center">Type</th>
+                                    <th class="pe-4 py-3 text-end">Settled Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 2a. SETTLED FEES (BORÇLAR) -->
+                                @if (ViewBag.PaidFees != null && ((List<StudentFee>)ViewBag.PaidFees).Any())
+                                {
+                                    foreach (var fee in (List<StudentFee>)ViewBag.PaidFees)
+                                    {
+                                        <tr class="bg-light opacity-75">
+                                            <td class="ps-4">
+                                                <div class="fw-bold text-secondary">@fee.Fee?.feeName</div>
+                                                <div class="text-muted" style="font-size: 10px;">CLOSED ON @fee.dueDate.ToString("yyyy-MM-dd")</div>
+                                            </td>
+                                            <td><span class="text-muted small">@fee.dueDate.ToString("dd MMM yyyy")</span></td>
+                                            <td class="text-center"><span class="badge border text-muted rounded-pill px-2 py-1" style="font-size: 8px;">SETTLED</span></td>
+                                            <td class="pe-4 text-end"><div class="fw-bold text-muted">$@fee.amount.ToString("N2")</div></td>
+                                        </tr>
+                                    }
+                                }
+
+                                <!-- 2b. ACTUAL PAYMENTS (MAKBUZLAR) -->
+                                @if (Model != null && Model.Any())
+                                {
+                                    foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="fw-900 text-dark">Deposit: @item.paymentReference</div>
+                                                <div class="text-success fw-bold" style="font-size: 10px;">ID: @(item.transactionId ?? "AUTO-GEN")</div>
+                                            </td>
+                                            <td><div class="text-dark small fw-900">@item.paymentDate.ToString("dd MMM, yyyy")</div></td>
+                                            <td class="text-center">
+                                                <span class="badge bg-success text-white rounded-pill px-3 py-1" style="font-size: 9px; font-weight: 800;">RECEIPT</span>
+                                            </td>
+                                            <td class="pe-4 text-end">
+                                                <div class="fw-900 text-success" style="font-size: 1.1rem;">+$@item.amount.ToString("N2")</div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- ADMİN GÖRÜNÜMÜ (Orijinal Tasarım) -->
+        <div class="row align-items-center mb-5">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin: 0;">
+                            Financial <span style="color: #6366f1;">Ledger.</span>
+                        </h1>
+                        <p class="text-muted fw-bold mt-2">Institutional revenue auditing and resident settlement history.</p>
+                    </div>
+                    <div class="text-end">
+                        <a asp-action="ExportReport" class="btn-action-premium btn-export-pro shadow-sm text-decoration-none py-3 px-4">
+                            <i class="bi bi-file-earmark-pdf-fill me-2"></i> Export Financial Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="search-wrapper-new shadow-sm">
+                    <i class="bi bi-search text-primary fs-5 me-2"></i>
+                    <input type="text" class="search-input-new" placeholder="Filter by reference, student name or payment method...">
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section-card p-0 overflow-hidden shadow-sm border-0 bg-white" style="border-radius: 30px;">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle" id="financialTable">
+                    <thead style="background: #f8fafc; border-bottom: 2px solid #edf2f7;">
+                        <tr class="small text-muted fw-900 text-uppercase" style="letter-spacing: 1px;">
+                            <th class="ps-5 py-4">Ref / Transaction</th>
+                            <th class="py-4">Resident Student</th>
+                            <th class="py-4">Payment Method</th>
+                            <th class="py-4 text-center">Settlement Date</th>
+                            <th class="pe-5 py-4 text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr class="payment-row-premium">
+                                    <td class="ps-5">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="icon-box-sm bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center" style="width:35px; height:35px;">
+                                                <i class="bi bi-receipt fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-900 text-dark" style="font-family: 'JetBrains Mono', monospace;">@item.paymentReference</div>
+                                                <div class="text-muted" style="font-size: 10px;">ID: @(item.transactionId ?? "TXN-000")</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="user-avatar-btn" style="width:36px; height:36px; font-size:12px; background:#f1f5f9; color:#6366f1; border:none !important; font-weight: 900;">
+                                                @(item.Student?.User?.firstName?[0])@(item.Student?.User?.lastName?[0])
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">@item.Student?.User?.firstName @item.Student?.User?.lastName</div>
+                                                <div class="text-muted small" style="font-size: 10px;">#@item.Student?.studentId</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge rounded-pill px-3 py-2" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; font-size: 10px; font-weight: 800; border: 1px solid rgba(139, 92, 246, 0.2);">
+                                            <i class="bi bi-credit-card-2-front-fill me-1"></i> @(item.paymentMethod?.ToUpper() ?? "CASH")
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="fw-bold text-dark small">@item.paymentDate.ToString("dd MMM, yyyy")</div>
+                                        <div class="text-muted" style="font-size: 10px;">@item.paymentDate.ToString("HH:mm")</div>
+                                    </td>
+                                    <td class="pe-5 text-end">
+                                        <div class="fw-900 text-dark fs-4" style="letter-spacing: -1px;">
+                                            <span class="text-muted fs-6 fw-normal">$</span>@item.amount.ToString("N2")
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="py-5 opacity-50">
+                                        <i class="bi bi-cash-stack fs-1"></i>
+                                        <h5 class="fw-bold mt-2">No records found.</h5>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- FINANCE SCRIPTS & MODALS -->
+@section Scripts {
+    <script>
+        if (document.querySelector('.search-input-new')) {
+            document.querySelector('.search-input-new').addEventListener('keyup', function (e) {
+                let term = e.target.value.toLowerCase();
+                let rows = document.querySelectorAll('#financialTable tbody tr');
+                rows.forEach(row => {
+                    if (row.cells.length > 1) {
+                        row.style.display = row.innerText.toLowerCase().includes(term) ? "" : "none";
+                    }
+                });
+            });
+        }
+
+        function showPaymentModal(feeId, amount, feeName) {
+            document.getElementById('modalFeeId').value = feeId;
+            document.getElementById('modalAmountLabel').innerText = '$' + amount;
+            document.getElementById('modalAmountRaw').value = amount.replace(',', '');
+            document.getElementById('modalFeeNameLabel').innerText = feeName;
+            
+            var myModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            myModal.show();
+        }
+
+        function triggerSuccess() {
+            Swal.fire({
+                title: 'Transaction Authorized',
+                text: 'Your payment is being processed and will be reflected shortly.',
+                icon: 'success',
+                timer: 4000,
+                showConfirmButton: false,
+                background: '#ffffff',
+                backdrop: `rgba(99,102,241,0.2)`
+            }).then(() => {
+                location.reload();
+            });
+        }
+    </script>
+}
+
+<!-- SECURE PAYMENT MODAL -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 30px; overflow: hidden;">
+            <div class="modal-header bg-primary text-white p-4 border-0">
+                <h5 class="modal-title fw-900"><i class="bi bi-shield-lock-fill me-2"></i>Secure Checkout</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-5">
+                <div class="text-center mb-4">
+                    <div class="small text-muted fw-bold text-uppercase mb-1" id="modalFeeNameLabel">Monthly Rent</div>
+                    <div class="display-5 fw-900 text-dark" id="modalAmountLabel">$0.00</div>
+                </div>
+
+                <form asp-action="Create" method="post" id="actualPaymentForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="modalFeeId" name="feeId" value="" />
+                    <input type="hidden" name="studentId" value="@(ViewBag.StudentIdForPayment)" />
+                    <input type="hidden" id="modalAmountRaw" name="amount" value="" />
+                    <input type="hidden" name="paymentMethod" value="Credit Card" />
+                    
+                    <div class="mb-4">
+                        <label class="label-premium">Cardholder Name</label>
+                        <input type="text" class="dorm-input-premium" required placeholder="Full Name as on card" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="label-premium">Card Number</label>
+                        <div class="position-relative">
+                            <input type="text" class="dorm-input-premium pe-5" required placeholder="0000 0000 0000 0000" />
+                            <i class="bi bi-credit-card-2-back position-absolute top-50 end-0 translate-middle-y me-3 text-muted fs-5"></i>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-5">
+                        <div class="col-7">
+                            <label class="label-premium">Expiry Date</label>
+                            <input type="text" class="dorm-input-premium" required placeholder="MM / YY" />
+                        </div>
+                        <div class="col-5">
+                            <label class="label-premium">CVV</label>
+                            <input type="password" class="dorm-input-premium" required placeholder="123" maxlength="3" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-premium w-100 py-3 fs-5 shadow-sm">
+                        <i class="bi bi-lock-fill me-2"></i>PAY SECURELY
+                    </button>
+                </form>
+
+                <div class="text-center mt-4 opacity-50">
+                    <i class="bi bi-shield-fill-check text-success small"></i>
+                    <span class="small fw-bold ms-1" style="font-size: 10px;">AES-256 BANK GRADE ENCRYPTION</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="stat-card-new p-0 overflow-hidden" style="border:none !important; background: white;">
-    <table class="table table-hover mb-0">
-        <thead style="background: #f8fafc;">
-            <tr class="small text-muted fw-bold">
-                <th class="p-4">REFERENCE</th>
-                <th class="p-4">RESIDENT</th>
-                <th class="p-4">METHOD</th>
-                <th class="p-4">DATE</th>
-                <th class="p-4 text-end">AMOUNT</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td class="p-4"><code class="fw-bold" style="color:#6366f1;">@item.paymentReference</code></td>
-                    <td class="p-4 fw-bold">@item.Student?.User?.firstName @item.Student?.User?.lastName</td>
-                    <td class="p-4">
-                        <span class="badge rounded-pill" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; padding: 6px 12px;">@item.paymentMethod</span>
-                    </td>
-                    <td class="p-4 text-muted">@item.paymentDate.ToString("dd MMM yyyy")</td>
-                    <td class="p-4 text-end fw-black text-dark" style="font-size: 1.1rem;">$@item.amount</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+<style>
+    .fw-900 { font-weight: 900 !important; }
+    .bg-indigo-subtle { background: rgba(99, 102, 241, 0.1) !important; }
+    .text-indigo { color: #6366f1 !important; }
+    .payment-row-premium:hover { background-color: #f8fafc !important; }
+</style>

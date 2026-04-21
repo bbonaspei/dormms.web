@@ -24,7 +24,10 @@ namespace DormMS.Web.Repositories
 
         public async Task<Room> GetByIdAsync(int id)
         {
-            return await _context.Rooms.FindAsync(id);
+            return await _context.Rooms
+                .Include(r => r.Building)  // Bina bilgilerini de getir
+                .Include(r => r.RoomType)  // Oda tipi bilgilerini de getir
+                .FirstOrDefaultAsync(r => r.id == id);
         }
 
         public async Task UpdateAsync(Room room)
@@ -38,5 +41,17 @@ namespace DormMS.Web.Repositories
             await _context.Rooms.AddAsync(room);
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(int id)
+        {
+            var room = await _context.Rooms.FindAsync(id);
+            if (room != null)
+            {
+                _context.Rooms.Remove(room);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<Room?> GetRoomWithDetailsAsync(int id) => await GetByIdAsync(id);
     }
 }

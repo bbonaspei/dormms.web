@@ -412,3 +412,83 @@ body {
     .room-slider-container::-webkit-scrollbar {
         display: none;
     }
+
+/* --- SOLID BUTTONS OVERRIDE --- */
+.btn-solid-indigo {
+    background-color: #6366f1 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 12px 30px !important;
+    font-weight: 900 !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+.btn-solid-indigo:hover {
+    background-color: #4f46e5 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3) !important;
+    color: white !important;
+}
+.btn-solid-dark {
+    background-color: #0f172a !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 12px 30px !important;
+    font-weight: 900 !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+.btn-solid-dark:hover {
+    background-color: #1e293b !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.3) !important;
+    color: white !important;
+}
+.btn-solid-success {
+    background-color: #10b981 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 12px 30px !important;
+    font-weight: 900 !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+.btn-solid-success:hover {
+    background-color: #059669 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3) !important;
+    color: white !important;
+}
+
+/* --- ACTION BUTTONS (INSPIRED BY BACK BUTTON) --- */
+.btn-action-light {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: white;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 100px;
+    color: #64748b !important;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-action-light:hover {
+    background: #f8fafc;
+    color: #6366f1 !important;
+    border-color: #6366f1 !important;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+

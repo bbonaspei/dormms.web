@@ -1,0 +1,146 @@
+﻿@model DormMS.Web.Models.Room
+
+@{
+    ViewData["Title"] = "Room Details";
+}
+
+<!-- Modern Onay Kutuları İçin Gerekli Kütüphane -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container mt-5">
+    <!-- Geri Butonu -->
+    <div class="mb-4">
+        <a asp-action="Index" class="btn-back-premium text-decoration-none shadow-sm">
+            <i class="bi bi-arrow-left"></i> Back to Inventory
+        </a>
+    </div>
+
+    <div class="form-card-premium shadow-sm">
+        <!-- BAŞLIK BÖLÜMÜ (İki Renkli ve Büyük Tasarım) -->
+        <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-4">
+            <div>
+                <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin: 0;">
+                    Room <span style="color: #6366f1;">@Model.roomNumber</span>
+                </h1>
+                <p class="text-muted fw-bold mt-1 mb-0">Unit Specification & Operational Status</p>
+            </div>
+
+            <!-- DURUM ROZETİ (GÜNCELLENDİ: Yeni Renk Sistemi) -->
+            <span class="badge @(Model.status == "Available" ? "badge-available" :
+                                                   Model.status == "Occupied" ? "badge-occupied" :
+                                                   Model.status == "Maintenance" ? "badge-maintenance" : "badge-archived")"
+                  style="font-size: 0.8rem; padding: 10px 22px; border-radius:100px; font-weight:800; text-transform:uppercase; letter-spacing:1px;">
+                @Model.status
+            </span>
+        </div>
+
+        <div class="row g-4">
+            <!-- Sol Sütun: Temel Bilgiler -->
+            <div class="col-md-6">
+                <div class="input-wrapper-premium">
+                    <label class="label-premium">Building Location</label>
+                    <div class="dorm-input-premium d-flex align-items-center">
+                        <i class="bi bi-building me-2 text-primary"></i>
+                        @Model.Building?.buildingName
+                    </div>
+                </div>
+
+                <div class="input-wrapper-premium">
+                    <label class="label-premium">Room Classification</label>
+                    <div class="dorm-input-premium d-flex align-items-center">
+                        <i class="bi bi-tag me-2 text-primary"></i>
+                        @Model.RoomType?.typeName
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Sütun: Kapasite ve Doluluk -->
+            <div class="col-md-6">
+                <div class="occupancy-glass-card h-100 d-flex flex-column justify-content-center">
+                    <label class="label-premium">Occupancy Status</label>
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <span class="stat-value-premium">@Model.currentOccupancy</span>
+                        <span class="text-muted fw-bold">/ @Model.capacity Residents</span>
+                    </div>
+                    <div class="progress" style="height: 10px; border-radius: 10px; background: #e2e8f0;">
+                        @{
+                            var percent = Model.capacity > 0 ? (Model.currentOccupancy * 100) / Model.capacity : 0;
+                        }
+                        <div class="progress-premium-bar" style="width: @percent%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN NOTLARI (YENİ EKLENDİ: Sadece not varsa görünür) -->
+            @if (!string.IsNullOrEmpty(Model.notes))
+            {
+                <div class="col-12 mt-4">
+                    <div class="p-4 rounded-4" style="background: #f8fafc; border: 1.5px dashed #cbd5e1;">
+                        <label class="label-premium text-primary mb-2">
+                            <i class="bi bi-journal-text me-1"></i> Internal Admin Notes
+                        </label>
+                        <p class="text-dark fw-medium mb-0" style="line-height: 1.6;">@Model.notes</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- ALT AKSİYON BUTONLARI -->
+        <div class="d-flex align-items-stretch gap-3 mt-5">
+            <a asp-action="Edit" asp-route-id="@Model.id" class="btn-premium flex-grow-1 d-flex align-items-center justify-content-center text-center text-decoration-none shadow-sm">
+                <i class="bi bi-pencil-square me-2"></i> Edit Room
+            </a>
+
+            @if (Model.status == "Archived")
+            {
+                <form id="restoreForm" asp-action="Restore" asp-route-id="@Model.id" method="post" class="flex-grow-1 m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn-premium w-100 h-100 d-flex align-items-center justify-content-center shadow-sm"
+                            style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;" onclick="confirmRestore()">
+                        <i class="bi bi-arrow-counterclockwise me-2"></i> Restore Room
+                    </button>
+                </form>
+            }
+            else
+            {
+                <form id="archiveForm" asp-action="Archive" asp-route-id="@Model.id" method="post" class="flex-grow-1 m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn-discard-premium w-100 h-100 d-flex align-items-center justify-content-center shadow-sm" onclick="confirmArchive()">
+                        <i class="bi bi-archive me-2"></i> Archive Room
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Onay Kutusu Scriptleri -->
+<script>
+    function confirmArchive() {
+        Swal.fire({
+            title: 'Archive Room?',
+            text: "This unit will be hidden from active inventory.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f43f5e',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, archive it!',
+            background: '#ffffff',
+            customClass: { popup: 'rounded-4 shadow-lg' }
+        }).then((result) => { if (result.isConfirmed) { document.getElementById('archiveForm').submit(); } })
+    }
+
+    function confirmRestore() {
+        Swal.fire({
+            title: 'Restore Room?',
+            text: "This unit will be moved back to active status.",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, restore it!',
+            background: '#ffffff',
+            customClass: { popup: 'rounded-4 shadow-lg' }
+        }).then((result) => { if (result.isConfirmed) { document.getElementById('restoreForm').submit(); } })
+    }
+</script>

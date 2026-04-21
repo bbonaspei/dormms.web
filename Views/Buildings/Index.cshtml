@@ -1,52 +1,114 @@
 ﻿@model IEnumerable<DormMS.Web.Models.Building>
 
-<div class="row align-items-center page-header-area px-2">
-    <div class="col-md-8 text-start">
-        <h1 style="color: #312e81; font-weight: 900; font-size: 2.2rem; letter-spacing: -1.5px;">
-            Campus <span style="color: #6366f1;">Infrastructure.</span>
-        </h1>
-        <p class="text-muted small fw-medium">Global management of physical dormitory blocks and facility status.</p>
+@{
+    ViewData["Title"] = "Campus Infrastructure";
+}
+
+<!-- SweetAlert2 (Tasarım Bütünlüğü İçin) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container-fluid px-4 mt-5">
+    <!-- Sayfa Başlığı (Oda Sayfasıyla Aynı Stil) -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-8">
+            <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin-bottom: 0;">
+                Campus <span style="color: #6366f1;">Infrastructure.</span>
+            </h1>
+            <p class="text-muted fw-bold mt-2">Global management of physical dormitory blocks and facility status.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="Create" class="btn-premium text-decoration-none d-flex align-items-center gap-2 float-end">
+                <i class="bi bi-plus-lg"></i> Register New Building
+            </a>
+        </div>
     </div>
-    <div class="col-md-4 text-end">
-        <a asp-action="Create" class="btn-premium text-decoration-none">
-            <i class="bi bi-plus-lg"></i> Register New Building
-        </a>
-    </div>
-</div>
 
-<div class="row g-4 px-2">
-    @foreach (var item in Model)
-    {
-        <div class="col-md-6 col-lg-4">
-            <div class="stat-card-new">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="icon-box icon-blue">
-                        <i class="bi bi-building-fill"></i>
+    <div class="row g-5">
+        <!-- g-5 ile kartlar arası ferahlatıldı -->
+        @foreach (var item in Model)
+        {
+            <div class="col-xl-4 col-md-6">
+                <div class="room-card-vibrant p-4 h-100 shadow-sm border-0">
+
+                    <!-- Kart Üstü: İkon ve Durum -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="icon-box icon-blue" style="width: 45px; height: 45px; border-radius: 12px;">
+                            <i class="bi bi-building-fill fs-4"></i>
+                        </div>
+                        <span class="@(item.status == "Active" ? "badge-student-active" : "badge-inactive")">
+                            @item.status
+                        </span>
                     </div>
-                    <!-- YENİ: Duruma göre Yeşil veya Kırmızı Rozet -->
-                    <span class="@(item.status == "Active" ? "badge-active" : "badge-inactive")">
-                        @item.status
-                    </span>
-                </div>
 
-                <div class="mb-4">
-                    <h4 class="fw-bold mb-1" style="color: #1e293b;">@item.buildingName</h4>
-                    <p class="text-muted small fw-bold text-uppercase">Code: @item.buildingCode</p>
-                </div>
-
-                <div class="p-3 rounded-4 mb-4" style="background: #f8fafc; border: 1px solid rgba(0,0,0,0.02);">
-                    <p class="small text-muted mb-2"><i class="bi bi-geo-alt-fill me-1"></i> @item.address</p>
-                    <div class="d-flex gap-3">
-                        <div><span class="small fw-bold text-muted">LEVELS:</span> <b style="color:#6366f1;">@item.totalFloors</b></div>
-                        <div><span class="small fw-bold text-muted">ELEVATOR:</span> <b style="color:#10b981;">@(item.hasElevator ? "YES" : "NO")</b></div>
+                    <!-- Bina Başlığı ve Kodu -->
+                    <div class="mb-4">
+                        <h3 class="fw-900 text-dark mb-1">@item.buildingName</h3>
+                        <div class="badge bg-light text-primary border fw-bold px-3 py-2" style="font-size: 10px; letter-spacing: 1px;">
+                            BLOCK @item.buildingCode
+                        </div>
                     </div>
-                </div>
 
-                <div class="d-flex gap-2 mt-auto">
-                    <a href="#" class="btn-card-edit w-100 text-decoration-none">Update Configuration</a>
-                    <button class="btn-card-delete border-0"><i class="bi bi-trash3-fill"></i></button>
+                    <!-- Detay Kutusu -->
+                    <div class="p-3 rounded-4 mb-4" style="background: #f8fafc; border: 1px solid #edf2f7;">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-geo-alt-fill text-muted"></i>
+                            <span class="small fw-bold text-dark">@item.address</span>
+                        </div>
+                        <div class="row g-2 pt-2 border-top">
+                            <div class="col-6 border-end">
+                                <span class="info-label-pro">LEVELS</span>
+                                <span class="info-value-pro">@item.totalFloors Floors</span>
+                            </div>
+                            <div class="col-6 ps-3">
+                                <span class="info-label-pro">ELEVATOR</span>
+                                <span class="info-value-pro">@(item.hasElevator ? "Equipped" : "None")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AKSİYON BUTONLARI (ODA SAYFASIYLA TAM UYUMLU) -->
+                    <div class="d-flex gap-2 mt-auto">
+                        <!-- SOL: Küçük Silme Butonu -->
+                        <form id="deleteForm-@item.id" asp-action="Delete" asp-route-id="@item.id" method="post" style="width: 25%;">
+                            @Html.AntiForgeryToken()
+                            <button type="button" class="btn-card-delete-mini w-100" onclick="confirmDelete(@item.id)" title="Remove Building">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                        </form>
+
+                        <!-- ESKİ HALİ: <a href="#" class="btn-card-details-wide ..."> -->
+                        <!-- YENİ HALİ: -->
+                        <a asp-action="Edit" asp-route-id="@item.id" class="btn-card-details-wide flex-grow-1">
+                            <i class="bi bi-pencil-square"></i>
+                            Edit Block
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 </div>
+
+<!-- Silme Onay Scripti -->
+<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Remove Building?',
+            text: "All associated rooms in this block will also be affected!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f43f5e',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, remove it!',
+            background: '#ffffff',
+            borderRadius: '20px',
+            customClass: {
+                popup: 'rounded-4 shadow-lg'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteForm-' + id).submit();
+            }
+        })
+    }
+</script>

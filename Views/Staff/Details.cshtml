@@ -1,0 +1,154 @@
+﻿@model DormMS.Web.Models.User
+
+@{
+    ViewData["Title"] = "Staff Member Profile";
+}
+
+<div class="container-fluid px-4 mt-4">
+    <!-- ÜST AKSİYON BAR -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <a asp-action="Index" class="btn-back-premium shadow-sm border-0 py-2 px-3" style="font-size: 0.85rem;">
+            <i class="bi bi-arrow-left me-2"></i> BACK TO REGISTRY
+        </a>
+        <div class="d-flex gap-2">
+            <button class="btn-action-premium btn-print-pro shadow-sm"><i class="bi bi-shield-lock-fill me-2"></i> Reset Key</button>
+            <button class="btn-action-premium btn-export-pro shadow-sm"><i class="bi bi-pencil-square me-2"></i> Edit Member</button>
+        </div>
+    </div>
+
+    <!-- PROFİL HEADER -->
+    <div class="profile-header-premium shadow-sm mb-5">
+        <div class="d-flex align-items-center gap-4">
+            <!-- Personel Avatarı (Mor Tonu) -->
+            <div class="avatar-main-wrapper shadow-sm" style="background:#f5f3ff; color:#7c3aed;">
+                @{
+                    var initials = (Model.firstName?.Length > 0 ? Model.firstName[0].ToString() : "") + 
+                                   (Model.lastName?.Length > 0 ? Model.lastName[0].ToString() : "");
+                }
+                @initials
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <h1 class="fw-900 text-dark m-0" style="font-size: 2.5rem; letter-spacing: -1.5px;">@Model.firstName @Model.lastName</h1>
+
+                    <!-- Dinamik Rol Rozeti -->
+                    @{
+                        var roleName = Model.UserRoles?.FirstOrDefault()?.Role?.RoleName ?? "Personnel";
+                        var badgeClass = roleName switch
+                        {
+                            "Admin" => "badge-role-admin",
+                            "DormManager" => "badge-role-manager",
+                            "MaintenanceStaff" => "badge-role-staff",
+                            _ => "badge-role-default"
+                        };
+                    }
+                    <span class="badge @badgeClass">@roleName.ToUpper()</span>
+                </div>
+                <div class="text-muted fw-bold d-flex gap-3 align-items-center">
+                    <span><i class="bi bi-envelope-fill text-primary"></i> @Model.email</span>
+                    <span class="opacity-25">|</span>
+                    <span><i class="bi bi-calendar-check text-primary"></i> Joined: @Model.createdAt.ToString("MMM yyyy")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-5">
+        <!-- SOL: PERSONEL BİLGİLERİ -->
+        <div class="col-lg-4">
+            <div class="info-section-card shadow-sm mb-4">
+                <h6 class="section-title-premium"><i class="bi bi-person-badge-fill me-2"></i>OFFICIAL RECORD</h6>
+
+                <div class="info-box-premium">
+                    <label class="info-label-pro">Username (System ID)</label>
+                    <span class="info-value-pro">@@@Model.username</span>
+                </div>
+
+                <div class="info-box-premium">
+                    <label class="info-label-pro">Contact Number</label>
+                    <span class="info-value-pro">@(string.IsNullOrEmpty(Model.phone) ? "No phone recorded" : Model.phone)</span>
+                </div>
+
+                <div class="info-box-premium">
+                    <label class="info-label-pro">Account Security</label>
+                    <span class="info-value-pro text-success">
+                        <i class="bi bi-check-circle-fill me-1"></i> Two-Factor Active
+                    </span>
+                </div>
+
+                <div class="info-box-premium border-start border-4 border-primary mt-4">
+                    <label class="info-label-pro">Last System Access</label>
+                    <span class="info-value-pro small">@DateTime.Now.AddHours(-2).ToString("MMM dd, yyyy HH:mm")</span>
+                </div>
+            </div>
+
+            <!-- KURUMSAL YETKİLER -->
+            <div class="info-section-card shadow-sm bg-light border-0">
+                <h6 class="fw-bold small text-muted mb-3" style="font-size: 11px; letter-spacing: 1px;">SYSTEM PERMISSIONS</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-white text-dark border small fw-bold py-2 px-3">Audit-Access</span>
+                    <span class="badge bg-white text-dark border small fw-bold py-2 px-3">Report-Generate</span>
+                    <span class="badge bg-white text-dark border small fw-bold py-2 px-3">Database-Read</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAĞ: PERSONEL AKTİVİTESİ (AUDIT LOGS) -->
+        <div class="col-lg-8">
+            <div class="info-section-card shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    <h6 class="fw-900 m-0 text-dark"><i class="bi bi-activity text-primary me-2"></i>OPERATIONAL TELEMETRY</h6>
+                    <span class="text-muted small fw-bold text-uppercase" style="font-size: 10px;">Recent modifications by this member</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr style="font-size: 10px; font-weight: 900; color: #64748b;">
+                                <th class="ps-3 py-3">TIMESTAMP</th>
+                                <th class="py-3">ACTION TYPE</th>
+                                <th class="py-3">MODIFIED ENTITY</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.UserLogs != null && ((List<DormMS.Web.Models.AuditLog>)ViewBag.UserLogs).Any())
+                            {
+                                // Veritabanındaki gerçek logları dönüyoruz
+                                foreach (var log in (List<DormMS.Web.Models.AuditLog>)ViewBag.UserLogs)
+                                {
+                                    <tr class="small">
+                                        <td class="ps-3 fw-bold">@log.createdAt.ToString("MMM dd, yyyy HH:mm")</td>
+                                        <td>
+                                            <span class="status-indicator @(log.action == "CREATE" ? "status-completed" : log.action == "DELETE" ? "status-pending" : "status-progress")">
+                                                @log.action
+                                            </span>
+                                        </td>
+                                        <td class="fw-bold text-dark">
+                                            @log.entityType #@log.entityId
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <!-- Eğer personel henüz hiç işlem yapmadıysa bu şık mesaj görünür -->
+                                <tr>
+                                    <td colspan="3" class="text-center py-5 text-muted small fw-bold">
+                                        <i class="bi bi-inbox d-block fs-2 mb-2 opacity-25"></i>
+                                        No activity recorded for this member yet.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a asp-controller="Audit" asp-action="Index" class="btn btn-link text-primary fw-bold text-decoration-none small">
+                        View Complete Audit History <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

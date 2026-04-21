@@ -43,5 +43,14 @@ namespace DormMS.Web.Services
         {
             return await _context.RoomTypes.ToListAsync();
         }
+        public async Task UpdateRoomAsync(Room room)
+        {
+            // Veritabanında güncelleme yapıyoruz
+            await _roomRepository.UpdateAsync(room);
+        }
+        public async Task DeleteRoomAsync(int id)
+        {
+            await _roomRepository.DeleteAsync(id);
+        }
     }
 }

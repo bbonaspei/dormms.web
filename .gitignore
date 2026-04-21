@@ -361,3 +361,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Backups
+*.bak
+
+# User uploads (Keep the folder, ignore the files)
+wwwroot/uploads/**
+!wwwroot/uploads/
+!wwwroot/uploads/**/

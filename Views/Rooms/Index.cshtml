@@ -4,83 +4,131 @@
     ViewData["Title"] = "Room Inventory";
 }
 
-<!-- Başlık Bölümü -->
-<div class="row align-items-center page-header-area px-2">
-    <div class="col-md-8 text-start">
-        <h1 style="color: #312e81; font-weight: 900; font-size: 2.2rem; letter-spacing: -1.5px;">
-            Residential <span style="color: #6366f1;">Inventory.</span>
-        </h1>
-        <p class="text-muted small fw-medium">Advanced monitoring and unit status management.</p>
-    </div>
-    <div class="col-md-4 text-end">
-        <a asp-action="Create" class="btn-premium text-decoration-none">
-            <i class="bi bi-plus-lg"></i> Register Unit
-        </a>
-    </div>
-</div>
+<!-- SweetAlert2 (Layout'ta yoksa burada kalsın) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- Arama Çubuğu -->
-<div class="row mb-5 px-2">
-    <div class="col-12">
-        <div class="search-wrapper-new">
-            <i class="bi bi-search" style="color: #6366f1;"></i>
-            <input type="text" class="search-input-new" placeholder="Filter by room, floor or unit status...">
+<div class="container-fluid px-4 mt-5">
+    <!-- Sayfa Başlığı -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin-bottom: 0;">
+                Residential <span style="color: #6366f1;">Inventory.</span>
+            </h1>
+            <p class="text-muted fw-bold mt-2">Manage dormitory housing units and occupancy levels.</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="d-inline-flex gap-3">
+                <a asp-action="Archives" class="btn-back-premium">
+                    <i class="bi bi-archive-fill"></i> View Archives
+                </a>
+                <a asp-action="Create" class="btn-premium">
+                    <i class="bi bi-plus-lg"></i> Add New Room
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Oda Kartları Listesi -->
-<div class="row g-4 px-2">
-    @if (Model == null || !Model.Any())
-    {
-        <div class="col-12 text-center py-5">
-            <p class="text-muted fw-bold">No units found in the database. Please register a unit.</p>
+    <!-- Arama Çubuğu -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="search-wrapper-new py-3 px-4 shadow-sm border">
+                <i class="bi bi-search" style="color: #6366f1;"></i>
+                <input type="text" class="search-input-new fs-5 ms-2" placeholder="Search rooms...">
+            </div>
         </div>
-    }
-    else
-    {
+    </div>
+
+    <!-- Kartlar Listesi -->
+    <div class="row g-4">
         @foreach (var item in Model)
         {
-            <div class="col-md-6 col-lg-4 col-xl-3">
-                <div class="room-card-vibrant">
-                    <!-- Üst Kısım -->
+            <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
+                <div class="room-card-vibrant p-4 h-100 shadow-sm border-0">
+
+                    <!-- Kart Üstü -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div style="width:40px; height:40px; background:rgba(99, 102, 241, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#6366f1;">
+                        <div class="icon-box icon-blue">
                             <i class="bi bi-door-closed-fill"></i>
                         </div>
-                        <span class="status-badge-premium">@item.status</span>
+                        <!-- Index.cshtml içinde rozetin olduğu yer -->
+                        <span class="badge badge-status-premium @(item.status == "Available" ? "badge-available" :
+                                                                        item.status == "Occupied" ? "badge-occupied" :
+                                                                        "badge-maintenance")">
+                        @item.status
+                    </span>
                     </div>
 
-                    <!-- Orta Kısım -->
+                    <!-- Oda Bilgisi -->
                     <div class="mb-4">
-                        <h4 class="fw-bold mb-1" style="color: #1e293b;">Room @item.roomNumber</h4>
-                        <p class="text-muted small fw-bold text-uppercase">Floor @item.floorNumber • @item.RoomType?.typeName</p>
+                        <h3 class="fw-bold mb-1" style="color: #0f172a;">Room @item.roomNumber</h3>
+                        <span class="text-muted small fw-bold text-uppercase">FLOOR @item.floorNumber • @item.RoomType?.typeName</span>
                     </div>
 
-                    <!-- Doluluk Alanı -->
-                    <div class="occupancy-glass-card">
-                        <div class="d-flex justify-content-between align-items-end mb-2">
-                            <span class="small fw-bold text-muted">RESIDENCY</span>
-                            <span style="font-weight: 900; color: #6366f1;">@item.currentOccupancy/@item.capacity</span>
+                    <!-- Doluluk Grafiği -->
+                    <div class="occupancy-container mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-bold text-secondary">RESIDENCY</span>
+                            <span class="fw-bold" style="color: #6366f1;">@item.currentOccupancy / @item.capacity</span>
                         </div>
-                        <div style="height: 10px; background: #eef2f7; border-radius: 20px; overflow: hidden;">
-                            <div class="progress-premium-bar" style="width: @((item.currentOccupancy * 100) / (item.capacity == 0 ? 1 : item.capacity))%;"></div>
+                        <div class="progress" style="height: 8px; border-radius: 10px;">
+                            @{
+                                var percent = item.capacity > 0 ? (item.currentOccupancy * 100) / item.capacity : 0;
+                            }
+                            <div class="progress-premium-bar" style="width: @percent%;"></div>
                         </div>
                     </div>
 
-                    <!-- Kira Bedeli -->
-                    <div class="lease-fee-badge">
-                        <span class="small fw-bold text-muted text-uppercase" style="font-size: 10px;">Lease Fee</span>
+                    <!-- Kira -->
+                    <div class="lease-fee-badge p-3 mb-4 d-flex justify-content-between align-items-center">
+                        <span class="small fw-bold text-muted">MONTHLY FEE</span>
                         <span class="lease-fee-amount">$@item.RoomType?.basePrice</span>
                     </div>
 
-                    <!-- Aksiyon Butonları (Yeni Hover Efektli) -->
+                    <!-- Butonlar (Yeni Class'lar Kullanıldı) -->
                     <div class="d-flex gap-2 mt-auto">
-                        <a asp-action="Edit" asp-route-id="@item.id" class="btn-card-edit w-100 text-decoration-none">Details</a>
-                        <button class="btn-card-delete border-0"><i class="bi bi-trash3-fill"></i></button>
+                        <form id="deleteForm-@item.id" asp-action="Archive" asp-route-id="@item.id" method="post" style="width: 25%;">
+                            @Html.AntiForgeryToken()
+                            <button type="button" class="btn-card-delete-mini" onclick="confirmDelete(@item.id)" title="Archive Room">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                        </form>
+
+                        <a asp-action="Details" asp-route-id="@item.id" class="btn-card-details-wide flex-grow-1">
+                            <i class="bi bi-info-circle-fill"></i> Details
+                        </a>
                     </div>
                 </div>
             </div>
         }
-    }
+    </div>
 </div>
+
+<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Archive Room?',
+            text: "This room will be moved to the archives and hidden from inventory.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f43f5e',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, delete it!',
+            background: '#ffffff',
+            borderRadius: '20px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteForm-' + id).submit();
+            }
+        })
+    }
+    document.querySelector('.search-input-new').addEventListener('keyup', function (e) {
+        let term = e.target.value.toLowerCase();
+        // Kartların olduğu sütunları seçiyoruz
+        let cards = document.querySelectorAll('.col-sm-12.col-md-6.col-lg-4.col-xl-3');
+
+        cards.forEach(card => {
+            let content = card.innerText.toLowerCase();
+            card.style.display = content.includes(term) ? "block" : "none";
+        });
+    });
+</script>

@@ -1,0 +1,113 @@
+﻿@model IEnumerable<DormMS.Web.Models.User>
+
+<div class="container-fluid px-lg-5 mt-5">
+    <!-- BAŞLIK BÖLÜMÜ -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-8">
+            <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin: 0;">
+                Worker <span style="color: #6366f1;">Registry.</span>
+            </h1>
+            <p class="text-muted fw-bold mt-2">Manage institutional staff accounts and departmental roles.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="Create" class="btn-premium">
+                <i class="bi bi-person-plus-fill me-2"></i> Hire New Staff
+            </a>
+        </div>
+    </div>
+
+    <!-- PERSONEL TABLOSU -->
+    <div class="info-section-card p-0 overflow-hidden shadow-sm border-0 bg-white" style="border-radius: 25px;">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead style="background: #f8fafc; border-bottom: 2px solid #edf2f7;">
+                    <tr class="small text-muted fw-900 text-uppercase" style="letter-spacing: 1px;">
+                        <th class="ps-5 py-4">Staff Member</th>
+                        <th class="py-4 text-center">Designation / Role</th>
+                        <th class="py-4">Account Status</th>
+                        <th class="pe-5 py-4 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-5">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="user-avatar-btn" style="width:40px; height:40px; font-size:14px; background:#f1f5f9; color:#6366f1; border:none !important; font-weight: 900;">
+                                        @if (!string.IsNullOrEmpty(item.profilePicture))
+                                        {
+                                            <img src="@item.profilePicture" alt="Staff" />
+                                        }
+                                        else
+                                        {
+                                            var initials = (item.firstName?.Length > 0 ? item.firstName[0].ToString() : "") + 
+                                                           (item.lastName?.Length > 0 ? item.lastName[0].ToString() : "");
+                                            <text>@initials</text>
+                                        }
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">@item.firstName @item.lastName</div>
+                                        <div class="text-muted small" style="font-size: 10px;">@item.email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <!-- DİNAMİK ROL ROZETİ -->
+                                @{
+                                    var roleName = item.UserRoles?.FirstOrDefault()?.Role?.RoleName ?? "Personnel";
+                                    var badgeClass = roleName switch
+                                    {
+                                        "Admin" => "badge-role-admin",
+                                        "DormManager" => "badge-role-manager",
+                                        "MaintenanceStaff" => "badge-role-staff",
+                                        _ => "badge-role-default"
+                                    };
+                                }
+                                <span class="badge @badgeClass">@roleName</span>
+                            </td>
+                            <td>
+                                <span class="text-success fw-bold small"><i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i> ACTIVE</span>
+                            </td>
+                            <td class="pe-5 text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-light rounded-pill px-4 fw-bold small border shadow-sm">
+                                        View Profile <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                    <form id="deleteForm-@item.Id" asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="button" onclick="confirmStaffDelete(@item.Id)" class="btn btn-outline-danger shadow-sm rounded-circle p-0" style="width: 38px; height: 38px;" title="Terminate Worker">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmStaffDelete(id) {
+        Swal.fire({
+            title: 'Terminate Staff Record?',
+            text: "This will permanently remove the personnel from the active registry. All associated operational history will be archived.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f43f5e',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, Terminate Account',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'rounded-4'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteForm-' + id).submit();
+            }
+        });
+    }
+</script>

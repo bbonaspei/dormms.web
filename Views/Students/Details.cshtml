@@ -1,118 +1,236 @@
 ﻿@model DormMS.Web.Models.Student
-@{
-    bool isAdmin = ViewBag.IsAdmin ?? false;
-    var user = Model.User;
-}
 
-<div class="container-fluid px-5">
-    <!-- Üst Gezinti -->
-    <div class="page-header-area d-flex justify-content-between align-items-center">
-        <a asp-action="Index" class="btn-back-premium text-decoration-none">
-            <i class="bi bi-arrow-left"></i> BACK TO DIRECTORY
-        </a>
-        <div class="d-flex gap-2">
-            <button class="btn btn-light border-0 fw-bold" style="border-radius:12px; padding:10px 20px;">Export CV</button>
-            @if (isAdmin)
+<style>
+    .btn-capsule-white {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 100px !important;
+        color: #5c6d83 !important;
+        padding: 10px 24px !important;
+        font-weight: 700 !important;
+        font-size: 0.8rem !important;
+        text-transform: uppercase !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        transition: 0.3s !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03) !important;
+        text-decoration: none !important;
+        line-height: 1 !important;
+    }
+    .btn-capsule-white:hover {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08) !important;
+        transform: translateY(-2px) !important;
+        color: #334155 !important;
+    }
+    .btn-capsule-white i {
+        font-size: 1rem !important;
+    }
+</style>
+
+<!-- UI VERSION: CAPSULE_V1 -->
+
+<div class="container-fluid px-4 mt-4 no-print">
+    <!-- ÜST AKSİYON BAR -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
+        {
+            <a asp-action="Index" class="btn-back-premium shadow-sm border-0 py-2 px-3" style="font-size: 0.85rem;">
+                <i class="bi bi-arrow-left me-2"></i> BACK TO DIRECTORY
+            </a>
+        }
+        else
+        {
+            <div></div> <!-- Spacer -->
+        }
+        <div class="d-flex gap-3">
+            <button onclick="window.print();" class="btn-capsule-white">
+                <i class="bi bi-printer-fill"></i> PRINT
+            </button>
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
             {
-                <button class="btn-premium">Manage Access</button>
+                <a asp-action="Export" asp-route-id="@Model.id" class="btn-capsule-white">
+                    <i class="bi bi-file-earmark-arrow-down-fill"></i> EXPORT
+                </a>
+            }
+            @if (User.IsInRole("Student") || User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.id" class="btn-capsule-white">
+                    <i class="bi bi-pencil-square"></i> EDIT PROFILE
+                </a>
             }
         </div>
     </div>
 
-    <!-- PROFİL KAPAĞI (MODERN TASARIM) -->
-    <div class="stat-card-new p-0 mb-5 overflow-hidden" style="border:none !important;">
-        <div style="height: 120px; background: var(--primary-grad); opacity: 0.8;"></div>
-        <div class="px-5 pb-5" style="margin-top: -40px;">
-            <div class="d-flex align-items-end gap-4">
-                <div style="width: 120px; height: 120px; background: white; border-radius: 30px; border: 6px solid var(--bg-base); display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: 900; color: #6366f1; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    @(user?.firstName?[0])
+    <!-- PROFİL HEADER -->
+    <div class="profile-header-premium shadow-sm mb-5">
+        <div class="d-flex align-items-center gap-4">
+            <div class="avatar-main-wrapper shadow-sm">
+                @{
+                    var initials = (Model.User?.firstName?.Length > 0 ? Model.User.firstName[0].ToString() : "") + 
+                                   (Model.User?.lastName?.Length > 0 ? Model.User.lastName[0].ToString() : "");
+                }
+                @initials
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <h1 class="fw-900 text-dark m-0" style="font-size: 2.5rem; letter-spacing: -1.5px;">@Model.User?.firstName @Model.User?.lastName</h1>
+                    <span class="badge-student-active">ACTIVE STUDENT</span>
                 </div>
-                <div class="pb-2">
-                    <h1 class="mb-1" style="color: #1e293b; font-weight: 900; font-size: 2.5rem;">@user?.firstName @user?.lastName</h1>
-                    <span class="badge @(isAdmin ? "bg-primary" : "bg-success") rounded-pill px-3 py-2 fw-bold" style="font-size: 11px; letter-spacing: 1px;">
-                        <i class="bi bi-patch-check-fill me-1"></i> @(isAdmin ? "ROOT ADMINISTRATOR" : "VERIFIED STUDENT")
-                    </span>
+                <div class="text-muted fw-bold d-flex gap-3 align-items-center">
+                    <span><i class="bi bi-geo-alt-fill text-primary"></i> @Model.city, @Model.nationality</span>
+                    <span class="opacity-25">|</span>
+                    <span><i class="bi bi-hash text-primary"></i> @Model.studentId</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-5">
-        <!-- SOL KOLON: Detaylar -->
+    <div class="row g-5 align-items-start">
+        <!-- SOL SÜTUN -->
         <div class="col-lg-4">
-            <div class="stat-card-new mb-4">
-                <h6 class="stat-title-premium">Core Metadata</h6>
-                <div class="d-flex flex-column gap-3 mt-4">
-                    <div class="d-flex justify-content-between border-bottom pb-2">
-                        <span class="text-muted small fw-bold">STUDENT ID</span>
-                        <span class="fw-bold text-dark">#@Model.studentId</span>
-                    </div>
-                    <div class="d-flex justify-content-between border-bottom pb-2">
-                        <span class="text-muted small fw-bold">EMAIL</span>
-                        <span class="fw-bold text-dark">@user?.email</span>
-                    </div>
-                    <div class="d-flex justify-content-between border-bottom pb-2">
-                        <span class="text-muted small fw-bold">INSTITUTION</span>
-                        <span class="fw-bold text-dark">@Model.university</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted small fw-bold">ALLOCATION</span>
-                        <span class="fw-bold" style="color:var(--indigo);">Room @Model.Room?.roomNumber</span>
-                    </div>
+            <!-- Akademik Bilgiler -->
+            <div class="info-section-card shadow-sm mb-4" style="height: fit-content !important;">
+                <h6 class="section-title-premium"><i class="bi bi-mortarboard-fill"></i> ACADEMIC PROFILE</h6>
+                <div class="info-box-premium"><label class="info-label-pro">University</label><span class="info-value-pro">@Model.university</span></div>
+                <div class="info-box-premium"><label class="info-label-pro">Department</label><span class="info-value-pro">@Model.course</span></div>
+                <div class="row g-2">
+                    <div class="col-6"><div class="info-box-premium"><label class="info-label-pro">Year</label><span class="info-value-pro">Grade @Model.yearOfStudy</span></div></div>
+                    <div class="col-6"><div class="info-box-premium"><label class="info-label-pro">Gender</label><span class="info-value-pro">@Model.gender</span></div></div>
                 </div>
             </div>
 
-            @if (isAdmin)
+            <!-- Acil Durum -->
+            <div class="info-section-card shadow-sm mb-4" style="height: fit-content !important;">
+                <h6 class="section-title-premium"><i class="bi bi-shield-lock-fill"></i> EMERGENCY CONTACT</h6>
+                <div class="info-box-premium border-start border-4 border-warning">
+                    <label class="info-label-pro">Name & Relation</label>
+                    <span class="info-value-pro">@Model.emergencyContactName (@Model.emergencyContactRelationship)</span>
+                </div>
+                <div class="info-box-premium border-start border-4 border-primary">
+                    <label class="info-label-pro">Phone</label>
+                    <span class="info-value-pro text-primary">@Model.emergencyContactPhone</span>
+                </div>
+            </div>
+
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
             {
-                <div class="stat-card-new" style="background: #f8fafc !important;">
-                    <h6 class="stat-title-premium text-primary">Admin Control</h6>
-                    <p class="small text-muted mb-4">You have full write-access to this profile's institutional records.</p>
-                    <button class="btn btn-dark w-100 py-3 fw-bold" style="border-radius:14px;">Modify Global Record</button>
+                <!-- RELATED OPERATIONS -->
+                <div class="info-section-card shadow-sm bg-light border-0" style="height: fit-content !important;">
+                    <h6 class="fw-bold small text-muted mb-3" style="font-size: 11px; letter-spacing: 1px;">RELATED OPERATIONS</h6>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Payments" asp-action="Index" asp-route-studentId="@Model.id" class="btn btn-white btn-sm border text-start fw-bold shadow-sm p-3 rounded-3 bg-white text-decoration-none hover-translate">
+                            <i class="bi bi-cash-stack text-success me-2"></i> View Payment History
+                        </a>
+                        <a asp-controller="Maintenance" asp-action="Index" asp-route-studentId="@Model.id" class="btn btn-white btn-sm border text-start fw-bold shadow-sm p-3 rounded-3 bg-white text-decoration-none hover-translate">
+                            <i class="bi bi-tools text-danger me-2"></i> Maintenance Requests
+                        </a>
+                    </div>
                 </div>
             }
         </div>
 
-        <!-- SAĞ KOLON: Dosyalar -->
+        <!-- SAĞ SÜTUN -->
         <div class="col-lg-8">
-            <div class="stat-card-new">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-black m-0" style="color:#1e293b;">Digital Repository</h5>
-                    <span class="text-muted small fw-bold text-uppercase">Section 6: Document Mgmt</span>
-                </div>
-
-                <div class="row g-3 mb-5">
-                    @foreach (var doc in ViewBag.Documents as List<DormMS.Web.Models.StudentDocument>)
-                    {
-                        <div class="col-md-6">
-                            <div class="p-3 rounded-4" style="background: #f8fafc; display:flex; justify-content:space-between; align-items:center; border: 1px solid #eef2f7;">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div style="width:40px; height:40px; background:white; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#f43f5e; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-                                        <i class="bi bi-file-earmark-pdf"></i>
-                                    </div>
-                                    <div><div class="small fw-bold text-dark">@doc.documentType</div><small class="text-muted" style="font-size:10px;">@doc.documentName</small></div>
-                                </div>
-                                <a href="@doc.filePath" target="_blank" class="btn btn-sm btn-white shadow-sm fw-bold px-3">Open</a>
+            <div class="row g-4">
+                <!-- KONAKLAMA BİLGİSİ -->
+                <div class="col-12">
+                    <div class="info-section-card shadow-sm border-start border-5 border-primary">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <label class="info-label-pro">Current Housing Unit</label>
+                                <h3 class="fw-900 m-0 text-dark">
+                                    <i class="bi bi-house-door-fill me-2 text-primary"></i>
+                                    @(Model.Room != null ? "Room " + Model.Room.roomNumber : "Waiting for Assignment")
+                                </h3>
                             </div>
+                            @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
+                            {
+                                <a asp-controller="Allocations" asp-action="Create" asp-route-studentId="@Model.id"
+                                   class="btn-premium px-4 text-decoration-none shadow-sm">Allocate Room</a>
+                            }
                         </div>
-                    }
+                    </div>
                 </div>
 
-                <!-- UPLOAD ZONE -->
-                <div class="p-5 rounded-5 text-center" style="background: #fafbfc; border: 2px dashed #e2e8f0;">
-                    <form asp-action="UploadDoc" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="studentId" value="@Model.id" />
-                        <i class="bi bi-cloud-arrow-up display-4 text-muted opacity-25"></i>
-                        <h6 class="fw-bold mt-3">Drop new documents here</h6>
-                        <p class="small text-muted mb-4">PDF, JPG or PNG up to 10MB</p>
-                        <div class="d-flex gap-2 justify-content-center">
-                            <input type="file" name="file" class="form-control form-control-sm w-50" required />
-                            <select name="docType" class="form-select form-select-sm w-25">
-                                <option value="ID">ID Card</option>
-                                <option value="Contract">Lease</option>
-                            </select>
+                <!-- DİJİTAL DEPO (BELGE LİSTESİ VE YÜKLEME) -->
+                <div class="col-12">
+                    <div class="info-section-card shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                            <h6 class="fw-900 m-0 text-dark"><i class="bi bi-folder-fill text-warning me-2"></i>DIGITAL REPOSITORY</h6>
+                            <span class="text-muted small fw-bold">SEC 6: DOCUMENT MGMT</span>
                         </div>
-                        <button type="submit" class="btn-premium mt-4">Initialize Upload</button>
-                    </form>
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager") || User.IsInRole("Student"))
+                        {
+                            <!-- Belge Yükleme Formu -->
+                            <div class="p-4 border rounded-4 bg-light mb-4">
+                                <form asp-action="UploadDoc" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="studentId" value="@Model.id" />
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-md-5">
+                                            <input type="file" name="file" class="form-control upload-input-pro shadow-sm border-0" required />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <select name="docType" class="form-select upload-input-pro shadow-sm border-0">
+                                                <option value="ID Card">ID Card</option>
+                                                <option value="Medical Report">Medical Report</option>
+                                                <option value="Housing Contract">Housing Contract</option>
+                                                <option value="Other">Other Document</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button type="submit" class="btn-premium w-100 py-2 border-0" style="font-size: 11px;">UPLOAD FILE</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        }
+
+                        <!-- Yüklenen Dosyalar Listesi (DİNAMİK HALE GETİRİLDİ) -->
+                        <h6 class="fw-900 mb-3 small text-muted">SECURED DOCUMENTS</h6>
+                        <div class="document-list-area">
+                            @if (ViewBag.Documents != null && ((List<DormMS.Web.Models.StudentDocument>)ViewBag.Documents).Any())
+                            {
+                                foreach (var doc in (List<DormMS.Web.Models.StudentDocument>)ViewBag.Documents)
+                                {
+                                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3 border bg-white shadow-sm hover-translate">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="icon-box-sm bg-primary-subtle text-primary rounded-2" style="width:35px; height:35px; display:flex; align-items:center; justify-content:center;">
+                                                <i class="bi bi-file-earmark-check-fill fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark small">@doc.documentName</div>
+                                                <div class="text-muted" style="font-size: 10px;">@doc.documentType | @doc.uploadedAt.ToString("dd MMM yyyy")</div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <a asp-action="DownloadDoc" asp-route-id="@doc.id" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" style="font-size: 10px;">
+                                                <i class="bi bi-download me-1"></i> Download
+                                            </a>
+                                            @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
+                                            {
+                                                <form asp-action="DeleteDoc" asp-route-id="@doc.id" method="post" onsubmit="return confirm('Secure Purge: Are you sure you want to permanently delete this record?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" style="font-size: 10px;">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-center py-5 border rounded-4 bg-white border-dashed">
+                                    <i class="bi bi-shield-lock-fill text-muted fs-1 mb-2 d-block"></i>
+                                    <span class="text-muted small fw-bold">No Encrypted Records Found</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,49 +1,286 @@
-﻿@model IEnumerable<DormMS.Web.Models.MaintenanceRequest>
+﻿@using System.Security.Claims
+@model IEnumerable<DormMS.Web.Models.MaintenanceRequest>
 
-<div class="row align-items-center page-header-area px-2">
-    <div class="col-md-8 text-start">
-        <h1 style="color: #312e81; font-weight: 900; font-size: 2.5rem; letter-spacing: -2px;">
-            Service <span style="color: #f43f5e;">Backlog.</span>
-        </h1>
-        <p class="text-muted">Tracking facility maintenance, repairs, and infrastructure requests.</p>
-    </div>
-    <div class="col-md-4 text-end">
-        <a asp-action="Create" class="btn-premium text-decoration-none" style="background:linear-gradient(135deg, #f43f5e 0%, #ec4899 100%) !important;">
-            + New Request
-        </a>
-    </div>
-</div>
+@{
+    ViewData["Title"] = "Operations Backlog";
 
-<div class="row g-4 px-2">
-    @foreach (var item in Model)
+    // KİMLİK VE ROL KONTROLLERİ
+    bool isStaff = User.IsInRole("Staff");
+    bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager");
+
+    int currentUserId = 0;
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedId))
     {
-        <div class="col-md-6 col-lg-4">
-            <div class="stat-card-new h-100" style="border-left: 5px solid #f43f5e !important;">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div style="width:40px; height:40px; background:rgba(244, 63, 94, 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#f43f5e;">
-                        <i class="bi bi-tools"></i>
-                    </div>
-                    <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800;">@item.priority.ToUpper()</span>
-                </div>
+        currentUserId = parsedId;
+    }
+}
 
-                <h5 class="fw-bold mb-1">@item.issueCategory Issue</h5>
-                <p class="small text-muted mb-3">@item.description</p>
+<div class="container-fluid px-4 mt-5">
+    <!-- SAYFA BAŞLIĞI & AKSİYON BUTONLARI -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-7 text-start">
+            <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px;">
+                @(User.IsInRole("Student") ? "My" : "Operations") <span style="color: #f43f5e;">@(User.IsInRole("Student") ? "Requests." : "Backlog.")</span>
+            </h1>
+            <p class="text-muted fw-bold mt-2">Active facility repairs and infrastructure requests.</p>
+        </div>
+        <div class="col-md-5 text-end d-flex justify-content-end gap-3">
+            <a asp-action="Archive" class="btn-back-premium text-decoration-none shadow-sm">
+                <i class="bi bi-archive-fill me-1"></i> View Archive
+            </a>
 
-                <div class="p-3 rounded-4 mb-4" style="background: #f8fafc;">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="small fw-bold text-muted">ROOM</span>
-                        <span class="small fw-bold">@item.Room?.roomNumber</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span class="small fw-bold text-muted">STATUS</span>
-                        <span class="small fw-bold" style="color: #f43f5e;">@item.status</span>
-                    </div>
-                </div>
+            @if (!isStaff)
+            {
+                <a asp-action="Create" class="btn-premium-rose text-decoration-none shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> New Request
+                </a>
+            }
+        </div>
+    </div>
 
-                <div class="d-grid">
-                    <button class="btn btn-light fw-bold" style="border-radius:12px; font-size: 0.85rem;">Update Status</button>
+    <!-- TALEPLER LİSTESİ -->
+    <div class="row g-4">
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-white shadow-sm rounded-4 border">
+                    <i class="bi bi-shield-check display-1 text-muted opacity-25"></i>
+                    <p class="mt-3 fw-bold text-muted">No pending maintenance requests found.</p>
                 </div>
             </div>
-        </div>
-    }
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                bool isMyTask = isStaff && (item.assignedTo == currentUserId);
+                bool isOtherStaffTask = isStaff && !isMyTask;
+
+                string borderColor = "#f43f5e";
+                string bgColor = "background-color: #ffffff;";
+                string iconClass = "icon-red";
+
+                if (isStaff)
+                {
+                    if (isMyTask)
+                    {
+                        borderColor = "#6366f1";
+                        bgColor = "background-color: #f8fafc;";
+                        iconClass = "icon-blue";
+                    }
+                    else
+                    {
+                        borderColor = "#cbd5e1";
+                        bgColor = "background-color: #f8fafc; opacity: 0.85;";
+                        iconClass = "bg-light text-muted";
+                    }
+                }
+
+                <div class="col-xl-4 col-md-6">
+                    <div class="stat-card-new h-100 shadow-sm border-0 d-flex flex-column" style="border-top: 5px solid @borderColor !important; @bgColor">
+
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div class="icon-box @iconClass">
+                                <i class="bi bi-tools"></i>
+                            </div>
+                            <div class="d-flex flex-column align-items-end gap-2">
+                                <span class="badge @(item.priority == "High" || item.priority == "Emergency" ? "bg-danger" : "bg-warning text-dark") rounded-pill px-3 py-1" style="font-size: 9px; font-weight:900;">
+                                    @item.priority?.ToUpper()
+                                </span>
+                                <span class="status-indicator @(item.status == "Pending" ? "status-pending" : "status-progress")">
+                                    @item.status
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            @if (isMyTask)
+                            {
+                                <span class="badge bg-primary text-white mb-3 px-3 py-2 rounded-pill shadow-sm d-inline-flex align-items-center" style="font-size: 0.65rem; font-weight: 900; letter-spacing: 0.5px;">
+                                    <i class="bi bi-person-check-fill me-1"></i> ASSIGNED TO YOU
+                                </span>
+                            }
+                            else if (isOtherStaffTask)
+                            {
+                                <span class="badge bg-secondary text-white mb-3 px-3 py-2 rounded-pill shadow-sm d-inline-flex align-items-center" style="font-size: 0.65rem; font-weight: 900; letter-spacing: 0.5px;">
+                                    <i class="bi bi-eye-slash-fill me-1"></i> READ ONLY
+                                </span>
+                            }
+
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h4 style="font-weight:900; color:#1e293b; margin:0; font-size:1.2rem;">@item.issueCategory Issue</h4>
+                                @if (item.studentId == null)
+                                {
+                                    <span class="badge bg-dark text-white rounded-pill px-2 py-1" style="font-size: 8px; letter-spacing: 0.5px;">SYSTEM ANNOUNCEMENT</span>
+                                }
+                                <span class="text-muted small fw-bold" style="font-size: 10px;">@item.requestNumber</span>
+                            </div>
+                            <p class="text-muted small fw-bold mb-0" style="line-height: 1.4;">
+                                <i class="bi bi-chat-left-dots-fill me-1 opacity-50"></i> "@item.description"
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded-4 mb-4 shadow-sm" style="background: white; border: 1px solid #edf2f7;">
+                            <div class="row g-2">
+                                @if (!User.IsInRole("Student") || item.studentId == null)
+                                {
+                                    <div class="col-6 border-end">
+                                        <span class="info-label-pro" style="font-size: 9px;">REPORTED BY</span>
+                                        @if (item.studentId != null)
+                                        {
+                                            <span class="small fw-bold text-dark d-block text-truncate">@item.Student?.User?.firstName @item.Student?.User?.lastName</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="small fw-bold text-danger d-block text-truncate"><i class="bi bi-shield-lock-fill me-1"></i>ADMINSTRATION</span>
+                                        }
+                                    </div>
+                                }
+                                <div class="@(User.IsInRole("Student") ? "col-12" : "col-6 ps-3")">
+                                    <span class="info-label-pro" style="font-size: 9px;">LOCATION</span>
+                                    @if (item.Room != null)
+                                    {
+                                        <span class="small fw-bold text-primary d-block">Room @item.Room?.roomNumber</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="small fw-bold text-secondary d-block">Facility / Common</span>
+                                    }
+                                </div>
+                                <div class="col-12 border-top mt-2 pt-2">
+                                    <span class="info-label-pro" style="font-size: 9px;">TIMESTAMP</span>
+                                    <span class="small fw-bold text-muted d-block">@item.requestDate?.ToString("MMM dd, yyyy - HH:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 px-1">
+                            <label class="info-label-pro" style="font-size: 9px;">ASSIGNED PERSONNEL</label>
+                            @if (item.Staff != null)
+                            {
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <div class="user-avatar-btn" style="width:28px; height:28px; font-size:10px; background:#6366f1; color:white; border:none !important; overflow:hidden;">
+                                        @if (!string.IsNullOrEmpty(item.Staff.profilePicture))
+                                        {
+                                            <img src="@item.Staff.profilePicture" style="width:100%; height:100%; object-fit:cover;" />
+                                        }
+                                        else
+                                        {
+                                            @(item.Staff.firstName?[0])
+                                        }
+                                    </div>
+                                    <span class="small" style="font-weight:900; color:#1e293b;">@item.Staff.firstName @item.Staff.lastName</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-danger small fw-bold mt-1">
+                                    <i class="bi bi-clock-history me-1"></i> Waiting for Staff...
+                                </div>
+                            }
+                        </div>
+
+                        <!-- AKSİYON BUTONLARI -->
+                        <div class="mt-auto pt-3 border-top d-flex gap-2 align-items-center">
+
+                            @if (ViewBag.IsStudent == true)
+                            {
+                                <!-- STUDENT: Sadece görüntüleyebilir -->
+                                <a asp-action="Details" asp-route-id="@item.id" class="btn-card-details-wide flex-grow-1">
+                                    Track Status <i class="bi bi-eye ms-1"></i>
+                                </a>
+                            }
+                            else if (isStaff)
+                            {
+                                if (isMyTask)
+                                {
+                                    <div class="w-100 d-flex flex-column gap-2">
+                                        <a asp-action="Details" asp-route-id="@item.id" class="btn w-100 fw-bold py-2 shadow-sm" style="background:#f1f5f9; color:#64748b; border-radius: 12px; font-size: 0.85rem; text-decoration:none; text-align:center;">
+                                            <i class="bi bi-eye-fill"></i> View Details
+                                        </a>
+
+                                        @if (item.status == "Pending")
+                                        {
+                                            <form asp-action="UpdateStatus" method="post" id="form-start-@item.id" class="w-100">
+                                                <input type="hidden" name="requestId" value="@item.id" />
+                                                <input type="hidden" name="newStatus" value="In Progress" />
+                                                <button type="button" onclick="confirmAction('form-start-@item.id', 'Start Work?', 'Are you sure you want to start working on this issue?', 'info', 'Yes, Start')" class="btn w-100 fw-bold py-2 shadow-sm" style="background:#e0e7ff; color:#4f46e5; border-radius: 12px;">
+                                                    <i class="bi bi-play-circle-fill"></i> Start Work
+                                                </button>
+                                            </form>
+                                        }
+                                        else if (item.status == "In Progress")
+                                        {
+                                            <form asp-action="UpdateStatus" method="post" id="form-complete-@item.id" class="w-100">
+                                                <input type="hidden" name="requestId" value="@item.id" />
+                                                <input type="hidden" name="newStatus" value="Completed" />
+                                                <button type="button" onclick="confirmAction('form-complete-@item.id', 'Complete Task?', 'Mark this maintenance request as fully resolved?', 'success', 'Yes, Mark Done')" class="btn w-100 fw-bold py-2 shadow-sm" style="background:#dcfce7; color:#16a34a; border-radius: 12px;">
+                                                    <i class="bi bi-check2-all"></i> Mark Completed
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <a asp-action="Details" asp-route-id="@item.id" class="btn w-100 fw-bold py-2 shadow-sm" style="background:#f1f5f9; color:#64748b; border-radius: 12px; font-size: 0.85rem; text-decoration:none; text-align:center;">
+                                        <i class="bi bi-eye-fill"></i> View Details
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <a asp-action="Details" asp-route-id="@item.id" class="btn-card-details-wide flex-grow-1">
+                                    Manage <i class="bi bi-gear-wide-connected ms-1"></i>
+                                </a>
+
+                                @if (isAdmin)
+                                {
+                                    <form asp-action="Delete" asp-route-id="@item.id" method="post" id="form-delete-@item.id">
+                                        <button type="button" onclick="confirmAction('form-delete-@item.id', 'Delete Request?', 'This action cannot be undone!', 'error', 'Yes, Delete')" class="btn-card-delete" title="Delete Request">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                }
+                            }
+
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
+    </div>
 </div>
+
+<!-- SWEETALERT2 JAVASCRIPT KODLARI -->
+@section Scripts {
+    <script>
+        function confirmAction(formId, title, text, iconType, confirmText) {
+            // İkon tipine göre buton rengi belirliyoruz
+            let btnColor = '#6366f1'; // Mavi (Start Work için)
+            if (iconType === 'success') btnColor = '#10b981'; // Yeşil (Complete için)
+            if (iconType === 'error') btnColor = '#f43f5e'; // Kırmızı (Delete için)
+
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: iconType,
+                showCancelButton: true,
+                confirmButtonColor: btnColor,
+                cancelButtonColor: '#cbd5e1',
+                confirmButtonText: confirmText,
+                customClass: {
+                    popup: 'border-radius-xl', // Premium köşeler
+                    confirmButton: 'fw-bold px-4 rounded-pill',
+                    cancelButton: 'fw-bold px-4 rounded-pill'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(formId).submit();
+                }
+            });
+        }
+    </script>
+}

@@ -1,51 +1,46 @@
-﻿using DormMS.Web.Data;
-using DormMS.Web.Interfaces;
+﻿using DormMS.Web.Interfaces;
 using DormMS.Web.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace DormMS.Web.Services
 {
     public class DocumentService : IDocumentService
     {
-        private readonly ApplicationDbContext _context;
-        public DocumentService(ApplicationDbContext context) { _context = context; }
+        private readonly IDocumentRepository _documentRepo;
+        public DocumentService(IDocumentRepository documentRepo) { _documentRepo = documentRepo; }
 
         public async Task<bool> UploadDocumentAsync(int studentId, string docType, IFormFile file)
         {
-            if (file == null || file.Length == 0) return false;
-
-            // 1. Klasör yolunu hazırla (wwwroot/documents)
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/documents");
-            if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
-
-            // 2. Benzersiz dosya adı oluştur
-            var fileName = Guid.NewGuid().ToString() + "_" + file.FileName;
-            var filePath = Path.Combine(folderPath, fileName);
-
-            // 3. Dosyayı sunucuya kopyala
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await file.CopyToAsync(stream);
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/documents");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{studentId}_{Guid.NewGuid().ToString().Substring(0, 4)}_{file.FileName}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                var doc = new StudentDocument
+                {
+                    studentId = studentId,
+                    documentType = docType,
+                    documentName = file.FileName,
+                    filePath = "/uploads/documents/" + fileName,
+                    fileSize = (int)file.Length,
+                    uploadedAt = DateTime.Now
+                };
+
+                return await _documentRepo.AddStudentDocumentAsync(doc);
             }
-
-            // 4. Veritabanına kaydet
-            var doc = new StudentDocument
-            {
-                studentId = studentId,
-                documentType = docType,
-                documentName = file.FileName,
-                filePath = "/documents/" + fileName
-            };
-            _context.StudentDocuments.Add(doc);
-            await _context.SaveChangesAsync();
-            return true;
+            catch { return false; }
         }
 
         public async Task<IEnumerable<StudentDocument>> GetStudentDocumentsAsync(int studentId)
         {
-            return await _context.StudentDocuments
-                .Where(d => d.studentId == studentId)
-                .ToListAsync();
+            return await _documentRepo.GetStudentDocumentsAsync(studentId);
         }
     }
 }

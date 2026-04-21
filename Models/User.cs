@@ -7,16 +7,43 @@ namespace DormMS.Web.Models
     public class User
     {
         [Key]
-        public int id { get; set; }
-        public string username { get; set; }
-        public string email { get; set; }
-        public string passwordHash { get; set; }
+        [Column("id")]
+        public int Id { get; set; } // Büyük I yaptık, daha profesyonel
+
+        [Column("username")]
+        public string username { get; set; } = string.Empty;
+
+        [Column("email")]
+        public string email { get; set; } = string.Empty;
+
+        [Column("passwordHash")]
+        public string passwordHash { get; set; } = string.Empty;
+
+        [Column("firstName")]
         public string? firstName { get; set; }
+
+        [Column("lastName")]
         public string? lastName { get; set; }
+
+        [Column("phone")]
         public string? phone { get; set; }
+
+        [Column("profilePicture")]
         public string? profilePicture { get; set; }
+
+        [Column("isActive")]
         public bool isActive { get; set; } = true;
+
+        [Column("lastLogin")]
         public DateTime? lastLogin { get; set; }
+
+        [Column("createdAt")]
         public DateTime createdAt { get; set; } = DateTime.Now;
+
+        // HATAYI ÇÖZEN SATIR: Rapor Sayfa 10'da istenen güncelleme tarihi
+        [Column("updatedAt")]
+        public DateTime updatedAt { get; set; } = DateTime.Now;
+
+        public virtual ICollection<UserRole>? UserRoles { get; set; }
     }
 }

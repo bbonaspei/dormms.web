@@ -6,29 +6,59 @@ namespace DormMS.Web.Models
     [Table("Maintenance_requests")]
     public class MaintenanceRequest
     {
-        [Key]
-        public int id { get; set; }
-        public string requestNumber { get; set; } = "";
+        // YENİ EKLENDİ: Sınıf oluşurken durum KESİNLİKLE Pending başlar
+        public MaintenanceRequest()
+        {
+            status = "Pending";
+        }
 
-        public int studentId { get; set; }
+        [Key]
+        [Column("id")]
+        public int id { get; set; }
+
+        [Column("request_number")]
+        public string? requestNumber { get; set; }
+
+        [Column("student_id")]
+        public int? studentId { get; set; }
+
         [ForeignKey("studentId")]
         public virtual Student? Student { get; set; }
 
-        public int roomId { get; set; }
+        [Column("room_id")]
+        public int? roomId { get; set; }
+
         [ForeignKey("roomId")]
         public virtual Room? Room { get; set; }
 
-        public string issueCategory { get; set; } = "General"; // Plumbing, Electrical, etc.
-        public string description { get; set; } = "";
-        public string priority { get; set; } = "Medium"; // Low, Medium, High
-        public string status { get; set; } = "Pending"; // Pending, In Progress, Completed
+        [Column("issue_category")]
+        public string? issueCategory { get; set; }
 
-        public int? assignedTo { get; set; } // Personel ID (User tablosuna bağlı)
+        [Column("description")]
+        public string? description { get; set; }
+
+        [Column("priority")]
+        public string? priority { get; set; }
+
+        [Column("status")]
+        public string? status { get; set; }
+
+        [Column("assigned_to")]
+        public int? assignedTo { get; set; }
+
         [ForeignKey("assignedTo")]
         public virtual User? Staff { get; set; }
 
-        public DateTime requestDate { get; set; } = DateTime.Now;
+        [Column("request_date")]
+        public DateTime? requestDate { get; set; }
+
+        [Column("completed_date")]
         public DateTime? completedDate { get; set; }
+
+        [Column("student_rating")]
         public int? studentRating { get; set; }
+
+        [Column("student_feedback")]
+        public string? studentFeedback { get; set; }
     }
 }

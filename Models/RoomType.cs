@@ -6,19 +6,13 @@ namespace DormMS.Web.Models
     [Table("RoomTypes")]
     public class RoomType
     {
-        [Key]
-        public int id { get; set; }
-
-        public string typeName { get; set; } // type_name değil
-
+        [Key][Column("id")] public int id { get; set; }
+        [Column("type_name")] public string typeName { get; set; } = string.Empty;
         public string? description { get; set; }
-
         public int capacity { get; set; }
-
-        public int bedCount { get; set; } // bed_count değil
-
-        public bool hasBathroom { get; set; } // has_bathroom değil
-
-        public decimal basePrice { get; set; } // base_price değil
+        [Column("bed_count")] public int bedCount { get; set; }
+        [Column("has_bathroom")] public bool hasBathroom { get; set; }
+        [Column("has_air_conditioner")] public bool hasAirConditioner { get; set; }
+        [Column("base_price_per_month")] public decimal basePrice { get; set; }
     }
 }

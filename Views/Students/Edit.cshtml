@@ -1,0 +1,98 @@
+@model DormMS.Web.Models.Student
+
+<div class="container-fluid px-lg-5 mt-5">
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-7">
+            <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2.5px; margin: 0;">
+                Refine <span style="color: #6366f1;">Profile.</span>
+            </h1>
+            <p class="text-muted fw-bold mt-2">Update your academic and emergency contact information.</p>
+        </div>
+        <div class="col-md-5 text-end">
+            <a asp-action="Details" asp-route-id="@Model.id" class="btn-back-premium px-4 py-2 text-decoration-none shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i> ABANDON CHANGES
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-xl-9">
+            <div class="stat-card-new p-0 overflow-hidden shadow-lg border-0 bg-white" style="border-radius: 40px;">
+                <div class="row g-0">
+                    <div class="col-lg-4 bg-glass-indigo p-5 d-flex flex-column justify-content-between text-white" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+                        <div>
+                            <div class="icon-box bg-white text-primary mb-4" style="width: 60px; height: 60px; font-size: 28px;">
+                                <i class="bi bi-person-gear"></i>
+                            </div>
+                            <h3 class="fw-900 mb-3">Identity Synthesis</h3>
+                            <p class="opacity-75 small fw-bold">Maintain accurate academic records to ensure seamless service delivery and emergency preparedness.</p>
+                        </div>
+                        <div class="opacity-25">
+                            <i class="bi bi-shield-check" style="font-size: 8rem;"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-8 p-5">
+                        <form asp-action="Edit">
+                            <input type="hidden" asp-for="id" />
+                            <input type="hidden" asp-for="userId" />
+                            <input type="hidden" asp-for="createdAt" />
+                            
+                            <h6 class="section-title-premium mb-4 text-primary"><i class="bi bi-mortarboard-fill me-2"></i>ACADEMIC DATA</h6>
+                            
+                            <div class="row g-4 mb-5">
+                                <div class="col-md-6">
+                                    <label class="label-premium">Student ID / Reference</label>
+                                    <input asp-for="studentId" class="dorm-input-premium @(User.IsInRole("Admin") ? "" : "bg-light")" readonly="@(!User.IsInRole("Admin"))" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="label-premium">University / Institution</label>
+                                    <input asp-for="university" class="dorm-input-premium" placeholder="e.g. Stanford University" />
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="label-premium">Major / Course of Study</label>
+                                    <input asp-for="course" class="dorm-input-premium" placeholder="e.g. B.Sc. Computer Science" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-premium">Year of Study</label>
+                                    <input asp-for="yearOfStudy" class="dorm-input-premium" type="number" min="1" max="10" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="label-premium">Nationality</label>
+                                    <input asp-for="nationality" class="dorm-input-premium" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="label-premium">Birth City</label>
+                                    <input asp-for="city" class="dorm-input-premium" />
+                                </div>
+                            </div>
+
+                            <h6 class="section-title-premium mb-4 text-danger"><i class="bi bi-telephone-fill me-2"></i>EMERGENCY PROTOCOL</h6>
+                            
+                            <div class="row g-4">
+                                <div class="col-md-7">
+                                    <label class="label-premium">Primary Contact Name</label>
+                                    <input asp-for="emergencyContactName" class="dorm-input-premium" />
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="label-premium">Relationship</label>
+                                    <input asp-for="emergencyContactRelationship" class="dorm-input-premium" placeholder="e.g. Father, Guardian" />
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="label-premium">Contact Secure Phone</label>
+                                    <input asp-for="emergencyContactPhone" class="dorm-input-premium" />
+                                </div>
+                            </div>
+
+                            <div class="mt-5 pt-4 border-top">
+                                <button type="submit" class="btn-premium w-100 py-3 shadow-lg fs-5">
+                                    <i class="bi bi-shield-check-fill me-2"></i> AUTHORIZE & SAVE PROFILE
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,76 @@
+﻿@model DormMS.Web.Models.Building
+
+<div class="container mt-5">
+    <!-- Geri Butonu -->
+    <div class="mb-4">
+        <a asp-action="Index" class="btn-back-premium shadow-sm text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> BACK TO INFRASTRUCTURE
+        </a>
+    </div>
+
+    <div class="form-card-premium shadow-sm border-top border-5 border-primary">
+        <h2 class="fw-900 text-dark mb-4" style="letter-spacing:-1.5px;">Edit Building <span style="color:#6366f1;">Config.</span></h2>
+
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="id" />
+
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <label class="label-premium">Building Name</label>
+                    <input asp-for="buildingName" class="dorm-input-premium" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="label-premium">Block Code</label>
+                    <input asp-for="buildingCode" class="dorm-input-premium" required />
+                </div>
+                <div class="col-12">
+                    <label class="label-premium">Location Address</label>
+                    <input asp-for="address" class="dorm-input-premium" placeholder="e.g. 123 Education Blvd..." />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">Total Floor Levels</label>
+                    <!-- min="0" eklendi -->
+                    <input asp-for="totalFloors" type="number" min="0" class="dorm-input-premium" />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">Current Status</label>
+                    <select asp-for="status" class="dorm-input-premium">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Maintenance">Maintenance</option>
+                    </select>
+                </div>
+
+                <!-- YUVARLATILMIŞ PREMIUM TOGGLE -->
+                <div class="col-12">
+                    <div class="p-4 bg-light rounded-4 border d-flex align-items-center justify-content-between shadow-sm">
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Building Accessibility</h6>
+                            <p class="text-muted small mb-0 fw-medium">Mark if this building includes a functioning elevator.</p>
+                        </div>
+                        <label class="switch-premium-wrapper">
+                            <input class="switch-premium-input" type="checkbox" asp-for="hasElevator">
+                            <div class="slider-premium"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALT BUTONLAR (Hizalı ve Modern) -->
+            <div class="d-flex gap-3 mt-5 pt-4 border-top">
+                <button type="submit" class="btn-premium flex-grow-1 justify-content-center">
+                    <i class="bi bi-check2-all me-2 fs-5"></i> COMMIT CHANGES
+                </button>
+                <a asp-action="Index" class="btn-discard-premium">
+                    DISCARD
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -7,25 +7,46 @@ namespace DormMS.Web.Models
     public class Room
     {
         [Key]
+        [Column("id")]
         public int id { get; set; }
 
-        // SQL'deki ismi "roomNumber" olduğu için böyle olmalı
-        public string roomNumber { get; set; }
+        [Required(ErrorMessage = "Room number is required")]
+        [Column("room_number")] // SQL: room_number
+        public string roomNumber { get; set; } = string.Empty;
 
-        public int buildingId { get; set; }
+        [Column("building_id")] // SQL: building_id
+        public int? buildingId { get; set; }
+
         [ForeignKey("buildingId")]
         public virtual Building? Building { get; set; }
 
-        public int roomTypeId { get; set; }
+        [Column("room_type_id")] // SQL: room_type_id
+        public int? roomTypeId { get; set; }
+
         [ForeignKey("roomTypeId")]
         public virtual RoomType? RoomType { get; set; }
 
         [Range(0, 50, ErrorMessage = "Floor level cannot be negative")]
-        public int floorNumber { get; set; } // floor_number değil
+        [Column("floor_number")] // SQL: floor_number
+        public int? floorNumber { get; set; }
 
-        [Range(1,5, ErrorMessage = "Capacity must be between 1 and 5")]
-        public int capacity { get; set; }
-        public int currentOccupancy { get; set; } // current_occupancy değil
-        public string status { get; set; }
+        [Range(1, 5, ErrorMessage = "Capacity must be between 1 and 5")]
+        [Column("capacity")]
+        public int? capacity { get; set; }
+
+        [Column("current_occupancy")] // SQL: current_occupancy
+        public int? currentOccupancy { get; set; }
+
+        [Column("status")]
+        public string? status { get; set; }
+
+        [Column("notes")]
+        public string? notes { get; set; }
+
+        [Column("created_at")] // SQL: created_at
+        public DateTime? createdAt { get; set; } = DateTime.Now;
+
+        [Column("updated_at")] // SQL: updated_at
+        public DateTime? updatedAt { get; set; } = DateTime.Now;
     }
 }

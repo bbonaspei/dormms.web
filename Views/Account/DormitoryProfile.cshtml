@@ -1,0 +1,39 @@
+﻿<div class="container mt-5">
+    <div class="profile-header-premium shadow-sm mb-5">
+        <div class="d-flex align-items-center gap-4">
+            <div class="avatar-main-wrapper bg-primary text-white">
+                <i class="bi bi-building-check"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h1 class="fw-900 text-dark m-0">Institutional Profile</h1>
+                <p class="text-muted fw-bold mb-0">Global Campus Configuration & Facility Standards</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="info-section-card shadow-sm">
+                <h6 class="section-title-premium"><i class="bi bi-info-circle"></i> CAMPUS INFO</h6>
+                <div class="info-box-premium"><label class="info-label-pro">Institution Name</label><span class="info-value-pro">DormMS Intelligence Systems</span></div>
+                <div class="info-box-premium"><label class="info-label-pro">Total Infrastructure</label><span class="info-value-pro">@ViewBag.BuildingCount Blocks Active</span></div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="info-section-card shadow-sm">
+                <h6 class="section-title-premium"><i class="bi bi-tags"></i> ROOM STANDARDS</h6>
+                <div class="row">
+                    @foreach (var type in ViewBag.RoomTypes)
+                    {
+                        <div class="col-md-6">
+                            <div class="info-box-premium">
+                                <label class="info-label-pro">@type.typeName</label>
+                                <span class="info-value-pro">$@type.basePrice / Month</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

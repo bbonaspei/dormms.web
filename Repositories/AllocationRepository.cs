@@ -13,7 +13,7 @@ namespace DormMS.Web.Repositories
         public async Task<IEnumerable<Allocation>> GetAllAsync()
         {
             return await _context.Allocations
-                .Include(a => a.Student).ThenInclude(s => s.User)
+                .Include(a => a.Student).ThenInclude(s => s!.User)
                 .Include(a => a.Room)
                 .ToListAsync();
         }
@@ -24,6 +24,13 @@ namespace DormMS.Web.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Allocation> GetByIdAsync(int id) => await _context.Allocations.FindAsync(id);
+        public async Task<Allocation?> GetByIdAsync(int id) => await _context.Allocations.FindAsync(id);
+
+        public async Task<Allocation?> GetActiveByStudentIdAsync(int studentId)
+        {
+            return await _context.Allocations
+                .Include(a => a.Room).ThenInclude(r => r.RoomType)
+                .FirstOrDefaultAsync(a => a.studentId == studentId && a.isCurrent == true);
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace DormMS.Web.Repositories
         public BuildingRepository(ApplicationDbContext context) { _context = context; }
 
         public async Task<IEnumerable<Building>> GetAllAsync() => await _context.Buildings.ToListAsync();
-        public async Task<Building> GetByIdAsync(int id) => await _context.Buildings.FindAsync(id);
+        public async Task<Building?> GetByIdAsync(int id) => await _context.Buildings.FindAsync(id);
         public async Task AddAsync(Building building) { await _context.Buildings.AddAsync(building); await _context.SaveChangesAsync(); }
         public async Task UpdateAsync(Building building) { _context.Buildings.Update(building); await _context.SaveChangesAsync();}
         public async Task DeleteAsync(int id)

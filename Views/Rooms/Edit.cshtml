@@ -1,0 +1,86 @@
+﻿@model DormMS.Web.Models.Room
+
+@{
+    ViewData["Title"] = "Edit Room";
+}
+
+<div class="container mt-5">
+    <!-- Geri Butonu -->
+    <div class="mb-4">
+        <a asp-action="Index" class="btn-back-premium shadow-sm text-decoration-none">
+            <i class="bi bi-arrow-left"></i> BACK TO INVENTORY
+        </a>
+    </div>
+
+    <div class="form-card-premium shadow-sm border-top border-5 border-primary">
+        <!-- Başlık -->
+        <h2 class="fw-900 text-dark mb-4" style="letter-spacing:-1px;">
+            Adjust Unit <span style="color:#6366f1;">Config.</span>
+        </h2>
+
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="id" />
+
+            <div class="row g-4">
+                <!-- Sol Kolon -->
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label asp-for="roomNumber" class="label-premium">Room Identifier</label>
+                        <input asp-for="roomNumber" class="dorm-input-premium" required />
+                        <span asp-validation-for="roomNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Building Assignment</label>
+                        <select asp-for="buildingId" class="dorm-input-premium" asp-items="ViewBag.buildingId"></select>
+                    </div>
+
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Room Category / Type</label>
+                        <select asp-for="roomTypeId" class="dorm-input-premium" asp-items="ViewBag.roomTypeId"></select>
+                    </div>
+                </div>
+
+                <!-- Sağ Kolon -->
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Max Capacity</label>
+                        <input asp-for="capacity" type="number" min="1" class="dorm-input-premium" />
+                    </div>
+
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Operational Status</label>
+                        <select asp-for="status" class="dorm-input-premium">
+                            <option value="Available">Available</option>
+                            <option value="Occupied">Occupied</option>
+                            <option value="Maintenance">Maintenance</option>
+                        </select>
+                    </div>
+
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Admin Notes</label>
+                        <!-- DÜZELTİLEN KISIM: 'textarea-fix' sınıfı eklendi -->
+                        <textarea asp-for="notes" class="dorm-input-premium textarea-fix" placeholder="Unit history notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUTONLAR -->
+            <div class="d-flex gap-3 mt-5 pt-4 border-top">
+                <button type="submit" class="btn-premium flex-grow-1 justify-content-center">
+                    <i class="bi bi-check2-circle me-2"></i> COMMIT CHANGES
+                </button>
+                <a asp-action="Index" class="btn-discard-premium text-decoration-none">
+                    DISCARD
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

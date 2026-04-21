@@ -322,25 +322,6 @@ select.dorm-input-premium {
         transform: translateX(-5px);
     }
 
-/* --- DISCARD BUTTON (Normal hali Renkli, Hover hali Glowlu) --- */
-.btn-discard-premium {
-    background: rgba(244, 63, 94, 0.08); /* Normal hali artık hafif kırmızı */
-    color: #f43f5e !important;
-    font-weight: 700;
-    font-size: 0.85rem;
-    padding: 12px 25px;
-    border-radius: 12px;
-    border: 1.5px solid rgba(244, 63, 94, 0.2) !important;
-    transition: 0.3s ease;
-    cursor: pointer;
-}
-
-    .btn-discard-premium:hover {
-        background: #f43f5e; /* Hover'da tamamen kırmızı olur */
-        color: white !important;
-        box-shadow: 0 8px 20px rgba(244, 63, 94, 0.3);
-        transform: translateY(-2px);
-    }
 
 /* --- SELECT DROPDOWN OPTIONS FIX --- */
 .dorm-input-premium option {
@@ -442,22 +423,6 @@ select.dorm-input-premium {
         left: 24px; /* Yuvarlağı sağa kaydır */
     }
 
-/* 4. Form Altı İptal Butonu (Daha estetik) */
-.btn-discard-premium {
-    color: #64748b !important;
-    font-weight: 700;
-    font-size: 0.8rem;
-    padding: 10px 20px;
-    letter-spacing: 1px;
-    transition: 0.3s;
-}
-
-    .btn-discard-premium:hover {
-        color: #f43f5e !important;
-        background: rgba(244, 63, 94, 0.05);
-        border-radius: 10px;
-    }
-
 /* --- MAINTENANCE MODULE SPECIFIC BUTTON (ROSE GRADIENT) --- */
 .btn-premium-rose {
     background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%) !important;
@@ -485,4 +450,909 @@ select.dorm-input-premium {
 .dorm-input-premium.textarea-fix {
     height: auto !important;
     padding: 20px !important;
+}
+/* --- ROOM INVENTORY SPECIFIC COMPONENTS --- */
+
+.room-card-vibrant {
+    border-radius: 30px !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    background: white !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
+}
+
+    .room-card-vibrant:hover {
+        transform: translateY(-10px) !important;
+        box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.2) !important;
+        border: 1px solid rgba(99, 102, 241, 0.15) !important;
+    }
+
+/* Sol Küçük Silme Butonu */
+.btn-card-delete-mini {
+    background: rgba(244, 63, 94, 0.08) !important;
+    color: #f43f5e !important;
+    border-radius: 12px !important;
+    height: 46px !important;
+    border: none !important;
+    transition: 0.3s ease !important;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-card-delete-mini:hover {
+        background: #f43f5e !important;
+        color: white !important;
+        transform: scale(1.05);
+    }
+
+/* Sağ Geniş Detay Butonu */
+.btn-card-details-wide {
+    background: #f1f5f9 !important;
+    color: #6366f1 !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    height: 46px !important;
+    text-decoration: none !important;
+    transition: 0.3s ease !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+    .btn-card-details-wide:hover {
+        background: #e2e8f0 !important;
+        color: #4f46e5 !important;
+        transform: translateY(-2px);
+    }
+
+/* Progress Bar Özelleştirmesi */
+.occupancy-container {
+    background: rgba(99, 102, 241, 0.04);
+    border-radius: 20px;
+    padding: 15px;
+}
+/* --- Glassmorphism Offcanvas (Mobile Menu) --- */
+.offcanvas-premium {
+    background: rgba(99, 102, 241, 0.2) !important; /* Çok şeffaf mor */
+    backdrop-filter: blur(25px) saturate(180%) !important; /* Arkayı bulanıklaştır */
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
+    width: 300px !important;
+}
+
+    /* Offcanvas içindeki linkler */
+    .offcanvas-premium .nav-link {
+        font-weight: 700;
+        padding: 15px 20px !important;
+        border-radius: 15px;
+        transition: 0.3s;
+    }
+
+        .offcanvas-premium .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(10px);
+        }
+
+/* Table Design Update */
+.table-hover tbody tr:hover {
+    background-color: rgba(99, 102, 241, 0.03);
+    transition: 0.2s;
+}
+
+/* Stat Card Border Improvement */
+.stat-card-new {
+    border: 1px solid rgba(0,0,0,0.03) !important;
+}
+/* --- ENTERPRISE DASHBOARD ENHANCEMENTS --- */
+
+/* Kart Kenarlık Renkleri (Hangi kartın ne olduğu belli olsun) */
+.alert-border-red {
+    border-top: 5px solid #f43f5e !important;
+}
+
+.alert-border-orange {
+    border-top: 5px solid #f59e0b !important;
+}
+
+.alert-border-blue {
+    border-top: 5px solid #6366f1 !important;
+}
+
+.alert-border-green {
+    border-top: 5px solid #10b981 !important;
+}
+
+/* Tarih Rozeti */
+.date-badge-premium {
+    background: white;
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: #1e293b;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Glassmorphism Etkili Koyu Kartlar */
+.bg-glass-dark {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* Kalın Font Desteği */
+.fw-800 {
+    font-weight: 800;
+}
+
+.fw-900 {
+    font-weight: 900;
+}
+
+/* Tablo Hover Efekti */
+.alert-list .bg-light:hover {
+    background: #f1f5f9 !important;
+    transform: scale(1.02);
+    transition: 0.3s;
+    cursor: pointer;
+}
+/* ============================================================
+   DORMMS MASTER COMPONENTS - ALL IN ONE
+   ============================================================ */
+
+/* --- GLOBAL STAT CARDS --- */
+.stat-card-new {
+    background: white !important;
+    border-radius: 22px !important;
+    padding: 28px !important;
+    transition: 0.4s ease;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+/* --- STUDENT PROFILE & DETAILS --- */
+.profile-header-premium {
+    background: white;
+    border-radius: 30px;
+    padding: 35px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+}
+
+.avatar-main-wrapper {
+    width: 100px;
+    height: 100px;
+    background: #f1f5f9;
+    color: #6366f1;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 900;
+}
+
+.info-section-card {
+    background: white;
+    border-radius: 25px;
+    padding: 25px;
+    border: 1px solid rgba(0,0,0,0.05);
+    height: 100%;
+}
+
+/* Veri Kutucukları (İstediğin Şık Görünüm) */
+.info-box-premium {
+    background: #f8fafc;
+    border: 1px solid #edf2f7;
+    border-radius: 16px;
+    padding: 12px 20px;
+    margin-bottom: 12px;
+    transition: 0.3s;
+}
+
+    .info-box-premium:hover {
+        background: white;
+        border-color: #6366f1;
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.08);
+    }
+
+.info-label-pro {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.info-value-pro {
+    display: block;
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1rem;
+}
+
+/* --- MODERN SECTION HEADERS --- */
+.section-title-premium {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #312e81;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: rgba(99, 102, 241, 0.06); /* Çok hafif mor arka plan */
+    padding: 10px 18px;
+    border-radius: 12px;
+    border-left: 4px solid #6366f1; /* Sol tarafa canlı bir çizgi */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+    width: fit-content; /* Sadece yazı kadar yer kaplasın */
+}
+
+    .section-title-premium i {
+        font-size: 1.1rem;
+        color: #6366f1;
+    }
+
+/* --- AKSİYON BUTONLARI (SAĞ ÜST) --- */
+.btn-action-premium {
+    padding: 10px 22px !important;
+    border-radius: 100px !important;
+    font-weight: 800 !important;
+    font-size: 0.8rem !important;
+    transition: 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none !important;
+}
+
+.btn-print-pro {
+    background: #f1f5f9 !important;
+    color: #312e81 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.btn-export-pro {
+    background: #1e293b !important;
+    color: white !important;
+}
+
+/* --- DOSYA YÜKLEME KUTUCUKLARI (BORDER FIX) --- */
+.upload-input-pro {
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 10px 15px !important;
+    background: #ffffff !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+}
+
+    .upload-input-pro:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+    }
+
+/* --- BADGES --- */
+.badge-student-active {
+    background: #dcfce7;
+    color: #15803d;
+    padding: 5px 14px;
+    border-radius: 100px;
+    font-size: 0.65rem;
+    font-weight: 900;
+}
+
+.border-dashed {
+    border: 2px dashed #cbd5e1 !important;
+}
+/* --- ALLOCATION STATUS BADGES --- */
+.badge-confirmed {
+    background: #dcfce7 !important; /* Hafif Yeşil */
+    color: #15803d !important; /* Koyu Yeşil */
+    padding: 6px 16px !important;
+    border-radius: 100px !important; /* Tam Yuvarlak */
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(21, 128, 61, 0.1) !important;
+}
+
+.badge-pending {
+    background: #fef3c7 !important; /* Hafif Turuncu */
+    color: #92400e !important; /* Koyu Turuncu */
+    padding: 6px 16px !important;
+    border-radius: 100px !important;
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+}
+
+.badge-completed {
+    background: #f1f5f9 !important; /* Gri */
+    color: #475569 !important; /* Koyu Gri */
+    padding: 6px 16px !important;
+    border-radius: 100px !important;
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+}
+/* --- MAINTENANCE MODULE PREMIUM STYLES --- */
+
+/* Durum Işıkları (Status Indicators) */
+.status-indicator {
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-pending {
+    background: #fff1f2;
+    color: #e11d48;
+    border: 1px solid #fecdd3;
+}
+/* Rose */
+.status-progress {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+}
+/* Blue */
+.status-completed {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+/* Green */
+
+/* Rose Buton Grubu */
+.btn-premium-rose {
+    background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 25px;
+    border-radius: 100px;
+    font-weight: 800;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 20px rgba(244, 63, 94, 0.2);
+}
+
+    .btn-premium-rose:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(244, 63, 94, 0.3);
+    }
+/* --- SECURITY TELEMETRY IMPROVEMENTS (TITREMESIZ VERSİYON) --- */
+
+/* IP Adresi Kutucuğu */
+.ip-tag-pro {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    background: #1e293b !important;
+    color: #38bdf8 !important;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* İşlem Yapılan Varlık Rozeti */
+.entity-pill {
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    padding: 5px 15px;
+    border-radius: 12px;
+    font-weight: 700;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+}
+
+/* HATAYI ÇÖZEN KISIM: Sadece renk değişir, zıplama yapmaz */
+.log-row-premium {
+    transition: background-color 0.2s ease;
+    border-left: 4px solid transparent; /* Kenarlığı önden gizli koyduk ki hoverda zıplamasın */
+}
+
+    .log-row-premium:hover {
+        background-color: #f8fafc !important; /* Hafif modern gri */
+        border-left: 4px solid #6366f1; /* Sadece renk belirir, yer kaplamaz */
+        cursor: pointer;
+    }
+
+/* Üst İstatistik Mini Kartlar */
+.audit-mini-card {
+    background: white;
+    border-radius: 20px;
+    padding: 15px 25px;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.compliance-list .border:hover {
+    border-color: #0ea5e9 !important;
+    transform: translateX(5px);
+    background: #f0f9ff !important;
+}
+/* --- 1. DISCARD BUTTON (Hizalama ve Stil Birleştirildi) --- */
+.btn-discard-premium {
+    /* Senin mevcut renklerin */
+    background: rgba(244, 63, 94, 0.08) !important;
+    color: #f43f5e !important;
+    border: 1.5px solid rgba(244, 63, 94, 0.2) !important;
+    /* Ortak özellikler */
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    padding: 12px 30px !important;
+    border-radius: 12px !important;
+    transition: 0.3s ease !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    /* KRİTİK DÜZELTME: Yazıyı tam ortalar */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    min-width: 130px; /* Butonun çok dar kalmasını önler, daha premium durur */
+}
+
+    .btn-discard-premium:hover {
+        background: #f43f5e !important;
+        color: white !important;
+        box-shadow: 0 8px 20px rgba(244, 63, 94, 0.3) !important;
+        transform: translateY(-2px) !important;
+    }
+
+/* --- 2. PREMIUM ROUNDED TOGGLE SWITCH (iOS Style) --- */
+.switch-premium-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.switch-premium-input {
+    display: none; /* Gerçek kutuyu gizle */
+}
+
+.slider-premium {
+    width: 54px;
+    height: 30px;
+    background: #e2e8f0;
+    border-radius: 50px;
+    position: relative;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+    .slider-premium::after {
+        content: "";
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        background: white;
+        border-radius: 50%;
+        top: 3px;
+        left: 4px;
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+/* Aktif olduğunda yeşile döner ve yuvarlak sağa kayar */
+.switch-premium-input:checked + .slider-premium {
+    background: #10b981;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+}
+
+    .switch-premium-input:checked + .slider-premium::after {
+        left: 27px;
+    }
+/* Sayfa içeriğinin gereksiz uzamasını engeller */
+
+.info-section-card
+
+{
+    height: auto !important;
+    height: fit-content !important; /* İçeriği kadardır, aşağı uzamaz */
+    display: block;
+    overflow: hidden;
+}
+
+.hover-translate:hover {
+    transform: translateX(5px);
+    border-color: #6366f1 !important;
+    transition: 0.3s;
+}
+.nav-pills .nav-link {
+    color: #64748b;
+    border: 1px solid transparent;
+}
+
+    .nav-pills .nav-link.active {
+        background: rgba(99, 102, 241, 0.1) !important;
+        color: #6366f1 !important;
+        border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    }
+
+    .nav-pills .nav-link:hover:not(.active) {
+        background: #f8fafc;
+        color: #1e293b;
+    }
+/* --- MASTER SETTINGS UI ENHANCEMENTS --- */
+.settings-nav-pill {
+    color: #64748b !important;
+    font-weight: 700 !important;
+    padding: 15px 20px !important;
+    border-radius: 15px !important;
+    transition: 0.3s;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    width: 100%;
+    text-align: left;
+}
+
+    .settings-nav-pill.active {
+        background: rgba(99, 102, 241, 0.1) !important;
+        color: #6366f1 !important;
+        border-color: rgba(99, 102, 241, 0.2) !important;
+    }
+
+    .settings-nav-pill:hover:not(.active) {
+        background: #f8fafc !important;
+        color: #1e293b !important;
+    }
+
+.settings-sidebar {
+    position: sticky;
+    top: 100px;
+}
+/* --- LANDING GALLERY & MAP --- */
+
+.gallery-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 24px;
+    z-index: 10;
+    transition: 0.3s;
+}
+
+    .gallery-nav-btn:hover {
+        background: white;
+        color: #6366f1;
+    }
+
+    .gallery-nav-btn.prev {
+        left: -80px;
+    }
+
+    .gallery-nav-btn.next {
+        right: -80px;
+    }
+
+@media (max-width: 992px) {
+    .gallery-nav-btn.prev {
+        left: 10px;
+    }
+
+    .gallery-nav-btn.next {
+        right: 10px;
+    }
+}
+
+.map-container-premium {
+    height: 400px;
+    border-radius: 25px;
+    overflow: hidden;
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.image-overlay-pro {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(99, 102, 241, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    opacity: 0;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.room-image-frame:hover .image-overlay-pro {
+    opacity: 1;
+}
+
+/* ============================================================
+   DORMMS LANDING & UI MASTER COMPONENTS
+   ============================================================ */
+
+/* 1. HERO 3D FLOATING CARD */
+.hero-mockup-container {
+    perspective: 1200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.floating-card-premium {
+    width: 100%;
+    max-width: 500px;
+    height: 400px;
+    background: white;
+    border-radius: 40px;
+    padding: 12px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.12);
+    transform: rotateY(-15deg) rotateX(5deg);
+    animation: floatAnimLanding 6s ease-in-out infinite;
+    transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255,255,255,1);
+}
+
+    .floating-card-premium:hover {
+        transform: rotateY(0deg) rotateX(0deg) scale(1.05);
+        box-shadow: 0 50px 120px rgba(99, 102, 241, 0.25);
+    }
+
+@keyframes floatAnimLanding {
+    0%, 100% {
+        transform: rotateY(-15deg) translateY(0);
+    }
+
+    50% {
+        transform: rotateY(-10deg) translateY(-25px);
+    }
+}
+
+/* 2. GALLERY NAVIGATION */
+.gallery-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 55px;
+    height: 55px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6366f1;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 2100;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: none;
+    transition: 0.3s;
+}
+
+    .gallery-nav-btn:hover {
+        background: #6366f1;
+        color: white;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+.btn-gallery-prev {
+    left: -75px;
+}
+
+.btn-gallery-next {
+    right: -75px;
+}
+
+/* 3. ROOM CARDS VARIETY */
+.room-feature-tag {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 8px;
+    text-transform: uppercase;
+}
+
+/* 4. MAP CONTAINER */
+.map-container-pro {
+    width: 100%;
+    height: 400px;
+    border-radius: 35px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 992px) {
+    .btn-gallery-prev {
+        left: 10px;
+    }
+
+    .btn-gallery-next {
+        right: 10px;
+    }
+}
+/* --- ROOM CARDS OPTIMIZATION (TIGHTER & CLEANER) --- */
+.room-card-premium {
+    min-width: 320px;
+    height: 480px !important; /* Artırıldı */
+    background: white !important;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    transition: all 0.4s ease;
+}
+
+    .room-card-premium:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 30px 60px rgba(99, 102, 241, 0.18);
+    }
+
+.room-image-frame {
+    width: 100%;
+    height: 240px !important; /* 170'den 240'a artırıldı */
+    overflow: hidden;
+}
+
+.room-card-body-premium {
+    padding: 20px !important; /* İç boşluğu daralttım */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Özellik etiketleri */
+.room-feature-tag {
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+/* --- ROOM STATUS COLORS (EXTENDED) --- */
+/* Renkler ve İnce Kenarlıklar (Daha şık durması için) */
+/* --- ROOM STATUS BADGES (REFINED SIZE) --- */
+.badge-status-premium {
+    padding: 7px 16px !important; /* Biraz daha dolgun padding */
+    font-size: 0.72rem !important; /* Yazı boyutunu çok hafif artırdık */
+    font-weight: 800 !important; /* Daha kalın ve oturaklı font */
+    border-radius: 100px !important;
+    text-transform: uppercase; /* Kurumsal görünüm için büyük harf */
+    letter-spacing: 0.5px; /* Harf arası boşluk ile ferahlık */
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02); /* Çok hafif bir derinlik */
+}
+.badge-available {
+    background: #dcfce7 !important;
+    color: #15803d !important;
+    border: 1px solid rgba(21, 128, 61, 0.1) !important;
+}
+
+.badge-occupied {
+    background: #e0f2fe !important;
+    color: #0369a1 !important;
+    border: 1px solid rgba(3, 105, 161, 0.1) !important;
+}
+
+.badge-maintenance {
+    background: #fee2e2 !important;
+    color: #b91c1c !important;
+    border: 1px solid rgba(185, 28, 28, 0.1) !important;
+}
+/* Kırmızı */
+.badge-archived {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+}
+/* Gri */
+/* Gri */
+/* --- MAINTENANCE FLOW BADGES --- */
+.badge-maint-pending {
+    background: #fff7ed !important;
+    color: #c2410c !important;
+    border: 1px solid #fdba74 !important;
+}
+/* Turuncu */
+.badge-maint-progress {
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border: 1px solid #bfdbfe !important;
+}
+/* Mavi */
+.badge-maint-completed {
+    background: #f0fdf4 !important;
+    color: #15803d !important;
+    border: 1px solid #bbf7d0 !important;
+}
+/* Yeşil */
+/* --- DYNAMIC ROLE BADGES --- */
+.badge-role-admin {
+    background: #e0e7ff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.badge-role-manager {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.badge-role-staff {
+    background: #fce7f3;
+    color: #be185d;
+    border: 1px solid #fbcfe8;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.badge-role-default {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+/* --- LANDING UI FIXES (ROOM CARDS) --- */
+.room-slider-container {
+    display: flex !important;
+    gap: 30px !important;
+    padding: 30px 10px !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.room-slider-container::-webkit-scrollbar {
+    display: none;
+}
+
+.room-card-premium {
+    scroll-snap-align: start;
+    flex: 0 0 320px !important; 
+}
+
+.room-image-frame img {
+    min-height: 100%;
+    min-width: 100%;
+    object-fit: cover !important;
+    object-position: center;
 }

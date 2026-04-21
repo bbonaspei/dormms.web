@@ -1,0 +1,176 @@
+﻿@using System.Security.Claims
+@model DormMS.Web.Models.MaintenanceRequest
+
+<div class="container mt-5">
+    <div class="mb-4">
+        <a asp-action="Index" class="btn-back-premium shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Operations Center
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- SOL: TALEP DETAYLARI -->
+        <div class="col-lg-8">
+            <div class="stat-card-new shadow-sm border-0 p-5">
+                <div class="d-flex justify-content-between border-bottom pb-4 mb-4">
+                    <div>
+                        <h2 class="fw-900 text-dark">Request Details</h2>
+                        <span class="text-muted fw-bold small">Ref No: @Model.requestNumber</span>
+                    </div>
+                    <div class="text-end">
+                        <!-- DÜZELTİLEN SATIR 20 -->
+                        <span class="status-indicator @(Model.status == "Pending" ? "status-pending" : (Model.status == "In Progress" ? "status-progress" : "status-completed")) fs-6 px-4 py-2">
+                            @Model.status
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <label class="info-label-pro">Issue Category</label>
+                        <span class="info-value-pro fs-5">@Model.issueCategory</span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="info-label-pro">Urgency Level</label>
+                        <span class="fw-900 @(Model.priority == "High" ? "text-danger" : "text-warning")">@(Model.priority?.ToUpper() ?? "NORMAL")</span>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="info-label-pro">Problem Description</label>
+                    <div class="p-4 bg-light rounded-4 fw-bold text-dark border">
+                        "@Model.description"
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-box-premium">
+                            <label class="info-label-pro">Resident Student</label>
+                            @if (Model.Student?.User != null)
+                            {
+                                <span class="info-value-pro">@Model.Student.User.firstName @Model.Student.User.lastName</span>
+                            }
+                            else
+                            {
+                                <span class="info-value-pro text-muted">Unknown Student</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box-premium">
+                            <label class="info-label-pro">Location</label>
+                            <span class="info-value-pro">Room @(Model.Room?.roomNumber ?? "N/A")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAĞ: AKSİYON PANELİ -->
+        <div class="col-lg-4">
+            @if (Model.status == "Completed")
+            {
+                <!-- KAPALI KAYIT BİLGİSİ -->
+                <div class="stat-card-new shadow-sm border-0 p-4 mb-4" style="border-top: 4px solid #94a3b8 !important;">
+                    <h6 class="section-title-premium mb-4"><i class="bi bi-lock-fill"></i> RECORD CLOSED</h6>
+                    <div class="p-3 rounded-4 text-center" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+                        <i class="bi bi-check2-circle display-6 text-muted opacity-50"></i>
+                        <p class="small fw-bold text-muted mt-3 mb-0">This request has been completed and closed. No further actions are available.</p>
+                    </div>
+                    @if (Model.Staff != null)
+                    {
+                        <div class="mt-4 p-3 bg-light rounded-3 d-flex align-items-center gap-3">
+                            <div class="user-avatar-btn" style="width:40px; height:40px; background:#94a3b8; color:white; border:none !important;">
+                                @(Model.Staff.firstName?.Length > 0 ? Model.Staff.firstName[0].ToString() : "?")
+                            </div>
+                            <div>
+                                <div class="small text-muted fw-bold">Closed By</div>
+                                <div class="fw-900 text-secondary small">@(Model.Staff.firstName) @(Model.Staff.lastName)</div>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.completedDate.HasValue)
+                    {
+                        <div class="mt-3 small text-muted fw-bold text-center">
+                            <i class="bi bi-calendar-check me-1"></i> Closed on @Model.completedDate.Value.ToString("MMM dd, yyyy")
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
+                {
+                    <!-- PERSONEL ATAMA -->
+                    <div class="stat-card-new shadow-sm border-0 p-4 mb-4">
+                        <h6 class="section-title-premium mb-4"><i class="bi bi-person-plus-fill"></i> ASSIGN STAFF</h6>
+
+                        <form asp-action="Assign" method="post">
+                            <input type="hidden" name="id" value="@Model.id" />
+                            <div class="mb-3">
+                                <select name="staffId" class="form-select upload-input-pro w-100" asp-items="ViewBag.StaffList">
+                                    <option value="">Select Technician...</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-premium w-100">Assign to Task</button>
+                        </form>
+
+                        @if (Model.Staff != null)
+                        {
+                            <div class="mt-4 p-3 bg-primary-subtle rounded-3 d-flex align-items-center gap-3">
+                                <div class="user-avatar-btn" style="width:40px; height:40px; background:#fff; color:#6366f1; border:none !important;">
+                                    @(Model.Staff.firstName?.Length > 0 ? Model.Staff.firstName[0].ToString() : "?")
+                                </div>
+                                <div>
+                                    <div class="small text-muted fw-bold">Current Assignee</div>
+                                    <div class="fw-900 text-primary small">@(Model.Staff.firstName) @(Model.Staff.lastName)</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (Model.Staff != null)
+                {
+                    <!-- ATANMIŞ PERSONEL BİLGİSİ (Öğrenci ve Staff için sadece okuma) -->
+                    <div class="stat-card-new shadow-sm border-0 p-4 mb-4">
+                        <h6 class="section-title-premium mb-4"><i class="bi bi-person-check-fill"></i> ASSIGNED PERSONNEL</h6>
+                        <div class="p-3 bg-light rounded-3 d-flex align-items-center gap-3">
+                            <div class="user-avatar-btn" style="width:40px; height:40px; background:#6366f1; color:white; border:none !important;">
+                                @(Model.Staff.firstName?.Length > 0 ? Model.Staff.firstName[0].ToString() : "?")
+                            </div>
+                            <div>
+                                <div class="small text-muted fw-bold">Current Assignee</div>
+                                <div class="fw-900 text-dark small">@Model.Staff.firstName @Model.Staff.lastName</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (!User.IsInRole("Student"))
+                {
+                    <!-- DURUM GÜNCELLEME (Öğrenci göremez) -->
+                    <div class="stat-card-new shadow-sm border-0 p-4">
+                        <h6 class="section-title-premium mb-4"><i class="bi bi-arrow-repeat"></i> UPDATE STATUS</h6>
+                        <form asp-action="UpdateStatus" method="post">
+                            <input type="hidden" name="requestId" value="@Model.id" />
+                            <div class="d-flex flex-column gap-2">
+                                @if (User.IsInRole("Admin") || User.IsInRole("Manager") || (User.IsInRole("Staff") && Model.assignedTo?.ToString() == User.FindFirstValue(ClaimTypes.NameIdentifier)))
+                                {
+                                    @if (Model.status == "Pending")
+                                    {
+                                        <button name="newStatus" value="In Progress" class="btn btn-outline-primary rounded-pill fw-bold small py-2">Start Work</button>
+                                    }
+                                    @if (Model.status == "In Progress")
+                                    {
+                                        <button name="newStatus" value="Completed" class="btn btn-success rounded-pill fw-bold small py-2">Mark as Completed</button>
+                                    }
+                                }
+                            </div>
+                        </form>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

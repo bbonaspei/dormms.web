@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using DormMS.Web.Interfaces;
+﻿using DormMS.Web.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DormMS.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
+
+    [Route("Audit/[action]")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class AuditController : Controller
     {
         private readonly IAuditService _auditService;
@@ -12,10 +17,9 @@ namespace DormMS.Web.Controllers
             _auditService = auditService;
         }
 
-        // GET: Audit (Log Listesi Sayfası)
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            // Servis üzerinden tüm kayıtları çekip sayfaya gönderiyoruz
             var logs = await _auditService.GetAllLogsAsync();
             return View(logs);
         }

@@ -1,0 +1,229 @@
+﻿@model DormMS.Web.Models.StudentDashboardViewModel
+@{
+    ViewData["Title"] = "Student Portal";
+
+    // Parayı ekrandaki tasarıma uydurmak için Dolar ve Cent olarak ayırıyoruz (Örn: $450 .00)
+    var amountStr = Model.TotalUpcomingDue.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+    var dollars = amountStr.Split('.')[0];
+    var cents = amountStr.Split('.')[1];
+}
+
+<div class="container-fluid px-4 mt-5">
+
+    <!-- GİRİŞ KARŞILAMASI -->
+    <div class="row mb-5 align-items-center">
+        <div class="col-auto">
+            @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+            {
+                <img src="@Model.ProfilePicture" 
+                     class="rounded-circle shadow-sm border border-4 border-white" 
+                     style="width: 80px; height: 80px; object-fit: cover;" />
+            }
+            else
+            {
+                <div class="rounded-circle shadow-sm border border-4 border-white d-flex align-items-center justify-content-center" 
+                     style="width: 80px; height: 80px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; font-size: 2rem; font-weight: 900;">
+                    @(Model.StudentFirstName?[0].ToString() ?? "S")
+                </div>
+            }
+        </div>
+        <div class="col">
+            <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin-bottom: 0;">
+                Hello, <span style="color: #6366f1;">@Model.StudentFirstName!</span>
+            </h1>
+            <p class="text-muted fw-bold mt-1 mb-0">Your resident hub for housing, payments, and support.</p>
+        </div>
+    </div>
+
+    <!-- HIZLI İSTATİSTİKLER (DİNAMİK) -->
+    <div class="row g-4 mb-5">
+
+        <!-- ODA DURUMU -->
+        <div class="col-md-4">
+            <div class="stat-card-new h-100 alert-border-blue d-flex align-items-center gap-4">
+                <div class="icon-box icon-blue" style="width: 60px; height: 60px; font-size: 28px;">
+                    <i class="bi bi-door-open-fill"></i>
+                </div>
+                <div>
+                    <h5 class="stat-title-premium mb-1">My Unit</h5>
+                    <div class="stat-value-premium" style="font-size: 1.8rem;">
+                        @(Model.HasActiveLease ? $"Room {Model.RoomNumber}" : "No Unit")
+                    </div>
+                    @if (Model.HasActiveLease)
+                    {
+                        <span class="badge badge-available mt-2">Active Lease</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-inactive mt-2">No Active Lease</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- FİNANS DURUMU -->
+        <div class="col-md-4">
+            <div class="stat-card-new h-100 alert-border-orange d-flex align-items-center gap-4">
+                <div class="icon-box icon-orange" style="width: 60px; height: 60px; font-size: 28px;">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+                <div>
+                    <h5 class="stat-title-premium mb-1">Upcoming Due</h5>
+                    <div class="stat-value-premium" style="font-size: 1.8rem;">$@dollars<span class="stat-unit-label">.@cents</span></div>
+
+                    @if (Model.TotalUpcomingDue > 0)
+                    {
+                        if (Model.IsOverdue)
+                        {
+                            <span class="text-danger small fw-bold d-block mt-2"><i class="bi bi-exclamation-triangle-fill"></i> Overdue by @Model.DaysUntilDue days</span>
+                        }
+                        else if (Model.DaysUntilDue == 0)
+                        {
+                            <span class="text-warning small fw-bold d-block mt-2"><i class="bi bi-clock-fill"></i> Due Today!</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted small fw-bold d-block mt-2"><i class="bi bi-clock"></i> Due in @Model.DaysUntilDue days</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-success small fw-bold d-block mt-2"><i class="bi bi-check-circle-fill"></i> All balances cleared</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- ARIZA DURUMU -->
+        <div class="col-md-4">
+            <div class="stat-card-new h-100 alert-border-red d-flex align-items-center gap-4">
+                <div class="icon-box icon-red" style="width: 60px; height: 60px; font-size: 28px;">
+                    <i class="bi bi-tools"></i>
+                </div>
+                <div>
+                    <h5 class="stat-title-premium mb-1">Active Requests</h5>
+                    <div class="stat-value-premium" style="font-size: 1.8rem;">@Model.ActiveRequestCount <span class="stat-unit-label">Pending</span></div>
+                    <a asp-controller="Maintenance" asp-action="Index" class="small fw-bold text-decoration-none text-muted d-block mt-2 hover-translate">Track status &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ALT BÖLÜM: AKSİYONLAR VE DETAYLAR -->
+    <div class="row g-4">
+
+        <!-- SOL: ODA DETAYLARI KARTI -->
+        <div class="col-lg-7">
+            <!-- KAYMA HATASI BURADA ÇÖZÜLDÜ: overflow-hidden ve ikon pozisyonu revize edildi -->
+            <div class="profile-header-premium h-100 position-relative overflow-hidden" style="z-index: 1;">
+
+                <!-- ARKA PLAN İKONU (SABİT VE TAŞMAZ) -->
+                <div class="position-absolute opacity-10" style="bottom: -30px; right: -20px; z-index: -1;">
+                    <i class="bi bi-house-door-fill" style="font-size: 160px; color: #6366f1; transform: rotate(-10deg); display: block;"></i>
+                </div>
+
+                <h6 class="section-title-premium"><i class="bi bi-info-circle-fill"></i> Lease Information</h6>
+
+                <div class="row mt-4">
+                    <div class="col-sm-6">
+                        <div class="info-box-premium">
+                            <span class="info-label-pro">Building & Floor</span>
+                            <span class="info-value-pro">@(Model.BuildingName), Floor @(Model.Floor?.ToString() ?? "-")</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="info-box-premium">
+                            <span class="info-label-pro">Room Type</span>
+                            <span class="info-value-pro">@Model.RoomType</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="info-box-premium">
+                            <span class="info-label-pro">Check-in Date</span>
+                            <span class="info-value-pro">@(Model.CheckInDate?.ToString("MMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture) ?? "-")</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="info-box-premium border-dashed bg-transparent">
+                            <span class="info-label-pro">Lease Ends</span>
+                            <span class="info-value-pro text-danger">@(Model.LeaseEndDate?.ToString("MMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture) ?? "-")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAĞ: HIZLI İŞLEMLER -->
+        <div class="col-lg-5">
+            <div class="info-section-card h-100 bg-glass-dark">
+                <h6 class="section-title-premium mb-4"><i class="bi bi-lightning-charge-fill text-warning"></i> Quick Actions</h6>
+
+                <!-- Ödeme Yap Butonu -->
+                <a asp-controller="Payments" asp-action="Index" class="portal-item text-decoration-none">
+                    <div class="icon-box icon-green" style="width: 40px; height: 40px; font-size: 18px;">
+                        <i class="bi bi-credit-card-fill"></i>
+                    </div>
+                    <div>
+                        <div class="d-block text-dark fw-bold" style="font-size: 1.05rem;">My Payments</div>
+                        <div class="small text-muted fw-normal">Settle monthly dues & view receipts.</div>
+                    </div>
+                    <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+                </a>
+
+                <!-- Arıza Bildir Butonu -->
+                <a asp-controller="Maintenance" asp-action="Create" class="portal-item text-decoration-none">
+                    <div class="icon-box icon-red" style="width: 40px; height: 40px; font-size: 18px;">
+                        <i class="bi bi-wrench-adjustable"></i>
+                    </div>
+                    <div>
+                        <div class="d-block" style="font-size: 1.05rem;">Report Facility Issue</div>
+                        <div class="small text-muted fw-normal">Electrical, plumbing, or furniture problems.</div>
+                    </div>
+                    <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+                </a>
+
+                <!-- Belgelerim Butonu -->
+                <a asp-controller="Account" asp-action="MyProfile" class="portal-item text-decoration-none">
+                    <div class="icon-box icon-blue" style="width: 40px; height: 40px; font-size: 18px;">
+                        <i class="bi bi-file-earmark-text-fill"></i>
+                    </div>
+                    <div>
+                        <div class="d-block" style="font-size: 1.05rem;">My Documents</div>
+                        <div class="small text-muted fw-normal">Contract, consent forms and IDs.</div>
+                    </div>
+                    <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+                </a>
+
+                <!-- ODA GÖZ AT BUTONU (YENİ) -->
+                @if (!Model.HasActiveLease)
+                {
+                    <a asp-controller="Rooms" asp-action="Browse" class="portal-item text-decoration-none mb-0 bg-primary text-white border-0 shadow-lg">
+                        <div class="icon-box bg-white text-primary" style="width: 40px; height: 40px; font-size: 18px;">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <div>
+                            <div class="d-block fw-bold" style="font-size: 1.05rem;">Find a Room</div>
+                            <div class="small text-white opacity-75 fw-normal">Browse available living units.</div>
+                        </div>
+                        <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Rooms" asp-action="Browse" class="portal-item text-decoration-none mb-0">
+                        <div class="icon-box icon-purple" style="width: 40px; height: 40px; font-size: 18px;">
+                            <i class="bi bi-buildings"></i>
+                        </div>
+                        <div>
+                            <div class="d-block" style="font-size: 1.05rem;">Unit Catalog</div>
+                            <div class="small text-muted fw-normal">View other options on campus.</div>
+                        </div>
+                        <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+                    </a>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

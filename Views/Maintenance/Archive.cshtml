@@ -1,0 +1,90 @@
+﻿@model IEnumerable<DormMS.Web.Models.MaintenanceRequest>
+
+@{
+    ViewData["Title"] = "Archived Operations";
+}
+
+<div class="container-fluid px-4 mt-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-md-8">
+            <h1 style="color: #475569; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px;">
+                Archived <span style="color: #94a3b8;">Records.</span>
+            </h1>
+            <p class="text-muted fw-bold mt-2">Completed and closed facility maintenance requests.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="Index" class="btn-back-premium text-decoration-none shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-arrow-left"></i> BACK TO ACTIVE LOGS
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-white shadow-sm rounded-4 border">
+                    <i class="bi bi-archive display-1 text-muted opacity-25"></i>
+                    <p class="mt-3 fw-bold text-muted">No archived records found.</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col-xl-4 col-md-6">
+                    <div class="stat-card-new h-100 shadow-sm border-0 d-flex flex-column" style="border-top: 5px solid #94a3b8 !important; opacity: 0.9;">
+
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div class="icon-box" style="background: #f1f5f9; color: #64748b;">
+                                <i class="bi bi-check2-circle"></i>
+                            </div>
+                            <div class="d-flex flex-column align-items-end gap-2">
+                                <span class="status-indicator status-completed">
+                                    @item.status
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 style="font-weight:900; color:#475569; margin:0; font-size:1.2rem;">@item.issueCategory Issue</h4>
+                            <span class="text-muted small fw-bold" style="font-size: 10px;">@item.requestNumber</span>
+                            <p class="text-muted small fw-bold mb-0 mt-2" style="line-height: 1.4;">
+                                "@item.description"
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded-4 mb-4 shadow-sm" style="background: #f8fafc; border: 1px solid #edf2f7;">
+                            <div class="row g-2">
+                                <div class="col-6 border-end">
+                                    <span class="info-label-pro" style="font-size: 9px;">REPORTED BY</span>
+                                    <span class="small fw-bold text-muted d-block text-truncate">@item.Student?.User?.firstName @item.Student?.User?.lastName</span>
+                                </div>
+                                <div class="col-6 ps-3">
+                                    <span class="info-label-pro" style="font-size: 9px;">CLOSED ON</span>
+                                    <span class="small fw-bold text-muted d-block">@(item.completedDate?.ToString("MMM dd, yyyy") ?? "-")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@item.id" class="btn-card-details-wide flex-grow-1" style="color: #64748b !important;">
+                                View Details <i class="bi bi-eye ms-1"></i>
+                            </a>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <form asp-action="Delete" asp-route-id="@item.id" method="post" onsubmit="return confirm('WARNING: Permanently delete this archived record?');">
+                                    <button type="submit" class="btn-card-delete" title="Delete Permanently">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

@@ -36,5 +36,32 @@ namespace DormMS.Web.Services
                 building.buildingName // Yeni değer (Eklenen binanın adı)
             );
         }
+        public async Task<Building?> GetBuildingByIdAsync(int id)
+        {
+            return await _repo.GetByIdAsync(id); // Repository üzerinden çağırır
+        }
+
+        public async Task UpdateBuildingAsync(Building building)
+        {
+            await _repo.UpdateAsync(building); // Repository üzerinden günceller
+        }
+
+        public async Task DeleteBuildingAsync(int id)
+        {
+            var building = await _repo.GetByIdAsync(id);
+            if (building != null)
+            {
+                await _repo.DeleteAsync(id);
+
+                // AUDIT LOG: Silme işlemini kaydet
+                await _audit.LogActionAsync(
+                    "DELETE",
+                    "Building",
+                    id,
+                    building.buildingName,
+                    null
+                );
+            }
+        }
     }
 }

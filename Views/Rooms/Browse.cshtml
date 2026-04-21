@@ -1,0 +1,99 @@
+@model IEnumerable<DormMS.Web.Models.Room>
+@{
+    ViewData["Title"] = "Available Units";
+}
+
+<div class="container-fluid px-4 mt-5">
+    <div class="mb-5">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2px;">
+            Available <span style="color: #6366f1;">Units.</span>
+        </h1>
+        <p class="text-muted fw-bold">Explore our high-quality living spaces and find your new home.</p>
+    </div>
+
+    <div class="row g-4">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var room in Model)
+            {
+                <div class="col-md-4 col-lg-3">
+                    <div class="stat-card-new shadow-sm border-0 p-0 overflow-hidden h-100 hover-translate">
+                        <div style="height: 180px; background: #f1f5f9; position: relative;">
+                            <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=800" 
+                                 class="w-100 h-100" 
+                                 style="object-fit: cover; opacity: 0.9;"
+                                 onerror="this.src='https://images.unsplash.com/photo-1555854817-5a22834a5078?q=80&w=800'">
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-success rounded-pill px-3 py-2 fw-bold shadow-sm">AVAILABLE</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h4 class="fw-900 text-dark mb-0">Room @room.roomNumber</h4>
+                                    <span class="text-muted small fw-bold">@(room.Building?.buildingName ?? "Campus") - Floor @room.floorNumber</span>
+                                </div>
+                                <div class="icon-box icon-blue" style="width: 45px; height: 45px;">
+                                    <i class="bi bi-house-star"></i>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-people-fill text-primary"></i>
+                                    <span class="small fw-bold text-dark">@room.capacity Person Sharing</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-tag-fill text-success"></i>
+                                    <span class="small fw-bold text-dark">$@(room.RoomType?.basePrice.ToString("N0") ?? "0") / Month</span>
+                                </div>
+                            </div>
+
+                            <div class="border-top pt-3">
+                                <div class="d-flex gap-1 flex-wrap">
+                                    <span class="badge bg-light text-muted border py-1 px-2" style="font-size: 10px;">WiFi</span>
+                                    <span class="badge bg-light text-muted border py-1 px-2" style="font-size: 10px;">A/C Included</span>
+                                    @if(room.RoomType?.hasBathroom == true) {
+                                        <span class="badge bg-light text-muted border py-1 px-2" style="font-size: 10px;">Private Bath</span>
+                                    }
+                                </div>
+                            </div>
+                            
+                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                            {
+                                <div class="mt-4">
+                                    <a asp-controller="Allocations" asp-action="Create" asp-route-roomId="@room.id" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">ASSIGN RESIDENT</a>
+                                </div>
+                            }
+                            else if (ViewBag.HasActiveAllocation == true)
+                            {
+                                <div class="mt-4">
+                                    <button class="btn btn-secondary w-100 rounded-pill fw-bold py-2 shadow-sm" disabled>REQUEST PENDING/ACTIVE</button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mt-4">
+                                    <form asp-action="RequestRoom" method="post">
+                                        <input type="hidden" name="roomId" value="@room.id" />
+                                        <button type="submit" class="btn btn-premium w-100 rounded-pill fw-bold py-2 shadow-sm">BOOK NOW</button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <div class="bg-light p-5 rounded-5 border border-dashed">
+                    <i class="bi bi-building-slash display-1 text-muted opacity-25 mb-4 d-block"></i>
+                    <h3 class="fw-900">All Units Currently Occupied</h3>
+                    <p class="text-muted">Please check back later or contact hospitality for waitlist options.</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

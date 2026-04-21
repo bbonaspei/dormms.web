@@ -1,48 +1,106 @@
 ﻿@model DormMS.Web.Models.Building
 
-<div class="container-fluid px-5">
-    <!-- Geri Butonu (Premium Tasarım) -->
-    <div class="mb-5 pt-3">
-        <a asp-action="Index" class="btn-back-premium text-decoration-none">
+@{
+    ViewData["Title"] = "Register New Building";
+}
+
+<div class="container mt-5">
+    <!-- Geri Butonu -->
+    <div class="mb-4">
+        <a asp-action="Index" class="btn-back-premium shadow-sm text-decoration-none">
             <i class="bi bi-arrow-left"></i> BACK TO INFRASTRUCTURE
         </a>
     </div>
 
+    <!-- BAŞLIK: Register Building. -->
     <div class="text-center mb-5">
-        <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2px;">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3.5rem; letter-spacing: -3px; line-height: 1;">
             Register <span style="color: #6366f1;">Building.</span>
         </h1>
-        <p class="text-muted">Initialize a new campus block in the system.</p>
+        <p class="text-muted mt-2">Initialize a new campus block in the system with full specifications.</p>
     </div>
 
-    <!-- Form Kartı -->
-    <div class="form-card-premium" style="max-width: 700px; margin: 0 auto;">
+    <div class="form-card-premium shadow-sm border-top border-5 border-primary">
         <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="row g-4">
-                <div class="col-md-12">
-                    <label class="label-premium">Building Name</label>
-                    <input asp-for="buildingName" class="dorm-input-premium" placeholder="e.g. North Block" required />
+                <!-- Bina Adı -->
+                <div class="col-md-8">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Building Name</label>
+                        <input asp-for="buildingName" class="dorm-input-premium" placeholder="e.g. West Resident Hall" required />
+                        <span asp-validation-for="buildingName" class="text-danger"></span>
+                    </div>
                 </div>
 
+                <!-- Blok Kodu -->
+                <div class="col-md-4">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Block Code</label>
+                        <input asp-for="buildingCode" class="dorm-input-premium" placeholder="e.g. BLK-W" required />
+                        <span asp-validation-for="buildingCode" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Adres -->
+                <div class="col-12">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Physical Location / Address</label>
+                        <input asp-for="address" class="dorm-input-premium" placeholder="Enter the full campus address..." />
+                    </div>
+                </div>
+
+                <!-- Kat Sayısı -->
                 <div class="col-md-6">
-                    <label class="label-premium">Total Floors</label>
-                    <input asp-for="totalFloors" type="number" min="1" class="dorm-input-premium" placeholder="1" />
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Total Floor Levels</label>
+                        <input asp-for="totalFloors" type="number" min="0" class="dorm-input-premium" value="1" />
+                    </div>
                 </div>
 
-                <!-- YENİ: Yan yana duran modern Switch -->
-                <div class="col-md-6 d-flex align-items-end pb-3 px-3">
-                    <label class="switch-inline">
-                        <input asp-for="hasElevator" type="checkbox" />
-                        <div class="slider-round"></div>
-                        <span class="label-premium m-0">Elevator Access</span>
-                    </label>
+                <!-- Başlangıç Durumu -->
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Operational Status</label>
+                        <select asp-for="status" class="dorm-input-premium">
+                            <option value="Active">Active</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- YUVARLATILMIŞ PREMIUM TOGGLE (Asansör) -->
+                <div class="col-12">
+                    <div class="p-4 bg-light rounded-4 border d-flex align-items-center justify-content-between shadow-sm">
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Elevator Accessibility</h6>
+                            <p class="text-muted small mb-0 fw-medium">Check if this block is equipped with a modern elevator system.</p>
+                        </div>
+                        <label class="switch-premium-wrapper">
+                            <input class="switch-premium-input" type="checkbox" asp-for="hasElevator">
+                            <div class="slider-premium"></div>
+                        </label>
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
-                <a asp-action="Index" class="btn-discard-premium text-decoration-none">DISCARD</a>
-                <button type="submit" class="btn-premium">Complete Registration</button>
+            <!-- BUTONLAR (Hizalama Edit ile aynı yapıldı) -->
+            <div class="d-flex gap-3 mt-5 pt-4 border-top">
+                <button type="submit" class="btn-premium flex-grow-1 justify-content-center">
+                    <i class="bi bi-building-add me-2 fs-5"></i> COMPLETE REGISTRATION
+                </button>
+                <a asp-action="Index" class="btn-discard-premium">
+                    DISCARD
+                </a>
             </div>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

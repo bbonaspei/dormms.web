@@ -2,43 +2,73 @@
 
 <div class="container-fluid px-5" style="position: relative; min-height: 85vh;">
 
-    <!-- 1. GERİ BUTONU: Sol üstte, hizalı -->
+    <!-- GERİ BUTONU -->
     <div style="position: absolute; left: 0; top: 15px;">
-        <a asp-action="Index" class="btn-back-premium text-decoration-none">
+        <a asp-action="Index" class="btn-back-premium text-decoration-none shadow-sm">
             <i class="bi bi-arrow-left"></i> BACK TO LOGS
         </a>
     </div>
 
-    <!-- 2. SAYFA BAŞLIĞI: Rose Accent -->
-    <div class="text-center" style="margin-top: 80px; margin-bottom: 60px;">
+    <!-- SAYFA BAŞLIĞI -->
+    <div class="text-center" style="margin-top: 80px; margin-bottom: 50px;">
         <h1 style="color: #312e81; font-weight: 900; font-size: 3.5rem; letter-spacing: -3px; line-height: 1;">
             Issue <span style="color: #f43f5e;">Reporting.</span>
         </h1>
-        <p class="text-muted mt-2">Formalize facility maintenance requests for institutional tracking.</p>
+        <p class="text-muted mt-2 fw-bold">Formalize facility maintenance requests for institutional tracking.</p>
     </div>
 
-    <!-- 3. FORM KARTI -->
-    <div class="stat-card-new p-5" style="max-width: 850px; margin: 0 auto; border: 1px solid rgba(0,0,0,0.02) !important;">
+    <!-- PREMIUM FORM KARTI -->
+    <div class="form-card-premium" style="max-width: 850px; margin: 0 auto; border: 1px solid rgba(0,0,0,0.02) !important;">
         <form asp-action="Create">
             <div class="row g-4 text-start">
 
-                <div class="col-md-6">
-                    <div class="input-wrapper-premium">
-                        <label class="label-premium" style="color:#f43f5e;">Reporting Resident</label>
-                        <select asp-for="studentId" class="dorm-input-premium" asp-items="ViewBag.studentId">
-                            <option value="">Select student...</option>
-                        </select>
-                    </div>
-                </div>
+                @if (ViewBag.IsStudent)
+                {
+                    <!-- ÖĞRENCİ İÇİN OTOMATİK DOLDURULAN VE GİZLİ ALANLAR -->
+                    <input type="hidden" asp-for="studentId" value="@ViewBag.StudentId" />
+                    <input type="hidden" asp-for="roomId" value="@ViewBag.RoomId" />
 
-                <div class="col-md-6">
-                    <div class="input-wrapper-premium">
-                        <label class="label-premium" style="color:#f43f5e;">Affected Unit (Room)</label>
-                        <select asp-for="roomId" class="dorm-input-premium" asp-items="ViewBag.roomId">
-                            <option value="">Select room...</option>
-                        </select>
+                    <div class="col-md-6">
+                        <div class="input-wrapper-premium">
+                            <label class="label-premium" style="color:#f43f5e;">Reporting Resident</label>
+                            <input type="text" class="dorm-input-premium text-muted" style="background:#f1f5f9; cursor:not-allowed;" value="@ViewBag.StudentName" readonly />
+                        </div>
                     </div>
-                </div>
+                    <div class="col-md-6">
+                        <div class="input-wrapper-premium">
+                            <label class="label-premium" style="color:#f43f5e;">Affected Unit (Room)</label>
+                            <input type="text" class="dorm-input-premium text-muted" style="background:#f1f5f9; cursor:not-allowed;" value="@ViewBag.RoomNumber" readonly />
+                            @if (ViewBag.RoomId == null)
+                            {
+                                <small class="text-danger fw-bold mt-1 d-block"><i class="bi bi-exclamation-circle"></i> You are not assigned to a room.</small>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- ADMİN İÇİN SEÇİM LİSTELERİ -->
+                    <div class="col-md-6">
+                        <div class="input-wrapper-premium">
+                            <label class="label-premium" style="color:#f43f5e;">Reporting Resident</label>
+                            <select asp-for="studentId" class="dorm-input-premium" asp-items="ViewBag.studentId">
+                                <option value="">Admin / General (Facility)</option>
+                            </select>
+                            <small class="text-muted d-block mt-1">Leave as 'Admin / General' for non-student issues.</small>
+                            <span asp-validation-for="studentId" class="text-danger small fw-bold"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-wrapper-premium">
+                            <label class="label-premium" style="color:#f43f5e;">Affected Unit (Room)</label>
+                            <select asp-for="roomId" class="dorm-input-premium" asp-items="ViewBag.roomId">
+                                <option value="">General Facility / Non-Room</option>
+                            </select>
+                            <small class="text-muted d-block mt-1">Select a room or leave as 'General Facility'.</small>
+                            <span asp-validation-for="roomId" class="text-danger small fw-bold"></span>
+                        </div>
+                    </div>
+                }
 
                 <div class="col-md-6">
                     <div class="input-wrapper-premium">
@@ -47,8 +77,10 @@
                             <option value="Electrical">Electrical</option>
                             <option value="Plumbing">Plumbing</option>
                             <option value="Furniture">Furniture</option>
+                            <option value="HVAC">HVAC / AC</option>
                             <option value="Other">Other</option>
                         </select>
+                        <span asp-validation-for="issueCategory" class="text-danger small fw-bold"></span>
                     </div>
                 </div>
 
@@ -59,27 +91,40 @@
                             <option value="Low">Low Priority</option>
                             <option value="Medium">Medium Priority</option>
                             <option value="High">High Priority</option>
+                            <option value="Emergency">Emergency</option>
                         </select>
+                        <span asp-validation-for="priority" class="text-danger small fw-bold"></span>
                     </div>
                 </div>
 
                 <div class="col-md-12">
                     <div class="input-wrapper-premium">
                         <label class="label-premium" style="color:#f43f5e;">Issue Description</label>
-                        <textarea asp-for="description" class="dorm-input-premium textarea-fix" rows="4" placeholder="Detail the problem here..."></textarea>
+                        <textarea asp-for="description" class="dorm-input-premium textarea-fix" rows="4" placeholder="Please provide specific details about the issue..."></textarea>
+                        <span asp-validation-for="description" class="text-danger small fw-bold"></span>
                     </div>
                 </div>
 
             </div>
 
-            <!-- 4. BUTONLAR: Premium Rose ve Discard -->
+            <!-- BUTONLAR -->
             <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top" style="border-color: #f1f5f9 !important;">
-                <a asp-action="Index" class="btn-discard-premium text-decoration-none">
-                    DISCARD REQUEST
+                <a asp-action="Index" class="btn-discard-premium">
+                    DISCARD
                 </a>
-                <button type="submit" class="btn-premium-rose">
-                    <i class="bi bi-megaphone-fill"></i> Broadcast Request
-                </button>
+
+                @if (ViewBag.IsStudent && ViewBag.RoomId == null)
+                {
+                    <button type="button" class="btn-premium-rose opacity-50" disabled title="You must be assigned to a room to submit a request">
+                        <i class="bi bi-lock-fill"></i> Unavailable
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" class="btn-premium-rose">
+                        <i class="bi bi-megaphone-fill"></i> Broadcast Request
+                    </button>
+                }
             </div>
         </form>
     </div>

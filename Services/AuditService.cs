@@ -1,25 +1,28 @@
-﻿using DormMS.Web.Data;
-using DormMS.Web.Interfaces;
+﻿using DormMS.Web.Interfaces;
 using DormMS.Web.Models;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace DormMS.Web.Services
 {
     public class AuditService : IAuditService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IAuditRepository _auditRepo;
         private readonly IHttpContextAccessor _httpContext;
 
-        public AuditService(ApplicationDbContext context, IHttpContextAccessor httpContext)
+        public AuditService(IAuditRepository auditRepo, IHttpContextAccessor httpContext)
         {
-            _context = context;
+            _auditRepo = auditRepo;
             _httpContext = httpContext;
         }
 
         public async Task LogActionAsync(string action, string entityType, int entityId, string? oldVal = null, string? newVal = null)
         {
+            var userIdString = _httpContext.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? currentUserId = string.IsNullOrEmpty(userIdString) ? null : int.Parse(userIdString);
+
             var log = new AuditLog
             {
+                userId = currentUserId,
                 action = action,
                 entityType = entityType,
                 entityId = entityId,
@@ -30,17 +33,12 @@ namespace DormMS.Web.Services
                 createdAt = DateTime.Now
             };
 
-            _context.AuditLogs.Add(log);
-            await _context.SaveChangesAsync();
+            await _auditRepo.AddAsync(log);
         }
 
-        // İsmi GetAllLogsAsync (Çoğul) olarak güncelledik
         public async Task<IEnumerable<AuditLog>> GetAllLogsAsync()
         {
-            return await _context.AuditLogs
-                .Include(a => a.User)
-                .OrderByDescending(a => a.createdAt)
-                .ToListAsync();
+            return await _auditRepo.GetAllAsync();
         }
     }
 }

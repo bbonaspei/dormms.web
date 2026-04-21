@@ -1,0 +1,71 @@
+﻿@model DormMS.Web.Models.User
+
+@{
+    ViewData["Title"] = "New Staff Enrollment";
+}
+
+<div class="container-fluid px-5">
+    <div class="mb-4 mt-4">
+        <a asp-action="Index" class="btn-back-premium shadow-sm border-0 py-2 px-3">
+            <i class="bi bi-arrow-left me-2"></i> BACK TO STAFF REGISTRY
+        </a>
+    </div>
+
+    <div class="text-center mb-5">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2px;">
+            Worker <span style="color: #10b981;">Enrollment.</span>
+        </h1>
+        <p class="text-muted fw-bold">Register a new personnel member and assign their institutional role.</p>
+    </div>
+
+    <div class="stat-card-new p-5 shadow-sm" style="max-width: 900px; margin: 0 auto; border-top: 5px solid #10b981;">
+        <form asp-action="Create">
+            <div class="row g-4 text-start">
+
+                <!-- KİŞİSEL BİLGİLER -->
+                <div class="col-12"><h6 class="section-title-premium"><i class="bi bi-person-vcard me-2"></i>PERSONAL IDENTITY</h6></div>
+
+                <div class="col-md-6">
+                    <label class="label-premium">First Name</label>
+                    <input asp-for="firstName" class="dorm-input-premium" placeholder="e.g. Ahmet" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">Last Name</label>
+                    <input asp-for="lastName" class="dorm-input-premium" placeholder="e.g. Yılmaz" required />
+                </div>
+                <div class="col-12">
+                    <label class="label-premium">Institutional Email</label>
+                    <input asp-for="email" type="email" class="dorm-input-premium" placeholder="staff@dormms.system" required />
+                </div>
+
+                <!-- GÖREV BİLGİLERİ -->
+                <div class="col-12 mt-5"><h6 class="section-title-premium"><i class="bi bi-person-workspace me-2"></i>ROLE & DEPARTMENT</h6></div>
+
+                <div class="col-md-6">
+                    <label class="label-premium">Username (Login ID)</label>
+                    <input asp-for="username" class="dorm-input-premium" placeholder="e.g. ahmet.yilmaz" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">Assign Role</label>
+                    <select name="roleId" class="dorm-input-premium" asp-items="ViewBag.Roles">
+                        <option value="">Select a role for this staff...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- BUTONLAR -->
+            <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top gap-3">
+                <a asp-action="Index" class="btn-discard-premium">CANCEL</a>
+                <button type="submit" class="btn-premium px-5" style="background:linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;">
+                    <i class="bi bi-person-plus-fill me-2"></i> HIRE STAFF
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

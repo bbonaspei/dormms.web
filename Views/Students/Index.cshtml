@@ -1,44 +1,101 @@
 ﻿@model IEnumerable<DormMS.Web.Models.Student>
 
-<div class="row align-items-center page-header-area px-2">
-    <div class="col-md-8 text-start">
-        <h1 style="color: #312e81; font-weight: 900; font-size: 2.2rem; letter-spacing: -1.5px;">
-            Student <span style="color: #10b981;">Directory.</span>
-        </h1>
-        <p class="text-muted small fw-medium">Official registry of all enrolled residents and academic details.</p>
+<div class="container-fluid px-4 mt-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px;">
+                Student <span style="color: #10b981;">Directory.</span>
+            </h1>
+            <p class="text-muted fw-bold">Official registry of all enrolled residents and academic details.</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Create" class="btn-premium" style="background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;">
+                <i class="bi bi-person-plus-fill me-2"></i> Enroll New Student
+            </a>
+        </div>
     </div>
-    <div class="col-md-4 text-end">
-        <a asp-action="Create" class="btn-premium text-decoration-none" style="background:linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;">
-            + Enroll Student
-        </a>
+
+    <div class="row g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-xl-4 col-lg-6">
+                <div class="room-card-vibrant p-4 h-100 border-0 shadow-sm" style="border-radius: 25px;">
+                    <div class="d-flex align-items-start gap-4">
+                        <!-- Avatar / Profil Resmi -->
+                        <div class="user-avatar-btn" style="width: 80px; height: 80px; font-size: 1.8rem; background: #f1f5f9; color: #6366f1; border: none !important;">
+                            @if (!string.IsNullOrEmpty(item.User?.profilePicture))
+                            {
+                                <img src="@item.User.profilePicture" alt="Profile" />
+                            }
+                            else
+                            {
+                                var initials = (item.User?.firstName?.Length > 0 ? item.User.firstName[0].ToString() : "") + 
+                                               (item.User?.lastName?.Length > 0 ? item.User.lastName[0].ToString() : "");
+                                <text>@initials</text>
+                            }
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold mb-1 text-dark">@item.User?.firstName @item.User?.lastName</h4>
+                            <span class="text-muted small fw-bold">ID: @item.studentId</span>
+
+                            <div class="mt-4 pt-3 border-top">
+                                <div class="mb-2">
+                                    <label class="label-premium mb-0" style="font-size: 10px;">University</label>
+                                    <div class="fw-bold small text-dark">@item.university</div>
+                                </div>
+                                <div>
+                                    <label class="label-premium mb-0" style="font-size: 10px;">Course</label>
+                                    <div class="fw-bold small text-dark">@item.course</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3">
+                        <span class="badge-active" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">@item.status</span>
+                        
+                        <div class="d-flex gap-2">
+                            @if (User.IsInRole("Admin") || User.IsInRole("DormManager"))
+                            {
+                                <form asp-action="Delete" asp-route-id="@item.id" method="post" id="form-delete-@item.id">
+                                    <button type="button" onclick="confirmDelete('form-delete-@item.id')" class="btn-card-delete" style="border-radius: 50% !important; width: 44px; height: 44px;" title="Delete Student">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </button>
+                                </form>
+                            }
+                            <a asp-action="Details" asp-route-id="@item.id" class="btn-card-details-wide px-4" style="width: auto;">
+                                View Profile <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
-<div class="row g-4 px-2">
-    @foreach (var item in Model)
-    {
-        <div class="col-md-6 col-lg-4">
-            <div class="stat-card-new h-100">
-                <div class="d-flex align-items-center gap-3 mb-4">
-                    <div style="width: 55px; height: 55px; background: #f1f5f9; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-weight:900; color:#6366f1; font-size:20px;">
-                        @(item.User?.firstName?[0])
-                    </div>
-                    <div>
-                        <h4 class="fw-bold mb-0">@item.User?.firstName @item.User?.lastName</h4>
-                        <small class="text-muted">ID: @item.studentId</small>
-                    </div>
-                </div>
-                <div class="p-3 rounded-4" style="background: #f8fafc; border: 1px solid rgba(0,0,0,0.02);">
-                    <p class="small mb-1 text-muted">UNIVERSITY</p>
-                    <p class="fw-bold small mb-2">@item.university</p>
-                    <p class="small mb-1 text-muted">COURSE</p>
-                    <p class="fw-bold small">@item.course</p>
-                </div>
-                <div class="mt-4 d-flex justify-content-between align-items-center">
-                    <span class="badge-active">@item.status</span>
-                    <a asp-action="Details" asp-route-id="@item.id" class="btn btn-link text-primary p-0 text-decoration-none fw-bold">View Profile</a>
-                </div>
-            </div>
-        </div>
-    }
-</div>
+@section Scripts {
+    <script>
+        function confirmDelete(formId) {
+            Swal.fire({
+                title: 'Delete Resident?',
+                text: "This will permanently remove the student and all associated records (payments, documents, requests). This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f43f5e',
+                cancelButtonColor: '#cbd5e1',
+                confirmButtonText: 'Yes, Delete Everything',
+                customClass: {
+                    popup: 'border-radius-xl',
+                    confirmButton: 'fw-bold px-4 rounded-pill',
+                    cancelButton: 'fw-bold px-4 rounded-pill'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(formId).submit();
+                }
+            });
+        }
+    </script>
+}

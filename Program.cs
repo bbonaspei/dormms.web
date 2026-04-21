@@ -1,73 +1,92 @@
 using DormMS.Web.Data;
 using DormMS.Web.Interfaces;
-using DormMS.Web.Repositories; // Eksik olan buydu
+using DormMS.Web.Repositories;
 using DormMS.Web.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. ADIM: MVC Servislerini ekle
-builder.Services.AddControllersWithViews();
-
-// 2. ADIM: Veritabaný Baðlantýsýný Tanýmla
+// 1. VERÄ°TABANI BAÄžLANTISI
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 3. ADIM: "GÖREV - KÝÞÝ" EÞLEÞTÝRMELERÝ (Dependency Injection)
-// Burada kural þudur: <GörevÝsmi, GerçekKod>
-
-// ROOM MODÜLÜ
-builder.Services.AddScoped<IRoomRepository, RoomRepository>();
-builder.Services.AddScoped<IRoomService, RoomService>();
-
-// BUILDING MODÜLÜ (Hata buradaydý, düzelttim)
-builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
-builder.Services.AddScoped<IBuildingService, BuildingService>();
-
-// ALLOCATION MODÜLÜ (Hata buradaydý, düzelttim)
-builder.Services.AddScoped<IAllocationService, AllocationService>();
-
-builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
-builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
-
+// 2. REPOSITORY KAYITLARI (KatmanlÄ± Mimari Uyumlu)
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
-builder.Services.AddScoped<IStudentService, StudentService>();
-
-// Program.cs içine eklenecek satýrlar:
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
+builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
 builder.Services.AddScoped<IAllocationRepository, AllocationRepository>();
+builder.Services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
+
+// RAPORDA Ä°STENEN EKSÄ°K REPOSITORY'LER (GÃœNCELLENDÄ°)
+builder.Services.AddScoped<IFeeRepository, FeeRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPenaltyRepository, PenaltyRepository>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+builder.Services.AddScoped<IStudentFeeRepository, StudentFeeRepository>();
+builder.Services.AddScoped<IAuditRepository, AuditRepository>();
+
+// 3. SERVÄ°S KAYITLARI
+builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
+builder.Services.AddScoped<IBuildingService, BuildingService>();
 builder.Services.AddScoped<IAllocationService, AllocationService>();
-
-builder.Services.AddScoped<IFinancialService, FinancialService>();
-
 builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
-
-// 1. HTTP bilgilerine (IP, Tarayýcý vb.) eriþmek için gereken anahtar servis
-builder.Services.AddHttpContextAccessor();
-
-// 2. Kendi yazdýðýmýz Audit servisini sisteme tanýtýyoruz
-builder.Services.AddScoped<DormMS.Web.Interfaces.IAuditService, DormMS.Web.Services.AuditService>();
-
+builder.Services.AddScoped<IFinancialService, FinancialService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-
 builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+
+// 4. AUTHENTICATION (Cookie-Based)
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    });
+
+// 5. SWAGGER DOKÃœMANTASYONU (Raporda SÃ¶z VerildiÄŸi Gibi)
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    { 
+        Title = "DormMS API", 
+        Version = "v1",
+        Description = "Dormitory Management System API Documentation"
+    });
+});
+
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// 4. ADIM: HTTP Ýstek Hattý Ayarlarý
+// 6. HTTP REQUEST PIPELINE
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "DormMS API v1");
+});
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-// Baþlangýç sayfasý: Home -> Landing
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Landing}/{id?}");

@@ -4,13 +4,21 @@ namespace DormMS.Web.Interfaces
 {
     public interface IAllocationService
     {
-        // 1. Diyagram 3, Adım 14'teki ID bazlı görev
-        Task<bool> CreateAllocationAsync(int studentId, int roomId, DateTime startDate, DateTime endDate);
+        // Rapor Diyagram 3'e göre: Detaylı atama süreci
+        Task<bool> CreateAllocationAsync(int studentId, int roomId, DateTime startDate, DateTime endDate, decimal deposit, string keyCard);
 
-        // 2. Aktif yerleştirmeleri listeleme görevi
+        // Aktif yerleştirmeleri listeleme
         Task<IEnumerable<Allocation>> GetActiveAllocationsAsync();
 
-        // 3. Formdan gelen tüm nesneyi işleme görevi
+        // Formdan gelen nesneyi komple işleme
         Task<bool> ProcessAllocationAsync(Allocation allocation);
+        // IAllocationService.cs içine ekle
+        Task<bool> TerminateAllocationAsync(int id);
+        
+        // Student room request
+        Task<bool> RequestAllocationAsync(int studentId, int roomId);
+        
+        // Check if student has active or pending allocation
+        Task<Allocation?> GetStudentActiveAllocationAsync(int studentId);
     }
 }

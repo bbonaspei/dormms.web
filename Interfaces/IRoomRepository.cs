@@ -9,6 +9,9 @@ namespace DormMS.Web.Interfaces
         
         Task UpdateAsync(Room room);
 
-        Task AddAsync(Room room);   
+        Task AddAsync(Room room);
+        Task DeleteAsync(int id);
+        Task<Room?> GetRoomWithDetailsAsync(int id);
+
     }
 }
