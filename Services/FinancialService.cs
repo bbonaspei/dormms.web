@@ -43,6 +43,15 @@ namespace DormMS.Web.Services
             {
                 fee.status = "Paid";
                 await _studentFeeRepo.UpdateAsync(fee);
+
+                // Bu faturaya bağlı tüm cezaları "Paid" yap (YENİ)
+                var penalties = await _penaltyRepo.GetByStudentIdAsync(payment.studentId);
+                var feePenalties = penalties.Where(p => p.reason != null && p.reason.Contains($"Fee #{feeId}")).ToList();
+                foreach (var p in feePenalties)
+                {
+                    p.status = "Paid";
+                    await _penaltyRepo.UpdatePenaltyAsync(p); 
+                }
             }
 
             await _notificationService.SendNotificationAsync(payment.studentId, "Payment Success", $"Amount: ${payment.amount}", "Success");
@@ -121,34 +130,55 @@ namespace DormMS.Web.Services
 
                 tempDate = tempDate.AddMonths(1);
             }
+
+            // 5. GECİKME CEZALARINI HESAPLA (YENİ EKLENDİ)
+            await CalculateLatePenaltiesAsync();
         }
 
-        // RAPOR UYUMU (Sayfa 6): Gecikme faizi hesaplama
+        // RAPOR UYUMU (Sayfa 6): Gecikme faizi hesaplama (Haftalık %5)
         public async Task CalculateLatePenaltiesAsync()
         {
-            // Son ödeme tarihi geçmiş ve ödenmemiş faturaları bul
             var overdueFees = (await _studentFeeRepo.GetAllAsync())
                               .Where(f => f.status == "Unpaid" && f.dueDate < DateTime.Now);
 
             foreach (var fee in overdueFees)
             {
-                // Daha önce bu faturaya ceza kesilmemişse (Basit bir kontrol)
-                var studentPenalties = await _penaltyRepo.GetByStudentIdAsync(fee.studentId);
-                var existingPenalty = studentPenalties.Any(p => p.reason != null && p.reason.Contains(fee.id.ToString()));
+                // Kaç hafta gecikti?
+                var daysOverdue = (DateTime.Now - fee.dueDate).Days;
+                var weeksOverdue = (int)Math.Floor((double)daysOverdue / 7);
 
-                if (!existingPenalty)
+                if (weeksOverdue > 0)
                 {
-                    var penalty = new Penalty
+                    var studentPenalties = await _penaltyRepo.GetByStudentIdAsync(fee.studentId);
+                    
+                    for (int i = 1; i <= weeksOverdue; i++)
                     {
-                        studentId = fee.studentId,
-                        penaltyType = "Late Fee",
-                        amount = fee.amount * 0.05m, // %5 Gecikme Zammı
-                        appliedDate = DateTime.Now,
-                        reason = $"Late payment penalty for Fee ID: {fee.id}",
-                        status = "Pending"
-                    };
-                    await _penaltyRepo.AddPenaltyAsync(penalty);
-                    await _audit.LogActionAsync("CREATE", "Penalty", fee.id, null, "Late fee applied");
+                        string weekReason = $"Week {i} Late Payment Penalty for Fee #{fee.id}";
+                        bool alreadyApplied = studentPenalties.Any(p => p.reason == weekReason);
+
+                        if (!alreadyApplied)
+                        {
+                            var penalty = new Penalty
+                            {
+                                studentId = fee.studentId,
+                                penaltyType = "Late Fee",
+                                amount = fee.amount * 0.05m, // Haftalık %5
+                                appliedDate = DateTime.Now,
+                                reason = weekReason,
+                                status = "Pending"
+                            };
+                            await _penaltyRepo.AddPenaltyAsync(penalty);
+                            
+                            // Bildirim Gönder
+                            await _notificationService.SendNotificationAsync(
+                                fee.studentId, 
+                                "New Penalty Applied", 
+                                $"A 5% late fee penalty (Week {i}) has been added due to overdue payment.", 
+                                "Warning");
+
+                            await _audit.LogActionAsync("CREATE", "Penalty", penalty.id, null, $"Weekly penalty added for Student #{fee.studentId}");
+                        }
+                    }
                 }
             }
         }

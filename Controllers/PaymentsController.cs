@@ -55,9 +55,15 @@ namespace DormMS.Web.Controllers
                         .Where(f => f.studentId == student.id)
                         .ToListAsync();
 
+                    // CEZALARI ÇEK (YENİ EKLENDİ)
+                    var penalties = await _context.Penalties
+                        .Where(p => p.studentId == student.id && p.status == "Pending")
+                        .ToListAsync();
+
                     ViewBag.PendingFees = allFees.Where(f => f.status == "Unpaid").OrderBy(f => f.dueDate).ToList();
                     ViewBag.PaidFees = allFees.Where(f => f.status == "Paid").OrderByDescending(f => f.dueDate).ToList();
-                    ViewBag.TotalBalance = allFees.Where(f => f.status == "Unpaid").Sum(f => f.amount);
+                    ViewBag.Penalties = penalties;
+                    ViewBag.TotalBalance = allFees.Where(f => f.status == "Unpaid").Sum(f => f.amount) + penalties.Sum(p => p.amount);
                     ViewBag.IsStudent = true;
                     ViewBag.StudentIdForPayment = student.id;
                 }
@@ -69,6 +75,12 @@ namespace DormMS.Web.Controllers
 
                 // Admin filtrelemesi
                 payments = payments.Where(p => p.studentId == studentId.Value);
+                
+                var penalties = await _context.Penalties
+                        .Where(p => p.studentId == studentId.Value && p.status == "Pending")
+                        .ToListAsync();
+
+                ViewBag.Penalties = penalties;
                 ViewBag.FilteredStudent = studentId.Value;
                 ViewBag.IsStudent = false;
             }

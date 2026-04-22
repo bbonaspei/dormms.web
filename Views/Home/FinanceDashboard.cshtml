@@ -1,0 +1,73 @@
+@{
+    ViewData["Title"] = "Finance Intelligence Hub";
+    var revenueData = ViewBag.RevenueData as IEnumerable<decimal> ?? new List<decimal> { 0, 0, 0, 0, 0, 0, 0 };
+}
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<div class="container-fluid px-4 mt-4">
+    <div class="mb-5">
+        <h1 style="color: #312e81 !important; font-weight: 900; font-size: 3rem; letter-spacing: -2.5px; margin-bottom: 0;">
+            Finance Center.
+        </h1>
+        <p class="text-muted fw-800">Financial oversight and revenue analytics hub.</p>
+    </div>
+
+    <!-- UPPER STATS -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+             <div class="stat-card-new p-4 text-center shadow-sm h-100 border-0" style="background-color: #6366f1 !important; color: #ffffff !important; border-radius: 24px; cursor: pointer; transition: transform 0.2s; position: relative;">
+                 <i class="bi bi-plus-circle-fill" style="font-size: 3rem; display: block; margin-bottom: 5px; color: white !important;"></i>
+                 <div class="fw-900" style="font-size: 1.1rem; color: white !important;">REGISTER PAYMENT</div>
+                 <p class="small mb-0" style="color: rgba(255,255,255,0.8) !important;">Submit new collection</p>
+                 <a asp-controller="Payments" asp-action="Create" class="stretched-link"></a>
+             </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card-new shadow-sm p-4 border-0 bg-white" style="border-radius: 24px; height: 100%; border-left: 5px solid #ef4444 !important; background: white !important;">
+                <div class="text-danger fw-800 mb-1" style="font-size: 0.7rem; letter-spacing: 1px; text-uppercase;">Outstanding Revenue</div>
+                <h2 class="fw-900 m-0 text-dark" style="font-size: 1.8rem;">$@(((decimal?)(ViewBag.UnpaidAmount ?? 0m))?.ToString("N2"))</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card-new shadow-sm p-4 border-0 bg-white" style="border-radius: 24px; height: 100%; border-left: 5px solid #10b981 !important; background: white !important;">
+                <div class="text-success fw-800 mb-1" style="font-size: 0.7rem; letter-spacing: 1px; text-uppercase;">Total Residents</div>
+                <h2 class="fw-900 m-0 text-dark" style="font-size: 1.8rem;">@(ViewBag.ActiveStudents ?? 0)</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card-new shadow-sm p-4 border-0 bg-white" style="border-radius: 24px; height: 100%; border-left: 5px solid #3b82f6 !important; background: white !important;">
+                <div class="text-primary fw-800 mb-1" style="font-size: 0.7rem; letter-spacing: 1px; text-uppercase;">Collections (7D)</div>
+                <h2 class="fw-900 m-0 text-dark" style="font-size: 1.8rem;">$@(revenueData.Sum().ToString("N2"))</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- FULL WIDTH CHART -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="stat-card-new shadow-sm p-4 border-0 bg-white" style="border-radius: 30px; background: white !important;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-900 m-0 text-dark"><i class="bi bi-activity me-2 text-primary"></i>Financial Flow Analytics</h5>
+                    <a asp-controller="Payments" asp-action="Index" class="btn btn-sm btn-outline-primary rounded-pill px-4 fw-bold">View Full Ledger</a>
+                </div>
+                <div id="financeRevenueChart" style="min-height: 400px; width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var options = {
+            series: [{ name: 'Revenue', data: @Html.Raw(Json.Serialize(revenueData)) }],
+            chart: { type: 'area', height: 400, toolbar: { show: false } },
+            stroke: { curve: 'smooth', width: 4 },
+            colors: ['#6366f1'],
+            xaxis: { categories: @Html.Raw(Json.Serialize(ViewBag.RevenueLabels)) },
+            yaxis: { labels: { formatter: function(val) { return "$" + val.toLocaleString(); } } }
+        };
+        var chart = new ApexCharts(document.querySelector("#financeRevenueChart"), options);
+        chart.render();
+    });
+</script>

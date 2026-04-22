@@ -75,8 +75,8 @@
                 {
                     var firstFee = ((List<StudentFee>)ViewBag.PendingFees).First();
                     <button class="btn-capsule-white px-5 py-3" 
-                            onclick="showPaymentModal(@firstFee.id, '@firstFee.amount.ToString("N2")', '@firstFee.Fee?.feeName')">
-                        <i class="bi bi-credit-card-2-front me-2"></i>Pay Online
+                            onclick="showPaymentModal(@firstFee.id, '@(((decimal)ViewBag.TotalBalance).ToString("N2"))', 'Total Account Balance')">
+                        <i class="bi bi-credit-card-2-front me-2"></i>Pay Online (Full)
                     </button>
                 }
             </div>
@@ -135,6 +135,42 @@
                 </div>
             </div>
         </div>
+
+        <!-- 1.1 GECİKME CEZALARI (PENALTIES) - YENİ EKLENDİ -->
+        @if (ViewBag.Penalties != null && ((List<Penalty>)ViewBag.Penalties).Any())
+        {
+            <div class="mb-5">
+                <h4 class="fw-900 mb-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Late Payment Penalties</h4>
+                <div class="card shadow border-0" style="border-radius: 25px; overflow: hidden; border-left: 10px solid #f43f5e !important;">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="bg-danger text-white">
+                                <tr class="small fw-900 text-uppercase" style="letter-spacing: 1px;">
+                                    <th class="ps-4 py-3">Penalty Reason</th>
+                                    <th class="py-3">Applied Date</th>
+                                    <th class="py-3 text-center">Protocol</th>
+                                    <th class="pe-4 py-3 text-end">Late Fee Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var penalty in (List<Penalty>)ViewBag.Penalties)
+                                {
+                                    <tr class="bg-danger bg-opacity-10">
+                                        <td class="ps-4 py-3">
+                                            <div class="fw-900 text-danger">@penalty.penaltyType</div>
+                                            <div class="small fw-bold text-muted">@penalty.reason</div>
+                                        </td>
+                                        <td><div class="small fw-bold">@penalty.appliedDate.ToString("dd MMM, yyyy")</div></td>
+                                        <td class="text-center"><span class="badge bg-danger rounded-pill px-2">OVERDUE %5</span></td>
+                                        <td class="pe-4 text-end"><div class="fw-900 text-danger fs-5">$@penalty.amount.ToString("N2")</div></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
 
         <!-- 2. ÖDEME GEÇMİŞİ (ARCHIVE & RECEIPTS) - SOLID ARCHIVE -->
         <div>

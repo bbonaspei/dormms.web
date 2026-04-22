@@ -164,7 +164,13 @@ namespace DormMS.Web.Controllers
         [Authorize(Roles = "Admin,Manager,Staff")] // Students cannot assign staff
         public async Task<IActionResult> Assign(int id, int staffId)
         {
+            if (staffId <= 0)
+            {
+                TempData["Error"] = "Please select a technician before assigning.";
+                return RedirectToAction(nameof(Details), new { id = id });
+            }
             await _service.AssignStaffAsync(id, staffId);
+            TempData["Success"] = "Technician assigned and task status updated.";
             return RedirectToAction(nameof(Details), new { id = id });
         }
 

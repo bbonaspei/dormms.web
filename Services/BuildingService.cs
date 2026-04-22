@@ -20,8 +20,11 @@ namespace DormMS.Web.Services
 
         public async Task CreateBuildingAsync(Building building)
         {
-            // 1. Binayı varsayılan olarak aktif yap
-            building.status = "Active";
+            // 1. Binayı varsayılan olarak aktif yap (Eğer kullanıcı seçmemişse)
+            if (string.IsNullOrEmpty(building.status))
+            {
+                building.status = "Active";
+            }
 
             // 2. Binayı veritabanına kaydet
             await _repo.AddAsync(building);

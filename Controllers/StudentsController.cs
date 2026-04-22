@@ -107,11 +107,14 @@ namespace DormMS.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Student student)
+        public async Task<IActionResult> Edit(int id, Student student, string? newUsername)
         {
             if (id != student.id) return NotFound();
 
-            if (!User.IsInRole("Admin") && !User.IsInRole("Manager") && !User.IsInRole("DormManager"))
+            // Sadece bir Admin her şeyi (username dahil) değiştirebilir
+            bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager");
+
+            if (!isAdmin)
             {
                 var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
@@ -124,9 +127,20 @@ namespace DormMS.Web.Controllers
             ModelState.Remove("User");
             if (ModelState.IsValid)
             {
+                // USERNAME GÜNCELLEME (Geliştirilmiş - Veritabanına yansıması için)
+                if (isAdmin && !string.IsNullOrEmpty(newUsername))
+                {
+                    var user = await _context.Users.FindAsync(student.userId);
+                    if (user != null)
+                    {
+                        user.username = newUsername;
+                        _context.Users.Update(user);
+                    }
+                }
+
                 _context.Update(student);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Profile updated successfully!";
+                TempData["Success"] = "Profile and credentials updated successfully!";
                 return RedirectToAction(nameof(Details), new { id = student.id });
             }
             return View(student);

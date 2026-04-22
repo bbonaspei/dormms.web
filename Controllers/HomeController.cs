@@ -199,14 +199,23 @@ namespace DormMS.Web.Controllers
                 ViewBag.CurrentUserId = userId;
                 ViewBag.StaffName = User.FindFirstValue("FullName") ?? User.Identity.Name;
 
+                // GERÇEK VERİ HESAPLAMA: Efficiency Rate (Rapor Sayfa 22 Uyumlu)
+                // Formül: (Tamamladığım İşler / Sistemdeki Toplam İşler) * 100
+                var totalSystemRequests = await _context.MaintenanceRequests.CountAsync();
+                var myCompletedTasks = await _context.MaintenanceRequests.CountAsync(m => m.assignedTo == userId && m.status == "Completed");
+                
+                ViewBag.EfficiencyRate = totalSystemRequests > 0 
+                    ? (int)Math.Round((double)myCompletedTasks / totalSystemRequests * 100) 
+                    : 0;
+
                 return View("StaffDashboard");
             }
 
             // ==========================================
             // 3. YÖNETİCİ (ADMIN/MANAGER)
             // ==========================================
-            if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager") ||
-                User.Claims.Any(c => c.Type == ClaimTypes.Role && (c.Value == "Admin" || c.Value == "Manager" || c.Value == "DormManager")))
+            if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager") || User.IsInRole("Finance") ||
+                User.Claims.Any(c => c.Type == ClaimTypes.Role && (c.Value == "Admin" || c.Value == "Manager" || c.Value == "DormManager" || c.Value == "Finance")))
             {
                 ViewBag.TotalRooms = await _context.Rooms.CountAsync(r => r.status != "Archived");
                 ViewBag.ActiveStudents = await _context.Students.CountAsync(s => s.status == "Active");
@@ -220,7 +229,7 @@ namespace DormMS.Web.Controllers
                 var studentsMissingDocs = await _context.Students
                     .Include(s => s.User)
                     .Where(s => !studentsWithDocs.Contains(s.id))
-                    .Take(10) // Limit to 10 for dashboard
+                    .Take(10)
                     .ToListAsync();
                 
                 ViewBag.MissingDocCount = await _context.Students.CountAsync(s => !studentsWithDocs.Contains(s.id));
@@ -230,10 +239,6 @@ namespace DormMS.Web.Controllers
                     .Include(f => f.Student).ThenInclude(s => s.User)
                     .Where(f => f.status != "Paid")
                     .OrderByDescending(f => f.amount)
-                    .Take(5).ToListAsync();
-
-                ViewBag.UrgentMaintenance = await _context.MaintenanceRequests
-                    .Where(r => r.priority == "High" || r.priority == "Emergency")
                     .Take(5).ToListAsync();
 
                 // Adminler de aktif işleri görebilsin (Backlog olarak)
@@ -246,7 +251,39 @@ namespace DormMS.Web.Controllers
 
                 ViewBag.StaffName = User.FindFirstValue("FullName") ?? User.Identity.Name;
 
-                return View(); // Admin için Index.cshtml
+                ViewBag.RecentPayments = await _context.Payments
+                    .Include(p => p.Student).ThenInclude(s => s.User)
+                    .OrderByDescending(p => p.paymentDate)
+                    .Take(5).ToListAsync();
+
+                // GRAFİK VERİSİ (YENİ - Gerçek Veri)
+                var last7Days = Enumerable.Range(0, 7)
+                    .Select(i => DateTime.Today.AddDays(-i))
+                    .OrderBy(d => d)
+                    .ToList();
+
+                var revenueData = new List<decimal>();
+                var revenueLabels = new List<string>();
+
+                foreach (var day in last7Days)
+                {
+                    var dayTotal = await _context.Payments
+                        .Where(p => p.paymentDate.Date == day.Date)
+                        .SumAsync(p => (decimal?)p.amount) ?? 0;
+                    
+                    revenueData.Add(dayTotal);
+                    revenueLabels.Add(day.ToString("ddd")); 
+                }
+
+                ViewBag.RevenueData = revenueData;
+                ViewBag.RevenueLabels = revenueLabels;
+
+                if (User.IsInRole("Finance") && !User.IsInRole("Admin") && !User.IsInRole("Manager"))
+                {
+                    return View("FinanceDashboard");
+                }
+
+                return View(); 
             }
 
             return View(); 

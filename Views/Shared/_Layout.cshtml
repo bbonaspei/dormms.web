@@ -46,11 +46,12 @@
                         <a class="nav-link @(currentController == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">
                             @if (User.IsInRole("Student")) { <text>Dashboard</text> }
                             else if (User.IsInRole("Staff") && !User.IsInRole("Admin")) { <text>Operations Hub</text> }
+                            else if (User.IsInRole("Finance")) { <text>Dashboard</text> }
                             else { <text>Analytics</text> }
                         </a>
                     </li>
 
-                    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager") || User.IsInRole("Student"))
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
                     {
                             <!-- HOUSING -->
                             <li class="nav-item dropdown">
@@ -77,19 +78,22 @@
                             </li>
                         }
 
-                        <!-- FINANCIAL (Staff hariç herkes) -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle @(currentController == "Payments" || currentController == "Fees" ? "active" : "")"
-                               href="#" data-bs-toggle="dropdown">@(User.IsInRole("Student") ? "My Finances" : "Financial Operations")</a>
-                            <ul class="dropdown-menu border-0 shadow-lg mt-3">
-                                <li><a class="dropdown-item py-2" asp-controller="Payments" asp-action="Index"><i class="bi bi-cash-stack me-2 text-success"></i> @(User.IsInRole("Student") ? "My Ledger" : "Revenue Ledger")</a></li>
+                        @if (!User.IsInRole("Staff") || User.IsInRole("Finance"))
+                        {
+                            <!-- FINANCIAL -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle @(currentController == "Payments" || currentController == "Fees" ? "active" : "")"
+                                   href="#" data-bs-toggle="dropdown">@(User.IsInRole("Student") ? "My Finances" : "Financial Operations")</a>
+                                <ul class="dropdown-menu border-0 shadow-lg mt-3">
+                                    <li><a class="dropdown-item py-2" asp-controller="Payments" asp-action="Index"><i class="bi bi-cash-stack me-2 text-success"></i> @(User.IsInRole("Student") ? "My Ledger" : "Revenue Ledger")</a></li>
 
-                                @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
-                                {
-                                    <li><a class="dropdown-item py-2" asp-controller="Fees" asp-action="Index"><i class="bi bi-calculator-fill me-2 text-success"></i> Fee Structure</a></li>
-                                }
-                            </ul>
-                        </li>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
+                                    {
+                                        <li><a class="dropdown-item py-2" asp-controller="Fees" asp-action="Index"><i class="bi bi-calculator-fill me-2 text-success"></i> Fee Structure</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
 
 
                     <!-- MAINTENANCE (Finance hariç herkes görebilir) -->
@@ -188,6 +192,7 @@
                         <i class="bi bi-speedometer2 me-2"></i>
                         @if (User.IsInRole("Student")) { <text>Dashboard</text> }
                         else if (User.IsInRole("Staff") && !User.IsInRole("Admin")) { <text>Operations Hub</text> }
+                        else if (User.IsInRole("Finance")) { <text>Dashboard</text> }
                         else { <text>Analytics</text> }
                     </a>
                 </li>

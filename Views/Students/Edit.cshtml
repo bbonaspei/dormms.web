@@ -46,6 +46,10 @@
                                     <input asp-for="studentId" class="dorm-input-premium @(User.IsInRole("Admin") ? "" : "bg-light")" readonly="@(!User.IsInRole("Admin"))" />
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="label-premium">Login Username</label>
+                                    <input name="newUsername" value="@Model.User?.username" class="dorm-input-premium @(User.IsInRole("Admin") ? "" : "bg-light")" readonly="@(!User.IsInRole("Admin"))" />
+                                </div>
+                                <div class="col-md-6">
                                     <label class="label-premium">University / Institution</label>
                                     <input asp-for="university" class="dorm-input-premium" placeholder="e.g. Stanford University" />
                                 </div>

@@ -95,24 +95,48 @@ namespace DormMS.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
-
-            // Güvenlik: Admin kendini silemesin (opsiyonel ama iyi uygulama)
-            var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
-            if (id == currentUserId)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                TempData["Error"] = "Safety Lock: You cannot terminate your own administrative account.";
-                return RedirectToAction(nameof(Index));
+                var user = await _context.Users.FindAsync(id);
+                if (user == null) return NotFound();
+
+                var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+                if (id == currentUserId)
+                {
+                    TempData["Error"] = "Safety Lock: You cannot terminate your own administrative account.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // 1. Audit Log: Silme işlemini kaydet (Silinmeden önce)
+                await _audit.LogActionAsync("DELETE", "Staff", id, null, $"Initiating deletion of staff member {user.firstName} {user.lastName}");
+
+                // 2. Depedencies: UserRoles (Ara tablo) temizlenmeli
+                var roles = await _context.UserRoles.Where(ur => ur.UserId == id).ToListAsync();
+                _context.UserRoles.RemoveRange(roles);
+
+                // 3. Maintenance assignments: Personeli görevlerinden ayır
+                var tasks = await _context.MaintenanceRequests.Where(m => m.assignedTo == id).ToListAsync();
+                foreach (var task in tasks) task.assignedTo = null;
+
+                // 4. Audit Log references: Eski işlemleri null yap
+                var userLogs = await _context.AuditLogs.Where(l => l.userId == id).ToListAsync();
+                foreach (var log in userLogs) log.userId = null;
+
+                // 5. User'ı sil
+                _context.Users.Remove(user);
+                
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["Success"] = "Staff record and dependencies successfully purged.";
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                TempData["Error"] = "Database Integrity Conflict: " + ex.Message;
             }
 
-            // AUDIT LOG: Silme işleminden ÖNCE kaydı tut (çünkü user nesnesi gidecek)
-            await _audit.LogActionAsync("DELETE", "Staff", id, null, $"Staff Member {user.firstName} {user.lastName} has been permanently removed from the system registry.");
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Staff record successfully purged from the infrastructure.";
             return RedirectToAction(nameof(Index));
         }
     }

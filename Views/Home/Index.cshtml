@@ -7,7 +7,6 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <div class="container-fluid px-4 mt-4">
-    <!-- 1. ÜST BAŞLIK -->
     <div class="mb-5 d-flex justify-content-between align-items-end">
         <div>
             <h1 style="color: #312e81 !important; font-weight: 900; font-size: 3rem; letter-spacing: -2.5px; margin-bottom: 0;">
@@ -25,11 +24,10 @@
         }
     </div>
 
-    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager") || User.IsInRole("Finance"))
     {
-        <!-- 4 ANA KRİTİK KART (SADECE ADMİNLER İÇİN) -->
         <div class="row g-4 mb-5">
-            <div class="col-md-3">
+            <div class="col-md-@(User.IsInRole("Finance") ? "6" : "3")">
                 <div class="stat-card-new alert-border-red shadow-sm">
                     <div class="stat-title-premium text-danger">OUTSTANDING DEBT</div>
                     <div class="d-flex justify-content-between align-items-center mt-2">
@@ -39,27 +37,30 @@
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="stat-card-new alert-border-orange shadow-sm">
-                    <div class="stat-title-premium text-warning">MISSING DOCUMENTS</div>
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <h2 class="stat-value-premium m-0">@(ViewBag.MissingDocCount ?? 0)</h2>
-                        <div class="icon-box icon-orange"><i class="bi bi-file-earmark-x"></i></div>
+            @if (!User.IsInRole("Finance"))
+            {
+                <div class="col-md-3">
+                    <div class="stat-card-new alert-border-orange shadow-sm">
+                        <div class="stat-title-premium text-warning">MISSING DOCUMENTS</div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <h2 class="stat-value-premium m-0">@(ViewBag.MissingDocCount ?? 0)</h2>
+                            <div class="icon-box icon-orange"><i class="bi bi-file-earmark-x"></i></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-3">
-                <div class="stat-card-new alert-border-blue shadow-sm">
-                    <div class="stat-title-premium text-primary">PENDING MAINTENANCE</div>
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <h2 class="stat-value-premium m-0">@(ViewBag.PendingRequestsCount ?? 0)</h2>
-                        <div class="icon-box icon-blue"><i class="bi bi-tools"></i></div>
+                <div class="col-md-3">
+                    <div class="stat-card-new alert-border-blue shadow-sm">
+                        <div class="stat-title-premium text-primary">PENDING MAINTENANCE</div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <h2 class="stat-value-premium m-0">@(ViewBag.PendingRequestsCount ?? 0)</h2>
+                            <div class="icon-box icon-blue"><i class="bi bi-tools"></i></div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
 
-            <div class="col-md-3">
+            <div class="col-md-@(User.IsInRole("Finance") ? "6" : "3")">
                 <div class="stat-card-new alert-border-green shadow-sm">
                     <div class="stat-title-premium text-success">TOTAL TENANCY</div>
                     <div class="d-flex justify-content-between align-items-center mt-2">
@@ -71,7 +72,6 @@
         </div>
 
         <div class="row g-4 mb-5">
-            <!-- GRAFİK PANELİ -->
             <div class="col-lg-8">
                 <div class="stat-card-new shadow-sm p-4 h-100 border-0 bg-glass-dark">
                     <h5 class="fw-900 mb-4 text-dark"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Revenue & Growth Analytics</h5>
@@ -79,7 +79,6 @@
                 </div>
             </div>
 
-            <!-- ÖDEME UYARILARI -->
             <div class="col-lg-4">
                 <div class="stat-card-new shadow-sm p-4 h-100 border-0">
                     <h5 class="fw-900 mb-4 text-danger"><i class="bi bi-cash-stack me-2"></i>Unpaid Dues</h5>
@@ -106,148 +105,67 @@
                 </div>
             </div>
         </div>
-    }
 
-    <!-- REAL-TIME SYSTEM SUMMARY -->
-    <div class="row g-4 mb-5">
-        <!-- 1. MISSING DOCUMENTS LIST -->
-        <div class="col-lg-6">
-            <div class="stat-card-new shadow-sm p-4 h-100 border-0 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-900 m-0 text-dark">
-                        <i class="bi bi-file-earmark-x me-2 text-warning"></i>Missing Documents
-                    </h5>
-                    <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill fw-bold">
-                        @ViewBag.MissingDocCount Action Required
-                    </span>
+        @if (!User.IsInRole("Finance"))
+        {
+            <div class="row g-4 mb-5">
+                <div class="col-lg-6">
+                    <div class="stat-card-new shadow-sm p-4 h-100 border-0 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-900 m-0 text-dark"><i class="bi bi-file-earmark-x me-2 text-warning"></i>Missing Documents</h5>
+                            <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill fw-bold">@ViewBag.MissingDocCount Action Required</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead><tr><th>STUDENT</th><th>ID NUMBER</th><th class="text-end">STATUS</th></tr></thead>
+                                <tbody>
+                                    @if (ViewBag.StudentsMissingDocs != null && ((List<DormMS.Web.Models.Student>)ViewBag.StudentsMissingDocs).Any())
+                                    {
+                                        @foreach (var student in (List<DormMS.Web.Models.Student>)ViewBag.StudentsMissingDocs)
+                                        {
+                                            <tr>
+                                                <td><span class="fw-bold text-dark small">@student.User?.firstName @student.User?.lastName</span></td>
+                                                <td class="small text-muted">@student.studentId</td>
+                                                <td class="text-end"><span class="badge bg-danger-subtle text-danger rounded-pill px-2">PENDING</span></td>
+                                            </tr>
+                                        }
+                                    }
+                                    else { <tr><td colspan="3" class="text-center py-4">None.</td></tr> }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle custom-dashboard-table">
-                        <thead>
-                            <tr>
-                                <th class="text-muted small fw-800 border-0">STUDENT</th>
-                                <th class="text-muted small fw-800 border-0">ID NUMBER</th>
-                                <th class="text-muted small fw-800 border-0 text-end">STATUS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (ViewBag.StudentsMissingDocs != null && ((List<DormMS.Web.Models.Student>)ViewBag.StudentsMissingDocs).Any())
+                <div class="col-lg-6">
+                    <div class="stat-card-new shadow-sm p-4 h-100 border-0 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-900 m-0 text-dark"><i class="bi bi-wrench-adjustable me-2 text-primary"></i>Maintenance</h5>
+                            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold">@(allTasks?.Count() ?? 0) Active</span>
+                        </div>
+                        <div class="maintenance-summary-list">
+                            @if (allTasks != null && allTasks.Any())
                             {
-                                @foreach (var student in (List<DormMS.Web.Models.Student>)ViewBag.StudentsMissingDocs)
+                                @foreach (var task in allTasks.Take(5))
                                 {
-                                    <tr>
-                                        <td class="border-0">
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle-sm me-2 bg-light text-primary fw-bold overflow-hidden" style="width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                                                    @if (!string.IsNullOrEmpty(student.User?.profilePicture))
-                                                    {
-                                                        <img src="@student.User.profilePicture" style="width:100%; height:100%; object-fit:cover;" />
-                                                    }
-                                                    else
-                                                    {
-                                                        var initials = (student.User?.firstName?.Length > 0 ? student.User.firstName[0].ToString() : "") + 
-                                                                       (student.User?.lastName?.Length > 0 ? student.User.lastName[0].ToString() : "");
-                                                        <text>@initials</text>
-                                                    }
-                                                </div>
-                                                <span class="fw-bold text-dark small">@student.User?.firstName @student.User?.lastName</span>
-                                            </div>
-                                        </td>
-                                        <td class="border-0 small text-muted">@student.studentId</td>
-                                        <td class="border-0 text-end">
-                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1" style="font-size: 0.65rem; font-weight: 800;">PENDING</span>
-                                        </td>
-                                    </tr>
+                                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3 bg-light">
+                                        <div><div class="fw-900 text-dark small">Room @(task.Room?.roomNumber ?? "-")</div><div class="text-muted small">@task.description</div></div>
+                                        <div class="text-end"><span class="badge bg-warning text-dark rounded-pill">@task.priority</span></div>
+                                    </div>
                                 }
                             }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="3" class="text-center py-4 text-muted small">No missing documents found.</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. ACTIVE MAINTENANCE REPORTS -->
-        <div class="col-lg-6">
-            <div class="stat-card-new shadow-sm p-4 h-100 border-0 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-900 m-0 text-dark">
-                        <i class="bi bi-wrench-adjustable me-2 text-primary"></i>Maintenance Reports
-                    </h5>
-                    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold">
-                        @(allTasks?.Count() ?? 0) Active
-                    </span>
-                </div>
-
-                <div class="maintenance-summary-list">
-                    @if (allTasks != null && allTasks.Any())
-                    {
-                        @foreach (var task in allTasks.Take(5))
-                        {
-                            <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3 bg-light border-0 hover-lift-sm">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-box-sm bg-white shadow-sm text-primary me-3">
-                                        <i class="bi bi-door-closed-fill"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-900 text-dark small mb-0">Room @(task.Room?.roomNumber ?? "-")</div>
-                                        <div class="text-muted" style="font-size: 0.75rem; font-weight: 600;">@task.description</div>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge @(task.priority == "High" || task.priority == "Emergency" ? "bg-danger" : "bg-warning text-dark") rounded-pill mb-1" style="font-size: 0.6rem; font-weight: 900;">
-                                        @task.priority?.ToUpper()
-                                    </span>
-                                    <div class="small text-muted fw-bold" style="font-size: 0.65rem;">@task.status</div>
-                                </div>
-                            </div>
-                        }
-                        @if (allTasks.Count() > 5)
-                        {
-                            <div class="text-center mt-3">
-                                <a asp-controller="Maintenance" asp-action="Index" class="text-primary text-decoration-none small fw-bold">View All Reports &rarr;</a>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="text-center py-5">
-                            <i class="bi bi-check-circle-fill text-success opacity-25 display-6"></i>
-                            <p class="mt-2 text-muted small fw-bold">All systems functional.</p>
+                            else { <div class="text-center py-5"><p class="text-muted small">All systems functional.</p></div> }
                         </div>
-                    }
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        }
+    }
 
-    <!-- Styles for the new sections -->
     <style>
         .custom-dashboard-table th { padding-bottom: 1.5rem !important; }
         .custom-dashboard-table td { padding: 0.85rem 0.5rem !important; }
-        .avatar-circle-sm {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-        }
-        .icon-box-sm {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .avatar-circle-sm { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
+        .icon-box-sm { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
         .hover-lift-sm { transition: transform 0.2s ease; cursor: pointer; }
         .hover-lift-sm:hover { transform: translateY(-3px); }
         .bg-warning-subtle { background-color: #fffbeb !important; }
@@ -260,12 +178,14 @@
 
 <script>
     var options = {
-        series: [{ name: 'Revenue', data: [31, 40, 28, 51, 42, 109, 100] }],
+        series: [{ name: 'Revenue', data: @Html.Raw(Json.Serialize(ViewBag.RevenueData)) }],
         chart: { type: 'area', height: 350, toolbar: {show:false} },
         stroke: { curve: 'smooth', width: 3 },
         colors: ['#6366f1'],
         fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.05 } },
-        xaxis: { categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] }
+        xaxis: { categories: @Html.Raw(Json.Serialize(ViewBag.RevenueLabels)) },
+        yaxis: { labels: { formatter: function(val) { return "$" + val.toFixed(0); } } },
+        tooltip: { y: { formatter: function(val) { return "$" + val.toFixed(2); } } }
     };
     var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
     chart.render();
