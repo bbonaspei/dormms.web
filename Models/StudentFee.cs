@@ -10,12 +10,12 @@ namespace DormMS.Web.Models
         [Column("id")]
         public int id { get; set; }
 
-        [Column("student_id")] // DB Eşleşmesi
+        [Column("student_id")]
         public int studentId { get; set; }
         [ForeignKey("studentId")]
         public virtual Student? Student { get; set; }
 
-        [Column("fee_id")] // DB Eşleşmesi
+        [Column("fee_id")]
         public int feeId { get; set; }
         [ForeignKey("feeId")]
         public virtual Fee? Fee { get; set; }
@@ -26,7 +26,8 @@ namespace DormMS.Web.Models
         [Column("status")]
         public string status { get; set; } = "Unpaid";
 
-        [Column("due_date")] // Rapor Sayfa 18
+        [Column("due_date")]
         public DateTime dueDate { get; set; } = DateTime.Now.AddMonths(1);
     }
 }
+

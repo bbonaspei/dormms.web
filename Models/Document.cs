@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DormMS.Web.Models
@@ -17,7 +17,7 @@ namespace DormMS.Web.Models
         public string filePath { get; set; } = string.Empty;
 
         [StringLength(100)]
-        public string? documentType { get; set; } // e.g., "Policy", "Contract Template", "Notice"
+        public string? documentType { get; set; }
 
         public int? uploadedByUserId { get; set; }
 
@@ -27,3 +27,4 @@ namespace DormMS.Web.Models
         public virtual User? Uploader { get; set; }
     }
 }
+

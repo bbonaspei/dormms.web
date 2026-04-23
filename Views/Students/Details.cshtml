@@ -30,10 +30,8 @@
     }
 </style>
 
-<!-- UI VERSION: CAPSULE_V1 -->
-
 <div class="container-fluid px-4 mt-4 no-print">
-    <!-- ÜST AKSİYON BAR -->
+    
     <div class="d-flex justify-content-between align-items-center mb-5">
         @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
         {
@@ -43,7 +41,7 @@
         }
         else
         {
-            <div></div> <!-- Spacer -->
+            <div></div> 
         }
         <div class="d-flex gap-3">
             <button onclick="window.print();" class="btn-capsule-white">
@@ -64,7 +62,6 @@
         </div>
     </div>
 
-    <!-- PROFİL HEADER -->
     <div class="profile-header-premium shadow-sm mb-5">
         <div class="d-flex align-items-center gap-4">
             <div class="avatar-main-wrapper shadow-sm">
@@ -89,9 +86,9 @@
     </div>
 
     <div class="row g-5 align-items-start">
-        <!-- SOL SÜTUN -->
+        
         <div class="col-lg-4">
-            <!-- Akademik Bilgiler -->
+            
             <div class="info-section-card shadow-sm mb-4" style="height: fit-content !important;">
                 <h6 class="section-title-premium"><i class="bi bi-mortarboard-fill"></i> ACADEMIC PROFILE</h6>
                 <div class="info-box-premium"><label class="info-label-pro">University</label><span class="info-value-pro">@Model.university</span></div>
@@ -102,7 +99,6 @@
                 </div>
             </div>
 
-            <!-- Acil Durum -->
             <div class="info-section-card shadow-sm mb-4" style="height: fit-content !important;">
                 <h6 class="section-title-premium"><i class="bi bi-shield-lock-fill"></i> EMERGENCY CONTACT</h6>
                 <div class="info-box-premium border-start border-4 border-warning">
@@ -117,7 +113,7 @@
 
             @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
             {
-                <!-- RELATED OPERATIONS -->
+                
                 <div class="info-section-card shadow-sm bg-light border-0" style="height: fit-content !important;">
                     <h6 class="fw-bold small text-muted mb-3" style="font-size: 11px; letter-spacing: 1px;">RELATED OPERATIONS</h6>
                     <div class="d-grid gap-2">
@@ -132,10 +128,9 @@
             }
         </div>
 
-        <!-- SAĞ SÜTUN -->
         <div class="col-lg-8">
             <div class="row g-4">
-                <!-- KONAKLAMA BİLGİSİ -->
+                
                 <div class="col-12">
                     <div class="info-section-card shadow-sm border-start border-5 border-primary">
                         <div class="d-flex justify-content-between align-items-center">
@@ -148,14 +143,23 @@
                             </div>
                             @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
                             {
-                                <a asp-controller="Allocations" asp-action="Create" asp-route-studentId="@Model.id"
-                                   class="btn-premium px-4 text-decoration-none shadow-sm">Allocate Room</a>
+                                @if (ViewBag.HasActiveAllocation == true)
+                                {
+                                    <a asp-controller="Allocations" asp-action="Index"
+                                       class="btn btn-outline-success px-4 fw-bold rounded-pill text-decoration-none shadow-sm" style="font-size:0.8rem;">
+                                        <i class="bi bi-check-circle-fill me-1"></i> View Placement
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Allocations" asp-action="Create" asp-route-studentId="@Model.id"
+                                       class="btn-premium px-4 text-decoration-none shadow-sm">Allocate Room</a>
+                                }
                             }
                         </div>
                     </div>
                 </div>
 
-                <!-- DİJİTAL DEPO (BELGE LİSTESİ VE YÜKLEME) -->
                 <div class="col-12">
                     <div class="info-section-card shadow-sm">
                         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
@@ -165,7 +169,7 @@
 
                         @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager") || User.IsInRole("Student"))
                         {
-                            <!-- Belge Yükleme Formu -->
+                            
                             <div class="p-4 border rounded-4 bg-light mb-4">
                                 <form asp-action="UploadDoc" method="post" enctype="multipart/form-data">
                                     <input type="hidden" name="studentId" value="@Model.id" />
@@ -189,7 +193,6 @@
                             </div>
                         }
 
-                        <!-- Yüklenen Dosyalar Listesi (DİNAMİK HALE GETİRİLDİ) -->
                         <h6 class="fw-900 mb-3 small text-muted">SECURED DOCUMENTS</h6>
                         <div class="document-list-area">
                             @if (ViewBag.Documents != null && ((List<DormMS.Web.Models.StudentDocument>)ViewBag.Documents).Any())
@@ -212,8 +215,9 @@
                                             </a>
                                             @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
                                             {
-                                                <form asp-action="DeleteDoc" asp-route-id="@doc.id" method="post" onsubmit="return confirm('Secure Purge: Are you sure you want to permanently delete this record?');">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" style="font-size: 10px;">
+                                                <form id="delete-doc-form-@doc.id" asp-action="DeleteDoc" asp-route-id="@doc.id" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="button" onclick="confirmDocDelete(@doc.id)" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" style="font-size: 10px;">
                                                         <i class="bi bi-trash-fill"></i>
                                                     </button>
                                                 </form>
@@ -236,3 +240,29 @@
         </div>
     </div>
 </div>
+
+
+@section Scripts {
+    <script>
+        function confirmDocDelete(docId) {
+            Swal.fire({
+                title: 'Secure Purge?',
+                text: "Are you sure you want to permanently delete this record? This action cannot be undone.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f43f5e',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Purge Record',
+                background: '#ffffff',
+                borderRadius: '20px',
+                customClass: {
+                    popup: 'rounded-4 shadow-lg'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-doc-form-' + docId).submit();
+                }
+            })
+        }
+    </script>
+}

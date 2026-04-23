@@ -66,7 +66,7 @@ namespace DormMS.Web.Repositories
 
         public async Task<Room?> GetRoomByStudentIdAsync(int studentId)
         {
-            // Öğrencinin aktif kaldığı odayı bulur
+
             var allocation = await _context.Allocations
                 .Include(a => a.Room)
                 .FirstOrDefaultAsync(a => a.studentId == studentId && a.isCurrent == true);
@@ -77,7 +77,8 @@ namespace DormMS.Web.Repositories
             await _context.UserRoles
                 .Include(ur => ur.User)
                 .Include(ur => ur.Role)
-                .Where(ur => ur.Role != null && ur.Role.RoleName != "Student")
+                .Where(ur => ur.Role != null && ur.Role.RoleName == "Staff")
                 .ToListAsync();
     }
 }
+

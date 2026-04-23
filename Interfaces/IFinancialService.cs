@@ -12,3 +12,4 @@ namespace DormMS.Web.Interfaces
         Task SyncStudentChargesAsync(int studentId);
     }
 }
+

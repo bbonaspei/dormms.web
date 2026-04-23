@@ -4,12 +4,10 @@
     ViewData["Title"] = "Room Archives";
 }
 
-<!-- Modern Onay Kutuları İçin SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container-fluid px-4 mt-5">
 
-    <!-- BAŞLIK VE GERİ BUTONU (SAĞA ALINDI) -->
     <div class="row align-items-center mb-5">
         <div class="col-md-8">
             <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin-bottom: 0;">
@@ -18,18 +16,17 @@
             <p class="text-muted fw-bold mt-2">Manage and restore previously decommissioned residential units.</p>
         </div>
         <div class="col-md-4 text-end">
-            <!-- BACK BUTONU SAĞDA -->
+            
             <a asp-action="Index" class="btn-back-premium text-decoration-none shadow-sm d-inline-flex align-items-center gap-2">
                 <i class="bi bi-arrow-left"></i> BACK TO INVENTORY
             </a>
         </div>
     </div>
 
-    <!-- ARŞİVLENMİŞ ODA KARTLARI -->
     <div class="row g-5">
         @if (!Model.Any())
         {
-            <!-- Boş Arşiv Görünümü -->
+            
             <div class="col-12 text-center py-5">
                 <div class="icon-box mx-auto mb-4 shadow-sm" style="width: 80px; height: 80px; background: rgba(99, 102, 241, 0.1); color: #6366f1; font-size: 40px; border-radius: 20px; display:flex; align-items:center; justify-content:center;">
                     <i class="bi bi-archive"></i>
@@ -45,7 +42,6 @@
                 <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
                     <div class="room-card-vibrant p-4 h-100 shadow-sm border-0" style="opacity: 0.95; background: #fcfcfc !important;">
 
-                        <!-- Kart Üstü -->
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div class="icon-box" style="width: 45px; height: 45px; background: #f1f5f9; color: #64748b; border-radius: 12px; display:flex; align-items:center; justify-content:center;">
                                 <i class="bi bi-archive-fill"></i>
@@ -53,7 +49,6 @@
                             <span class="badge-inactive" style="background: rgba(100, 116, 139, 0.1); color: #64748b;">Archived</span>
                         </div>
 
-                        <!-- Oda Başlığı -->
                         <div class="mb-4">
                             <h3 class="fw-900 text-dark mb-1">Room @item.roomNumber</h3>
                             <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;">
@@ -61,7 +56,6 @@
                             </span>
                         </div>
 
-                        <!-- Eski Doluluk Bilgisi -->
                         <div class="occupancy-container mb-4" style="background: rgba(100, 116, 139, 0.05); padding: 12px; border-radius: 15px;">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="small fw-bold text-secondary">LAST STATE</span>
@@ -69,10 +63,9 @@
                             </div>
                         </div>
 
-                        <!-- AKSİYON BUTONLARI (SOLDA KÜÇÜK RESTORE, SAĞDA GENİŞ DETAY) -->
                         <div class="d-flex gap-2 mt-auto">
-                            <!-- SOL: Geri Yükle Butonu (Yeşil) -->
-                            <form id="restoreForm-@item.id" asp-action="Restore" asp-route-id="@item.id" method="post" style="width: 25%;">
+                            
+                            <form id="restoreForm-@item.id" asp-action="Restore" asp-route-id="@item.id" method="post" style="width: 20%;">
                                 @Html.AntiForgeryToken()
                                 <button type="button" class="btn-card-delete-mini w-100"
                                         style="background: rgba(16, 185, 129, 0.1) !important; color: #10b981 !important; border:none; height:46px; border-radius:12px; transition:0.3s;"
@@ -81,10 +74,18 @@
                                 </button>
                             </form>
 
-                            <!-- SAĞ: Detay Butonu -->
+                            <form id="deleteForm-@item.id" asp-action="Delete" asp-route-id="@item.id" method="post" style="width: 20%;">
+                                @Html.AntiForgeryToken()
+                                <button type="button" class="btn-card-delete-mini w-100"
+                                        style="background: rgba(244, 63, 94, 0.1) !important; color: #f43f5e !important; border:none; height:46px; border-radius:12px; transition:0.3s;"
+                                        onclick="confirmDelete(@item.id)" title="Delete Permanently">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                            </form>
+
                             <a asp-action="Details" asp-route-id="@item.id" class="btn-card-details-wide flex-grow-1 d-flex align-items-center justify-content-center gap-2 text-decoration-none"
                                style="background: #f1f5f9; color: #6366f1; border-radius: 12px; font-weight: 700; height: 46px;">
-                                <i class="bi bi-eye-fill"></i> View Record
+                                <i class="bi bi-eye-fill"></i> View
                             </a>
                         </div>
                     </div>
@@ -94,26 +95,42 @@
     </div>
 </div>
 
-<!-- Geri Yükleme Onay Scripti -->
 <script>
     function confirmRestore(id) {
         Swal.fire({
             title: 'Restore this unit?',
-            text: "The room will be moved back to the active inventory and will be available for new allocations.",
+            text: "The room will be moved back to the active inventory.",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#10b981',
             cancelButtonColor: '#64748b',
             confirmButtonText: 'Yes, restore it!',
             background: '#ffffff',
-            borderRadius: '20px',
-            customClass: {
-                popup: 'rounded-4 shadow-lg'
-            }
+            borderRadius: '20px'
         }).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById('restoreForm-' + id).submit();
             }
         })
     }
+
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Delete Permanently?',
+            text: "This room will be removed from the database records forever.",
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#f43f5e',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, delete forever!',
+            background: '#ffffff',
+            borderRadius: '20px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteForm-' + id).submit();
+            }
+        })
+    }
 </script>
+
+

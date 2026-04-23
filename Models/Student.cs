@@ -10,15 +10,15 @@ namespace DormMS.Web.Models
         [Column("id")]
         public int id { get; set; }
 
-        [Column("user_id")] // Veritabanındaki 'user_id' ile eşleşir
+        [Column("user_id")]
         public int userId { get; set; }
 
         [ForeignKey("userId")]
         public virtual User? User { get; set; }
 
         [Required, StringLength(20)]
-        [Column("student_id_number")] // Rapor Sayfa 12'deki gerçek isim
-        public string studentId { get; set; } = string.Empty; // Okul No
+        [Column("student_id_number")]
+        public string studentId { get; set; } = string.Empty;
 
         [Column("date_of_birth")]
         public DateTime? dateOfBirth { get; set; }
@@ -62,10 +62,11 @@ namespace DormMS.Web.Models
         [Column("updated_at")]
         public DateTime updatedAt { get; set; } = DateTime.Now;
 
-        [Column("room_id")] // Veritabanındaki 'room_id' ile eşleşir
+        [Column("room_id")]
         public int? roomId { get; set; }
 
         [ForeignKey("roomId")]
         public virtual Room? Room { get; set; }
     }
 }
+

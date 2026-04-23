@@ -15,3 +15,4 @@ namespace DormMS.Web.Models
         public string status { get; set; } = "Active";
     }
 }
+

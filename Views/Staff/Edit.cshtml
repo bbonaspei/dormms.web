@@ -1,0 +1,84 @@
+﻿@model DormMS.Web.Models.User
+
+@{
+    ViewData["Title"] = "Update Staff Record";
+}
+
+<div class="container-fluid px-5">
+    <div class="mb-4 mt-4">
+        <a asp-action="Index" class="btn-back-premium shadow-sm border-0 py-2 px-3">
+            <i class="bi bi-arrow-left me-2"></i> BACK TO STAFF REGISTRY
+        </a>
+    </div>
+
+    <div class="text-center mb-5">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2px;">
+            Profile <span style="color: #6366f1;">Update.</span>
+        </h1>
+        <p class="text-muted fw-bold">Modify personal details or institutional standing of the worker.</p>
+    </div>
+
+    <div class="stat-card-new p-5 shadow-sm" style="max-width: 900px; margin: 0 auto; border-top: 5px solid #6366f1;">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <div class="row g-4 text-start">
+
+                <div class="col-12"><h6 class="section-title-premium"><i class="bi bi-person-vcard me-2"></i>PERSONAL IDENTITY</h6></div>
+
+                <div class="col-md-6">
+                    <label class="label-premium">First Name</label>
+                    <input asp-for="firstName" class="dorm-input-premium" placeholder="e.g. Ahmet" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">Last Name</label>
+                    <input asp-for="lastName" class="dorm-input-premium" placeholder="e.g. YÄ±lmaz" required />
+                </div>
+                <div class="col-md-12">
+                    <label class="label-premium">Institutional Email</label>
+                    <input asp-for="email" type="email" class="dorm-input-premium" placeholder="staff@dormms.system" required />
+                </div>
+
+                <div class="col-12 mt-5"><h6 class="section-title-premium"><i class="bi bi-person-workspace me-2"></i>ACCOUNT SETTINGS</h6></div>
+
+                <div class="col-md-6">
+                    <label class="label-premium">Username (Login ID)</label>
+                    <input asp-for="username" class="dorm-input-premium" placeholder="e.g. ahmet.yilmaz" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="label-premium">Account Status</label>
+                    <div class="mt-2">
+                        <label class="switch-inline">
+                            <input type="hidden" name="isActive" value="false" />
+                            <input type="checkbox" id="isActive" name="isActive" value="true" @(Model.isActive ? "checked" : "") />
+                            <span class="slider-round"></span>
+                            <span class="fw-bold ms-2">Active Personnel</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="col-12">
+                    <div class="alert alert-warning rounded-4 border-0 shadow-sm small py-3 px-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Security Note:</strong> Role adjustments must be authorized by high-level administration. Contact IT support for departmental transfers.
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top gap-3">
+                <a asp-action="Index" class="btn btn-light rounded-pill px-4 fw-bold border">DISCARD CHANGES</a>
+                <button type="submit" class="btn-premium px-5">
+                    <i class="bi bi-cloud-check-fill me-2"></i> SAVE CHANGES
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+
+

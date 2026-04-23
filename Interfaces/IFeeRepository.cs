@@ -1,4 +1,4 @@
-using DormMS.Web.Models;
+﻿using DormMS.Web.Models;
 
 namespace DormMS.Web.Interfaces
 {
@@ -11,3 +11,4 @@ namespace DormMS.Web.Interfaces
         Task<bool> DeleteFeeAsync(int id);
     }
 }
+

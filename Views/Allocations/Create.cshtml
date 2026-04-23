@@ -1,14 +1,13 @@
 ﻿@model DormMS.Web.Models.Allocation
 
 <div class="container-fluid px-5">
-    <!-- Geri Butonu -->
+    
     <div class="mb-4 mt-3">
         <a asp-action="Index" class="btn-back-premium text-decoration-none shadow-sm">
             <i class="bi bi-arrow-left"></i> BACK TO PLACEMENTS
         </a>
     </div>
 
-    <!-- Başlık -->
     <div class="text-center mb-5">
         <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2px;">
             Unit <span style="color: #6366f1;">Allocation.</span>
@@ -16,12 +15,11 @@
         <p class="text-muted fw-bold">Register new student residency and configure access credentials.</p>
     </div>
 
-    <!-- FORM KARTI -->
     <div class="stat-card-new p-5 shadow-sm" style="max-width: 950px; margin: 0 auto; border-top: 5px solid #6366f1;">
         <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4 fw-bold small"></div>
             <div class="row g-4">
 
-                <!-- Bölüm 1: Atama Detayları -->
                 <div class="col-12"><h6 class="section-title-premium"><i class="bi bi-person-check"></i> RESIDENT SELECTION</h6></div>
 
                 <div class="col-md-6">
@@ -42,7 +40,6 @@
                     </div>
                 </div>
 
-                <!-- Bölüm 2: Tarih ve Güvenlik -->
                 <div class="col-12 mt-4"><h6 class="section-title-premium"><i class="bi bi-calendar-event"></i> LEASE & SECURITY</h6></div>
 
                 <div class="col-md-4">
@@ -61,12 +58,11 @@
 
                 <div class="col-md-4">
                     <div class="input-wrapper-premium">
-                        <label class="label-premium">Security Deposit ($)</label>
+                        <label class="label-premium">Security Deposit (TL)</label>
                         <input asp-for="securityDeposit" class="dorm-input-premium shadow-sm" placeholder="500.00" type="number" step="0.01" />
                     </div>
                 </div>
 
-                <!-- Bölüm 3: Access Control -->
                 <div class="col-md-12">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Electronic Key Card Number (RFID)</label>
@@ -79,7 +75,6 @@
 
             </div>
 
-            <!-- AKSİYON BUTONLARI -->
             <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top gap-3">
                 <a asp-action="Index" class="btn-discard-premium">DISCARD</a>
                 <button type="submit" class="btn-premium px-5" style="height: 55px;">
@@ -95,3 +90,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+

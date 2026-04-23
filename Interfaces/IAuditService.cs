@@ -6,7 +6,7 @@ namespace DormMS.Web.Interfaces
     {
         Task LogActionAsync(string action, string entityType, int entityId, string? oldVal = null, string? newVal = null);
 
-        // Çoğul (Logs) olarak düzelttik
         Task<IEnumerable<AuditLog>> GetAllLogsAsync();
     }
 }
+

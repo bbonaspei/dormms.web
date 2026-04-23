@@ -11,30 +11,30 @@ namespace DormMS.Web.Models
         public int id { get; set; }
 
         [Required(ErrorMessage = "Room number is required")]
-        [Column("room_number")] // SQL: room_number
+        [Column("room_number")]
         public string roomNumber { get; set; } = string.Empty;
 
-        [Column("building_id")] // SQL: building_id
+        [Column("building_id")]
         public int? buildingId { get; set; }
 
         [ForeignKey("buildingId")]
         public virtual Building? Building { get; set; }
 
-        [Column("room_type_id")] // SQL: room_type_id
+        [Column("room_type_id")]
         public int? roomTypeId { get; set; }
 
         [ForeignKey("roomTypeId")]
         public virtual RoomType? RoomType { get; set; }
 
         [Range(0, 50, ErrorMessage = "Floor level cannot be negative")]
-        [Column("floor_number")] // SQL: floor_number
+        [Column("floor_number")]
         public int? floorNumber { get; set; }
 
         [Range(1, 5, ErrorMessage = "Capacity must be between 1 and 5")]
         [Column("capacity")]
         public int? capacity { get; set; }
 
-        [Column("current_occupancy")] // SQL: current_occupancy
+        [Column("current_occupancy")]
         public int? currentOccupancy { get; set; }
 
         [Column("status")]
@@ -43,10 +43,17 @@ namespace DormMS.Web.Models
         [Column("notes")]
         public string? notes { get; set; }
 
-        [Column("created_at")] // SQL: created_at
+        [Column("has_bathroom")]
+        public bool hasBathroom { get; set; }
+
+        [Column("created_at")]
         public DateTime? createdAt { get; set; } = DateTime.Now;
 
-        [Column("updated_at")] // SQL: updated_at
+        [Column("updated_at")]
         public DateTime? updatedAt { get; set; } = DateTime.Now;
+
+        public virtual ICollection<Allocation> Allocations { get; set; } = new List<Allocation>();
+        public virtual ICollection<MaintenanceRequest> MaintenanceRequests { get; set; } = new List<MaintenanceRequest>();
     }
 }
+

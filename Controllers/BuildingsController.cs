@@ -11,7 +11,7 @@ namespace DormMS.Web.Controllers
     public class BuildingsController : Controller
     {
         private readonly IBuildingService _buildingService;
-        private readonly IAuditService _audit; // EKLENDİ
+        private readonly IAuditService _audit;
 
         public BuildingsController(IBuildingService buildingService, IAuditService audit)
         {
@@ -35,30 +35,34 @@ namespace DormMS.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Binayı oluştur
-                await _buildingService.CreateBuildingAsync(building);
+                try 
+                {
 
-                // AUDIT LOG: Kimin eklediğini kaydet
-                await _audit.LogActionAsync("CREATE", "Building", building.id, null, $"Building {building.buildingName} added to infrastructure.");
+                    await _buildingService.CreateBuildingAsync(building);
 
-                return RedirectToAction(nameof(Index));
+                    await _audit.LogActionAsync("CREATE", "Building", building.id, null, $"Building {building.buildingName} added to infrastructure.");
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("buildingCode", ex.Message);
+                }
             }
             return View(building);
         }
-        // GET: Buildings/Edit/5
+
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            // Servis üzerinden binayı getir (Eğer servis metodun yoksa aşağıda ekleyeceğiz)
             var building = await _buildingService.GetBuildingByIdAsync(id.Value);
             if (building == null) return NotFound();
 
             return View(building);
         }
 
-        // POST: Buildings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Building building)
@@ -67,12 +71,18 @@ namespace DormMS.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                await _buildingService.UpdateBuildingAsync(building);
+                try 
+                {
+                    await _buildingService.UpdateBuildingAsync(building);
 
-                // AUDIT LOG: Güncelleme kaydı
-                await _audit.LogActionAsync("UPDATE", "Building", building.id, null, $"Building {building.buildingName} updated.");
+                    await _audit.LogActionAsync("UPDATE", "Building", building.id, null, $"Building {building.buildingName} updated.");
 
-                return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("buildingCode", ex.Message);
+                }
             }
             return View(building);
         }
@@ -93,3 +103,4 @@ namespace DormMS.Web.Controllers
         }
     }
 }
+

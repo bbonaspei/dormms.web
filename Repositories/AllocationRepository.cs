@@ -12,9 +12,12 @@ namespace DormMS.Web.Repositories
 
         public async Task<IEnumerable<Allocation>> GetAllAsync()
         {
+
             return await _context.Allocations
+                .Where(a => a.isCurrent == true)
                 .Include(a => a.Student).ThenInclude(s => s!.User)
                 .Include(a => a.Room)
+                .OrderByDescending(a => a.startDate)
                 .ToListAsync();
         }
 
@@ -34,3 +37,4 @@ namespace DormMS.Web.Repositories
         }
     }
 }
+

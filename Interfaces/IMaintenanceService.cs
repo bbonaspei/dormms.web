@@ -4,21 +4,21 @@ namespace DormMS.Web.Interfaces
 {
     public interface IMaintenanceService
     {
-        // CRUD ve Listeleme
-        Task<IEnumerable<MaintenanceRequest>> GetActiveRequestsAsync(int? studentId = null); // Pending, In Progress
-        Task<IEnumerable<MaintenanceRequest>> GetArchivedRequestsAsync(int? studentId = null); // Completed, Rejected
+
+        Task<IEnumerable<MaintenanceRequest>> GetActiveRequestsAsync(int? studentId = null);
+        Task<IEnumerable<MaintenanceRequest>> GetArchivedRequestsAsync(int? studentId = null);
         Task<MaintenanceRequest?> GetRequestByIdAsync(int id);
         Task CreateRequestAsync(MaintenanceRequest request);
         Task UpdateStatusAsync(int requestId, string newStatus);
-        Task DeleteRequestAsync(int id); // Sadece Admin için
+        Task DeleteRequestAsync(int id);
 
-        // İşlemler
-        Task AssignStaffAsync(int requestId, int staffId);
+        Task<bool> AssignStaffAsync(int requestId, int staffId);
         Task AddFeedbackAsync(int requestId, int rating, string feedback);
 
-        // Yardımcı Metotlar (Controller'ı DbContext'ten kurtarmak için)
         Task<Student?> GetStudentProfileAsync(int userId);
         Task<dynamic> GetCreateDropdownDataAsync(int userId, bool isStudent);
         Task<IEnumerable<User>> GetAvailableStaffAsync();
+        Task<Room?> GetStudentRoomAsync(int studentId);
     }
 }
+

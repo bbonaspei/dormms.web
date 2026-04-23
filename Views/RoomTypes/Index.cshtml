@@ -43,8 +43,65 @@
                     </div>
                 </div>
 
-                <h3 class="fw-black text-end" style="color:#8b5cf6; letter-spacing:-1px;">$@item.basePrice<small class="fs-6 text-muted fw-normal">/mo</small></h3>
+                <div class="d-flex justify-content-between align-items-end">
+                    <div class="text-start">
+                        @if (item.Fee != null)
+                        {
+                            <span class="badge bg-primary-subtle text-primary border rounded-pill px-2 py-1" style="font-size: 8px;">
+                                <i class="bi bi-link-45deg"></i> LINKED: @item.Fee.feeName
+                            </span>
+                        }
+                        <div class="mt-2 text-start d-flex gap-2">
+                            <a asp-action="Edit" asp-route-id="@item.id" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold" style="font-size: 10px;">
+                                <i class="bi bi-pencil"></i> EDIT
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@item.id" method="post" class="delete-form">
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill fw-bold delete-btn" style="font-size: 10px;">
+                                    <i class="bi bi-trash"></i> DELETE
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <h3 class="fw-black text-end m-0" style="color:#8b5cf6; letter-spacing:-1px;">@item.basePrice TL<small class="fs-6 text-muted fw-normal">/mo</small></h3>
+                </div>
             </div>
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const form = this.closest('.delete-form');
+                    
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "All room configurations under this category will be affected if they are still linked!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ee4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'Cancel',
+                        borderRadius: '25px',
+                        customClass: {
+                            confirmButton: 'rounded-pill px-4 py-2 fw-bold',
+                            cancelButton: 'rounded-pill px-4 py-2 fw-bold'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}
+
+
+

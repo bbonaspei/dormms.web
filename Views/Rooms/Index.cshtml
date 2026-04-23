@@ -4,11 +4,10 @@
     ViewData["Title"] = "Room Inventory";
 }
 
-<!-- SweetAlert2 (Layout'ta yoksa burada kalsın) -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container-fluid px-4 mt-5">
-    <!-- Sayfa Başlığı -->
+    
     <div class="row align-items-center mb-5">
         <div class="col-md-6">
             <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin-bottom: 0;">
@@ -21,6 +20,12 @@
                 <a asp-action="Archives" class="btn-back-premium">
                     <i class="bi bi-archive-fill"></i> View Archives
                 </a>
+                <form asp-action="Sync" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-back-premium" title="Recalculate All Occupancy">
+                        <i class="bi bi-arrow-repeat"></i> Sync Occupancy
+                    </button>
+                </form>
                 <a asp-action="Create" class="btn-premium">
                     <i class="bi bi-plus-lg"></i> Add New Room
                 </a>
@@ -28,7 +33,6 @@
         </div>
     </div>
 
-    <!-- Arama Çubuğu -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="search-wrapper-new py-3 px-4 shadow-sm border">
@@ -38,19 +42,17 @@
         </div>
     </div>
 
-    <!-- Kartlar Listesi -->
     <div class="row g-4">
         @foreach (var item in Model)
         {
             <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
                 <div class="room-card-vibrant p-4 h-100 shadow-sm border-0">
 
-                    <!-- Kart Üstü -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="icon-box icon-blue">
                             <i class="bi bi-door-closed-fill"></i>
                         </div>
-                        <!-- Index.cshtml içinde rozetin olduğu yer -->
+                        
                         <span class="badge badge-status-premium @(item.status == "Available" ? "badge-available" :
                                                                         item.status == "Occupied" ? "badge-occupied" :
                                                                         "badge-maintenance")">
@@ -58,37 +60,41 @@
                     </span>
                     </div>
 
-                    <!-- Oda Bilgisi -->
                     <div class="mb-4">
                         <h3 class="fw-bold mb-1" style="color: #0f172a;">Room @item.roomNumber</h3>
-                        <span class="text-muted small fw-bold text-uppercase">FLOOR @item.floorNumber • @item.RoomType?.typeName</span>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <span class="text-muted small fw-bold text-uppercase">FLOOR @item.floorNumber • @item.RoomType?.typeName</span>
+                            @if(item.hasBathroom == true) {
+                                <span class="badge bg-primary-subtle text-primary border-primary border" style="font-size: 9px; padding: 2px 8px;">PRIVATE BATH</span>
+                            } else {
+                                <span class="badge bg-light text-muted border" style="font-size: 9px; padding: 2px 8px;">SHARED BATH</span>
+                            }
+                        </div>
                     </div>
 
-                    <!-- Doluluk Grafiği -->
                     <div class="occupancy-container mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="small fw-bold text-secondary">RESIDENCY</span>
-                            <span class="fw-bold" style="color: #6366f1;">@item.currentOccupancy / @item.capacity</span>
+                            <span class="fw-bold" style="color: #6366f1;">@(item.currentOccupancy ?? 0) / @item.capacity</span>
                         </div>
                         <div class="progress" style="height: 8px; border-radius: 10px;">
                             @{
-                                var percent = item.capacity > 0 ? (item.currentOccupancy * 100) / item.capacity : 0;
+                                var percent = item.capacity > 0 ? ((item.currentOccupancy ?? 0) * 100) / item.capacity : 0;
                             }
                             <div class="progress-premium-bar" style="width: @percent%;"></div>
                         </div>
                     </div>
 
-                    <!-- Kira -->
                     <div class="lease-fee-badge p-3 mb-4 d-flex justify-content-between align-items-center">
                         <span class="small fw-bold text-muted">MONTHLY FEE</span>
-                        <span class="lease-fee-amount">$@item.RoomType?.basePrice</span>
+                        <span class="lease-fee-amount">@(item.RoomType?.basePrice) TL</span>
                     </div>
 
-                    <!-- Butonlar (Yeni Class'lar Kullanıldı) -->
                     <div class="d-flex gap-2 mt-auto">
-                        <form id="deleteForm-@item.id" asp-action="Archive" asp-route-id="@item.id" method="post" style="width: 25%;">
+                        
+                        <form id="deleteForm-@item.id" asp-action="Delete" asp-route-id="@item.id" method="post" style="width: 15%;">
                             @Html.AntiForgeryToken()
-                            <button type="button" class="btn-card-delete-mini" onclick="confirmDelete(@item.id)" title="Archive Room">
+                            <button type="button" class="btn-card-delete-mini" onclick="confirmDelete(@item.id)" title="Delete Permanently">
                                 <i class="bi bi-trash3-fill"></i>
                             </button>
                         </form>
@@ -106,13 +112,13 @@
 <script>
     function confirmDelete(id) {
         Swal.fire({
-            title: 'Archive Room?',
-            text: "This room will be moved to the archives and hidden from inventory.",
-            icon: 'warning',
+            title: 'Delete Permanently?',
+            text: "This room will be removed from the database. This action CANNOT be undone!",
+            icon: 'error',
             showCancelButton: true,
-            confirmButtonColor: '#f43f5e',
+            confirmButtonColor: '#ef4444',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Yes, delete it!',
+            confirmButtonText: 'Yes, delete forever!',
             background: '#ffffff',
             borderRadius: '20px'
         }).then((result) => {
@@ -121,9 +127,27 @@
             }
         })
     }
+
+    function confirmArchive(id) {
+        Swal.fire({
+            title: 'Archive Room?',
+            text: "This room will be moved to the archives and hidden from inventory.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f43f5e',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, archive it!',
+            background: '#ffffff',
+            borderRadius: '20px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('archiveForm-' + id).submit();
+            }
+        })
+    }
     document.querySelector('.search-input-new').addEventListener('keyup', function (e) {
         let term = e.target.value.toLowerCase();
-        // Kartların olduğu sütunları seçiyoruz
+
         let cards = document.querySelectorAll('.col-sm-12.col-md-6.col-lg-4.col-xl-3');
 
         cards.forEach(card => {
@@ -132,3 +156,6 @@
         });
     });
 </script>
+
+
+

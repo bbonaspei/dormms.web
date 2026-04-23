@@ -10,7 +10,7 @@ namespace DormMS.Web.Models
         [Column("id")]
         public int id { get; set; }
 
-        [Column("payment_reference")] // SQL'deki isme bak dedik
+        [Column("payment_reference")]
         public string paymentReference { get; set; } = string.Empty;
 
         [Column("student_id")]
@@ -40,3 +40,4 @@ namespace DormMS.Web.Models
         public string status { get; set; } = "Success";
     }
 }
+

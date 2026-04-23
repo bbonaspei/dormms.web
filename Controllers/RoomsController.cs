@@ -46,7 +46,7 @@ namespace DormMS.Web.Controllers
             if (success)
             {
                 TempData["Success"] = "Your booking request has been submitted and is awaiting approval.";
-                // Notify admins? (In a real app, you'd find admins and notify them)
+
             }
             else
             {
@@ -55,7 +55,6 @@ namespace DormMS.Web.Controllers
 
             return RedirectToAction(nameof(Browse));
         }
-
 
         [Authorize(Roles = "Admin,Manager,DormManager")]
         [HttpGet]
@@ -94,8 +93,14 @@ namespace DormMS.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ViewBag.buildingId = new SelectList(await _roomService.GetBuildingsAsync(), "id", "buildingName");
-            ViewBag.roomTypeId = new SelectList(await _roomService.GetRoomTypesAsync(), "id", "typeName");
+            var buildings = await _roomService.GetBuildingsAsync();
+            var roomTypes = await _roomService.GetRoomTypesAsync();
+
+            ViewBag.BuildingsJson = System.Text.Json.JsonSerializer.Serialize(buildings.Select(b => new { b.id, b.totalFloors }));
+            ViewBag.RoomTypesJson = System.Text.Json.JsonSerializer.Serialize(roomTypes.Select(rt => new { rt.id, rt.capacity, rt.hasBathroom }));
+
+            ViewBag.buildingId = new SelectList(buildings, "id", "buildingName");
+            ViewBag.roomTypeId = new SelectList(roomTypes, "id", "typeName");
             return View();
         }
 
@@ -104,13 +109,46 @@ namespace DormMS.Web.Controllers
         public async Task<IActionResult> Create(Room room)
         {
             ModelState.Remove("Building"); ModelState.Remove("RoomType");
+
+            var buildings = await _roomService.GetBuildingsAsync();
+            var building = buildings.FirstOrDefault(b => b.id == room.buildingId);
+
+            if (building == null)
+            {
+                ModelState.AddModelError("buildingId", "Selected building is inactive or does not exist. Please choose an active building.");
+            }
+            else if (room.floorNumber > building.totalFloors)
+            {
+                ModelState.AddModelError("floorNumber", $"Selected building only has {building.totalFloors} floors.");
+            }
+
+            var roomTypes = await _roomService.GetRoomTypesAsync();
+            var roomType = roomTypes.FirstOrDefault(rt => rt.id == room.roomTypeId);
+            if (roomType != null)
+            {
+                if (room.capacity != roomType.capacity)
+                    ModelState.AddModelError("capacity", $"Capacity must be {roomType.capacity} for this room type.");
+            }
+
             if (ModelState.IsValid)
             {
-                await _roomService.CreateRoomAsync(room);
-                await _audit.LogActionAsync("CREATE", "Room", room.id, null, $"New room {room.roomNumber} registered");
-                TempData["Success"] = "New unit added to inventory!";
-                return RedirectToAction(nameof(Index));
+                try 
+                {
+                    await _roomService.CreateRoomAsync(room);
+                    await _audit.LogActionAsync("CREATE", "Room", room.id, null, $"New room {room.roomNumber} registered");
+                    TempData["Success"] = "New unit added to inventory!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("roomNumber", ex.Message);
+                }
             }
+
+            ViewBag.BuildingsJson = System.Text.Json.JsonSerializer.Serialize(buildings.Select(b => new { b.id, b.totalFloors }));
+            ViewBag.RoomTypesJson = System.Text.Json.JsonSerializer.Serialize(roomTypes.Select(rt => new { rt.id, rt.capacity, rt.hasBathroom }));
+            ViewBag.buildingId = new SelectList(buildings, "id", "buildingName", room.buildingId);
+            ViewBag.roomTypeId = new SelectList(roomTypes, "id", "typeName", room.roomTypeId);
             return View(room);
         }
 
@@ -122,10 +160,50 @@ namespace DormMS.Web.Controllers
             var room = await _roomService.GetRoomDetailsAsync(id);
             if (room != null)
             {
-                room.status = "Archived"; await _roomService.UpdateRoomAsync(room);
+
+                if (room.currentOccupancy.HasValue && room.currentOccupancy.Value > 0)
+                {
+                    TempData["Error"] = $"Cannot archive room {room.roomNumber} because it currently has {room.currentOccupancy} resident(s).";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                room.status = "Archived"; 
+                await _roomService.UpdateRoomAsync(room);
                 await _audit.LogActionAsync("DELETE", "Room", id, "Available", "Moved to archive");
+                TempData["Success"] = "Room moved to archives.";
             }
-            TempData["Success"] = "Room moved to archives.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = "Admin,Manager,DormManager")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var room = await _roomService.GetRoomDetailsAsync(id);
+            if (room != null)
+            {
+
+                if (room.currentOccupancy.HasValue && room.currentOccupancy.Value > 0)
+                {
+                    TempData["Error"] = $"Cannot delete room {room.roomNumber} because it is currently occupied.";
+                    return RedirectToAction(room.status == "Archived" ? nameof(Archives) : nameof(Index));
+                }
+
+                await _roomService.DeleteRoomAsync(id);
+                await _audit.LogActionAsync("DELETE", "Room", id, null, "Permanently deleted from database");
+                TempData["Success"] = "Room deleted permanently.";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = "Admin,Manager,DormManager")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Sync()
+        {
+            await _roomService.SyncAllRoomsOccupancyAsync();
+            TempData["Success"] = "All room occupancy levels synchronized with active allocations.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -144,7 +222,6 @@ namespace DormMS.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Rooms/Edit/5
         [Authorize(Roles = "Admin,Manager,DormManager")]
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
@@ -154,14 +231,18 @@ namespace DormMS.Web.Controllers
             var room = await _roomService.GetRoomDetailsAsync(id.Value);
             if (room == null) return NotFound();
 
-            // Dropdown listelerini (Binalar ve Tipler) dolduruyoruz
-            ViewBag.buildingId = new SelectList(await _roomService.GetBuildingsAsync(), "id", "buildingName", room.buildingId);
-            ViewBag.roomTypeId = new SelectList(await _roomService.GetRoomTypesAsync(), "id", "typeName", room.roomTypeId);
+            var buildings = await _roomService.GetBuildingsAsync();
+            var roomTypes = await _roomService.GetRoomTypesAsync();
+
+            ViewBag.BuildingsJson = System.Text.Json.JsonSerializer.Serialize(buildings.Select(b => new { b.id, b.totalFloors }));
+            ViewBag.RoomTypesJson = System.Text.Json.JsonSerializer.Serialize(roomTypes.Select(rt => new { rt.id, rt.capacity, rt.hasBathroom }));
+
+            ViewBag.buildingId = new SelectList(buildings, "id", "buildingName", room.buildingId);
+            ViewBag.roomTypeId = new SelectList(roomTypes, "id", "typeName", room.roomTypeId);
 
             return View(room);
         }
 
-        // POST: Rooms/Edit/5
         [Authorize(Roles = "Admin,Manager,DormManager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -169,25 +250,72 @@ namespace DormMS.Web.Controllers
         {
             if (id != room.id) return NotFound();
 
-            // İlişkili nesneleri doğrulamadan muaf tut (Hata almamak için)
             ModelState.Remove("Building");
             ModelState.Remove("RoomType");
 
-            if (ModelState.IsValid)
+            var buildings = await _roomService.GetBuildingsAsync();
+            var building = buildings.FirstOrDefault(b => b.id == room.buildingId);
+
+            if (building == null)
             {
-                await _roomService.UpdateRoomAsync(room);
-
-                // AUDIT LOG: Değişikliği mühürle (Rapor Sayfa 22)
-                await _audit.LogActionAsync("UPDATE", "Room", room.id, null, $"Room {room.roomNumber} configuration updated.");
-
-                TempData["Success"] = "Room configuration updated.";
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("buildingId", "Selected building is inactive or does not exist. Please choose an active building.");
+            }
+            else if (room.floorNumber > building.totalFloors)
+            {
+                ModelState.AddModelError("floorNumber", $"Selected building only has {building.totalFloors} floors.");
             }
 
-            // Hata varsa listeleri tekrar yükle
-            ViewBag.buildingId = new SelectList(await _roomService.GetBuildingsAsync(), "id", "buildingName", room.buildingId);
-            ViewBag.roomTypeId = new SelectList(await _roomService.GetRoomTypesAsync(), "id", "typeName", room.roomTypeId);
+            var roomTypes = await _roomService.GetRoomTypesAsync();
+            var roomType = roomTypes.FirstOrDefault(rt => rt.id == room.roomTypeId);
+            if (roomType != null)
+            {
+                if (room.capacity != roomType.capacity)
+                    ModelState.AddModelError("capacity", $"Capacity must be {roomType.capacity} for this room type.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try 
+                {
+                    var existingRoom = await _roomService.GetRoomDetailsAsync(id);
+                    if (existingRoom == null) return NotFound();
+
+                    if (room.status == "Archived" && existingRoom.currentOccupancy.HasValue && existingRoom.currentOccupancy.Value > 0)
+                    {
+                        ModelState.AddModelError("status", "Cannot archive occupied rooms. Please deallocate residents first.");
+                    }
+
+                    if (ModelState.IsValid)
+                    {
+                        existingRoom.roomNumber = room.roomNumber;
+                        existingRoom.buildingId = room.buildingId;
+                        existingRoom.roomTypeId = room.roomTypeId;
+                        existingRoom.floorNumber = room.floorNumber;
+                        existingRoom.capacity = room.capacity;
+                        existingRoom.status = room.status;
+                        existingRoom.hasBathroom = room.hasBathroom;
+                        existingRoom.notes = room.notes;
+                        existingRoom.updatedAt = DateTime.Now;
+
+                        await _roomService.UpdateRoomAsync(existingRoom);
+                        await _audit.LogActionAsync("UPDATE", "Room", room.id, null, $"Room {room.roomNumber} configuration updated.");
+
+                        TempData["Success"] = "Room configuration updated.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("roomNumber", ex.Message);
+                }
+            }
+
+            ViewBag.BuildingsJson = System.Text.Json.JsonSerializer.Serialize(buildings.Select(b => new { b.id, b.totalFloors }));
+            ViewBag.RoomTypesJson = System.Text.Json.JsonSerializer.Serialize(roomTypes.Select(rt => new { rt.id, rt.capacity }));
+            ViewBag.buildingId = new SelectList(buildings, "id", "buildingName", room.buildingId);
+            ViewBag.roomTypeId = new SelectList(roomTypes, "id", "typeName", room.roomTypeId);
             return View(room);
         }
     }
 }
+

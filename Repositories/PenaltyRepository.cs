@@ -1,4 +1,4 @@
-using DormMS.Web.Data;
+﻿using DormMS.Web.Data;
 using DormMS.Web.Interfaces;
 using DormMS.Web.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +14,11 @@ namespace DormMS.Web.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Penalty>> GetAllPenaltiesAsync() => await _context.Penalties.ToListAsync();
+        public async Task<IEnumerable<Penalty>> GetAllPenaltiesAsync() 
+            => await _context.Penalties
+                .Include(p => p.Student)
+                    .ThenInclude(s => s.User)
+                .ToListAsync();
 
         public async Task<Penalty?> GetPenaltyByIdAsync(int id) => await _context.Penalties.FindAsync(id);
 
@@ -34,3 +38,4 @@ namespace DormMS.Web.Repositories
             => await _context.Penalties.Where(p => p.studentId == studentId).ToListAsync();
     }
 }
+

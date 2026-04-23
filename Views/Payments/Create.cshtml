@@ -1,4 +1,4 @@
-@model DormMS.Web.Models.Payment
+﻿@model DormMS.Web.Models.Payment
 @{
     ViewData["Title"] = "Record New Collection";
 }
@@ -32,7 +32,7 @@
                         <div class="col-md-6">
                             <div class="form-floating">
                                 <input asp-for="amount" class="form-control rounded-pill px-4" placeholder="0.00" style="height: 60px;" />
-                                <label asp-for="amount" class="ms-2">Execution Amount ($)</label>
+                                <label asp-for="amount" class="ms-2">Execution Amount (TL)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -72,3 +72,6 @@
     .bg-primary-subtle { background-color: #eef2ff !important; }
     .flex-grow-2 { flex: 2; }
 </style>
+
+
+

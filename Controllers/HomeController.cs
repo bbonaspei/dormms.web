@@ -1,4 +1,4 @@
-using DormMS.Web.Data;
+﻿using DormMS.Web.Data;
 using DormMS.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,78 +24,10 @@ namespace DormMS.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Setup()
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
         {
-            try {
-                // Rolü kontrol et, yoksa ekle
-                var studentRole = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == "Student" || r.RoleName == "Resident");
-                if (studentRole == null) {
-                    studentRole = new Role { RoleName = "Student", Description = "Resident Role" };
-                    _context.Roles.Add(studentRole);
-                    await _context.SaveChangesAsync();
-                }
-
-                // Kullanıcıyı kontrol et, yoksa ekle
-                var studentUser = await _context.Users.FirstOrDefaultAsync(u => u.username == "student");
-                if (studentUser == null) {
-                    studentUser = new User { 
-                        username = "student", passwordHash = "123", 
-                        firstName = "Emily", lastName = "Resident", email = "student@dorm.com",
-                        isActive = true, createdAt = DateTime.Now
-                    };
-                    _context.Users.Add(studentUser);
-                    await _context.SaveChangesAsync();
-                }
-
-                // UserRole eşleşmesini kontrol et
-                var ur = await _context.UserRoles.FirstOrDefaultAsync(x => x.UserId == studentUser.Id && x.RoleId == studentRole.Id);
-                if (ur == null) {
-                    _context.UserRoles.Add(new UserRole { UserId = studentUser.Id, RoleId = studentRole.Id });
-                    await _context.SaveChangesAsync();
-                }
-
-                // Öğrenci profilini kontrol et
-                var studentProfile = await _context.Students.FirstOrDefaultAsync(s => s.userId == studentUser.Id);
-                if (studentProfile == null) {
-                    _context.Students.Add(new Student { userId = studentUser.Id, studentId = "STU001", status = "Active", createdAt = DateTime.Now });
-                    await _context.SaveChangesAsync();
-                }
-                
-                return Content("Setup Complete. Use 'student' / '123' to login. Role: " + studentRole.RoleName);
-            } catch (Exception ex) {
-                return Content("Error during setup: " + ex.Message);
-            }
-        }
-
-        [HttpGet]
-        public IActionResult MyClaims()
-        {
-            var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
-            return Json(claims);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> CheckUsers()
-        {
-            var users = await _context.Users.ToListAsync();
-            var profiles = await _context.Students.ToListAsync();
-            var roles = await _context.UserRoles.Include(ur => ur.Role).ToListAsync();
-
-            var data = users.Select(u => new {
-                u.Id,
-                u.username,
-                Roles = roles.Where(r => r.UserId == u.Id).Select(r => r.Role?.RoleName ?? "N/A"),
-                ProfileId = profiles.FirstOrDefault(s => s.userId == u.Id)?.id
-            }).ToList();
-            
-            return Json(data);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> CheckRoles()
-        {
-            var roles = await _context.Roles.ToListAsync();
-            return Json(roles);
+            return View(new ErrorViewModel { RequestId = System.Diagnostics.Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         [Route("~/")]
@@ -116,9 +48,6 @@ namespace DormMS.Web.Controllers
 
             var userId = int.Parse(userIdString);
 
-            // ==========================================
-            // 1. ÖĞRENCİ (STUDENT) KONTROLÜ VE YÖNLENDİRMESİ
-            // ==========================================
             if (User.IsInRole("Student") || User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Student"))
             {
                 var student = await _context.Students
@@ -131,10 +60,6 @@ namespace DormMS.Web.Controllers
                     return View("StudentDashboard", new StudentDashboardViewModel { StudentFirstName = User.Identity.Name });
                 }
 
-                // ... (rest of student logic)
-                // (Omission for brevity in replacement, but I will keep all logic)
-
-                // OTOMATİK BORÇLANDIRMA SİNKRONİZASYONU
                 await _financialService.SyncStudentChargesAsync(student.id);
 
                 var allocation = await _context.Allocations
@@ -164,7 +89,7 @@ namespace DormMS.Web.Controllers
 
                 var model = new StudentDashboardViewModel
                 {
-                    StudentFirstName = student.User?.firstName ?? "Student",
+                    StudentFirstName = student.User?.firstName ?? "Ã–ÄŸrenci",
                     HasActiveLease = allocation != null,
                     RoomNumber = allocation?.Room?.roomNumber ?? "Not Assigned",
                     BuildingName = allocation?.Room?.Building?.buildingName ?? "N/A",
@@ -182,9 +107,6 @@ namespace DormMS.Web.Controllers
                 return View("StudentDashboard", model);
             }
 
-            // ==========================================
-            // 2. PERSONEL (STAFF)
-            // ==========================================
             if (User.IsInRole("Staff") || User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Staff"))
             {
                 var activeTasks = await _context.MaintenanceRequests
@@ -199,8 +121,6 @@ namespace DormMS.Web.Controllers
                 ViewBag.CurrentUserId = userId;
                 ViewBag.StaffName = User.FindFirstValue("FullName") ?? User.Identity.Name;
 
-                // GERÇEK VERİ HESAPLAMA: Efficiency Rate (Rapor Sayfa 22 Uyumlu)
-                // Formül: (Tamamladığım İşler / Sistemdeki Toplam İşler) * 100
                 var totalSystemRequests = await _context.MaintenanceRequests.CountAsync();
                 var myCompletedTasks = await _context.MaintenanceRequests.CountAsync(m => m.assignedTo == userId && m.status == "Completed");
                 
@@ -211,9 +131,6 @@ namespace DormMS.Web.Controllers
                 return View("StaffDashboard");
             }
 
-            // ==========================================
-            // 3. YÖNETİCİ (ADMIN/MANAGER)
-            // ==========================================
             if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager") || User.IsInRole("Finance") ||
                 User.Claims.Any(c => c.Type == ClaimTypes.Role && (c.Value == "Admin" || c.Value == "Manager" || c.Value == "DormManager" || c.Value == "Finance")))
             {
@@ -235,13 +152,22 @@ namespace DormMS.Web.Controllers
                 ViewBag.MissingDocCount = await _context.Students.CountAsync(s => !studentsWithDocs.Contains(s.id));
                 ViewBag.StudentsMissingDocs = studentsMissingDocs;
 
-                ViewBag.TopDebtors = await _context.StudentFees
+                var topDebtors = await _context.StudentFees
                     .Include(f => f.Student).ThenInclude(s => s.User)
                     .Where(f => f.status != "Paid")
-                    .OrderByDescending(f => f.amount)
+                    .GroupBy(f => f.studentId)
+                    .Select(g => new {
+                        Student = g.First().Student,
+                        TotalAmount = g.Sum(f => f.amount)
+                    })
+                    .OrderByDescending(x => x.TotalAmount)
                     .Take(5).ToListAsync();
+                
+                ViewBag.TopDebtors = topDebtors.Select(x => new StudentFee {
+                    Student = x.Student,
+                    amount = x.TotalAmount
+                }).ToList();
 
-                // Adminler de aktif işleri görebilsin (Backlog olarak)
                 ViewBag.AllTasks = await _context.MaintenanceRequests
                     .Include(m => m.Room)
                     .Include(m => m.Student).ThenInclude(s => s.User)
@@ -256,7 +182,6 @@ namespace DormMS.Web.Controllers
                     .OrderByDescending(p => p.paymentDate)
                     .Take(5).ToListAsync();
 
-                // GRAFİK VERİSİ (YENİ - Gerçek Veri)
                 var last7Days = Enumerable.Range(0, 7)
                     .Select(i => DateTime.Today.AddDays(-i))
                     .OrderBy(d => d)
@@ -322,7 +247,7 @@ namespace DormMS.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin,Manager,Finance")]
         public async Task<IActionResult> SyncAllFinances()
         {
             var students = await _context.Students.Where(s => s.status == "Active").ToListAsync();
@@ -335,3 +260,4 @@ namespace DormMS.Web.Controllers
         }
     }
 }
+

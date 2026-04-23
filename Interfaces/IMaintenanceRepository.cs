@@ -10,7 +10,6 @@ namespace DormMS.Web.Interfaces
         Task UpdateAsync(MaintenanceRequest request);
         Task DeleteAsync(int id);
 
-        // Ekstra Data İhtiyaçları
         Task<Student?> GetStudentByUserIdAsync(int userId);
         Task<IEnumerable<Student>> GetAllStudentsAsync();
         Task<IEnumerable<Room>> GetAllRoomsAsync();
@@ -18,3 +17,4 @@ namespace DormMS.Web.Interfaces
         Task<IEnumerable<UserRole>> GetStaffUsersAsync();
     }
 }
+

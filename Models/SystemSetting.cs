@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DormMS.Web.Models
 {
@@ -23,3 +23,4 @@ namespace DormMS.Web.Models
         public DateTime updatedAt { get; set; } = DateTime.Now;
     }
 }
+

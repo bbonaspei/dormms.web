@@ -31,7 +31,7 @@
                 <div class="stat-card-new alert-border-red shadow-sm">
                     <div class="stat-title-premium text-danger">OUTSTANDING DEBT</div>
                     <div class="d-flex justify-content-between align-items-center mt-2">
-                        <h2 class="stat-value-premium m-0 text-dark">$@(((decimal?)(ViewBag.UnpaidAmount ?? 0m))?.ToString("N2"))</h2>
+                        <h2 class="stat-value-premium m-0 text-dark">@(((decimal?)(ViewBag.UnpaidAmount ?? 0m))?.ToString("N2")) TL</h2>
                         <div class="icon-box icon-red"><i class="bi bi-exclamation-octagon"></i></div>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                                             @fee.Student?.User?.firstName @fee.Student?.User?.lastName
                                         </div>
                                     </div>
-                                    <span class="badge bg-danger-subtle text-danger fw-900">$@fee.amount</span>
+                                    <span class="badge bg-danger-subtle text-danger fw-900">@fee.amount TL</span>
                                 </div>
                             }
                         }
@@ -130,7 +130,10 @@
                                             </tr>
                                         }
                                     }
-                                    else { <tr><td colspan="3" class="text-center py-4">None.</td></tr> }
+                                    else
+                                    {
+                                        <tr><td colspan="3" class="text-center py-4">None.</td></tr>
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -153,7 +156,10 @@
                                     </div>
                                 }
                             }
-                            else { <div class="text-center py-5"><p class="text-muted small">All systems functional.</p></div> }
+                            else
+                            {
+                                <div class="text-center py-5"><p class="text-muted small">All systems functional.</p></div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -184,9 +190,12 @@
         colors: ['#6366f1'],
         fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.05 } },
         xaxis: { categories: @Html.Raw(Json.Serialize(ViewBag.RevenueLabels)) },
-        yaxis: { labels: { formatter: function(val) { return "$" + val.toFixed(0); } } },
-        tooltip: { y: { formatter: function(val) { return "$" + val.toFixed(2); } } }
+        yaxis: { labels: { formatter: function(val) { return val.toLocaleString() + " TL"; } } },
+        tooltip: { y: { formatter: function(val) { return val.toLocaleString() + " TL"; } } }
     };
     var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
     chart.render();
 </script>
+
+
+

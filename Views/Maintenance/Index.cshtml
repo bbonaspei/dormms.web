@@ -4,7 +4,6 @@
 @{
     ViewData["Title"] = "Operations Backlog";
 
-    // KİMLİK VE ROL KONTROLLERİ
     bool isStaff = User.IsInRole("Staff");
     bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager");
 
@@ -17,7 +16,7 @@
 }
 
 <div class="container-fluid px-4 mt-5">
-    <!-- SAYFA BAŞLIĞI & AKSİYON BUTONLARI -->
+    
     <div class="row align-items-center mb-5">
         <div class="col-md-7 text-start">
             <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px;">
@@ -39,7 +38,6 @@
         </div>
     </div>
 
-    <!-- TALEPLER LİSTESİ -->
     <div class="row g-4">
         @if (!Model.Any())
         {
@@ -181,12 +179,11 @@
                             }
                         </div>
 
-                        <!-- AKSİYON BUTONLARI -->
                         <div class="mt-auto pt-3 border-top d-flex gap-2 align-items-center">
 
                             @if (ViewBag.IsStudent == true)
                             {
-                                <!-- STUDENT: Sadece görüntüleyebilir -->
+                                
                                 <a asp-action="Details" asp-route-id="@item.id" class="btn-card-details-wide flex-grow-1">
                                     Track Status <i class="bi bi-eye ms-1"></i>
                                 </a>
@@ -254,14 +251,13 @@
     </div>
 </div>
 
-<!-- SWEETALERT2 JAVASCRIPT KODLARI -->
 @section Scripts {
     <script>
         function confirmAction(formId, title, text, iconType, confirmText) {
-            // İkon tipine göre buton rengi belirliyoruz
-            let btnColor = '#6366f1'; // Mavi (Start Work için)
-            if (iconType === 'success') btnColor = '#10b981'; // Yeşil (Complete için)
-            if (iconType === 'error') btnColor = '#f43f5e'; // Kırmızı (Delete için)
+
+            let btnColor = '#6366f1';
+            if (iconType === 'success') btnColor = '#10b981';
+            if (iconType === 'error') btnColor = '#f43f5e';
 
             Swal.fire({
                 title: title,
@@ -272,7 +268,7 @@
                 cancelButtonColor: '#cbd5e1',
                 confirmButtonText: confirmText,
                 customClass: {
-                    popup: 'border-radius-xl', // Premium köşeler
+                    popup: 'border-radius-xl',
                     confirmButton: 'fw-bold px-4 rounded-pill',
                     cancelButton: 'fw-bold px-4 rounded-pill'
                 }
@@ -284,3 +280,5 @@
         }
     </script>
 }
+
+

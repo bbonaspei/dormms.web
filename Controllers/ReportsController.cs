@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using DormMS.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -58,3 +58,4 @@ namespace DormMS.Web.Controllers
         }
     }
 }
+

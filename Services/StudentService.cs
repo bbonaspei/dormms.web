@@ -10,14 +10,14 @@ namespace DormMS.Web.Services
         private readonly IStudentRepository _repo;
         private readonly ApplicationDbContext _context;
         private readonly IAuditService _audit;
-        private readonly INotificationService _notificationService; // EKLENDİ
+        private readonly INotificationService _notificationService;
 
         public StudentService(IStudentRepository repo, ApplicationDbContext context, IAuditService audit, INotificationService notificationService)
         {
             _repo = repo;
             _context = context;
             _audit = audit;
-            _notificationService = notificationService; // Enjekte edildi
+            _notificationService = notificationService;
         }
 
         public async Task<IEnumerable<Student>> GetStudentListAsync()
@@ -33,7 +33,7 @@ namespace DormMS.Web.Services
                 email = email,
                 firstName = firstName,
                 lastName = lastName,
-                passwordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=", // Hash of "123456"
+                passwordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
                 isActive = true
             };
             _context.Users.Add(user);
@@ -45,7 +45,6 @@ namespace DormMS.Web.Services
 
             await _audit.LogActionAsync("CREATE", "Student", student.id, null, $"{firstName} {lastName} Registered");
 
-            // BİLDİRİM: Yeni öğrenciye otomatik mesaj gönder
             await _notificationService.SendNotificationAsync(user.Id, "Welcome to DormMS!", "Your account is active. Please change your default password.", "Success", "/Home/Index");
         }
 
@@ -75,3 +74,4 @@ namespace DormMS.Web.Services
         }
     }
 }
+

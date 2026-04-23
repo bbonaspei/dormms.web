@@ -1,0 +1,95 @@
+﻿@model IEnumerable<DormMS.Web.Models.Penalty>
+
+@{
+    ViewData["Title"] = "Archived Penalties";
+}
+
+<div class="container-fluid px-lg-5 mt-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-md-7">
+            <h1 style="color: #64748b; font-weight: 950; font-size: 3.5rem; letter-spacing: -3px; margin: 0;">
+                Penalty <span style="color: #94a3b8;">Archive.</span>
+            </h1>
+            <p class="text-secondary fw-bold mt-2 fs-5">Historically archived administrative sanctions and late fees.</p>
+        </div>
+        <div class="col-md-5 text-end">
+            <a asp-action="Index" class="btn-back-premium shadow-sm text-decoration-none">
+                <i class="bi bi-arrow-left me-1"></i> BACK TO ACTIVE LOGS
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow border-0 bg-white" style="border-radius: 35px; overflow: hidden; opacity: 0.85;">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light" style="border-bottom: 2px solid #f1f5f9;">
+                    <tr class="small text-muted fw-900 text-uppercase" style="letter-spacing: 1px;">
+                        <th class="ps-5 py-4">Resident</th>
+                        <th class="py-4">Type / Reason</th>
+                        <th class="py-4">Applied Date</th>
+                        <th class="py-4 text-center">Status</th>
+                        <th class="py-4 text-end">Amount</th>
+                        <th class="pe-5 py-4 text-end">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model.OrderByDescending(p => p.appliedDate))
+                        {
+                            <tr style="border-bottom: 1px solid #f8fafc;">
+                                <td class="ps-5 py-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="user-avatar-btn" style="width:40px; height:40px; font-size:14px; background:#f1f5f9; color:#64748b; border:none !important; font-weight: 900;">
+                                            @(item.Student?.User?.firstName?[0])@(item.Student?.User?.lastName?[0])
+                                        </div>
+                                        <div>
+                                            <div class="fw-900 text-slate-600">@item.Student?.User?.firstName @item.Student?.User?.lastName</div>
+                                            <div class="text-muted small" style="font-size: 11px;">#@item.Student?.studentId</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark text-muted">@item.penaltyType</div>
+                                    <div class="text-muted small">@item.reason</div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-muted">@item.appliedDate.ToString("dd MMM, yyyy")</div>
+                                    <div class="text-muted small">@item.appliedDate.ToString("HH:mm")</div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-1 fw-bold">ARCHIVED</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="fw-900 text-muted fs-5">@item.amount.ToString("N2") TL</div>
+                                </td>
+                                <td class="pe-5 text-end">
+                                    <span class="text-muted small italic">Record Locked</span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted fw-bold">
+                                <div class="mb-3 text-secondary"><i class="bi bi-archive-fill display-4"></i></div>
+                                No archived penalties found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-secondary-subtle { background: rgba(148, 163, 184, 0.1) !important; }
+    .text-secondary { color: #64748b !important; }
+    .user-avatar-btn { display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+</style>
+
+
+
+

@@ -6,7 +6,7 @@ namespace DormMS.Web.Models
     public class Role
     {
         [Key]
-        [Column("id")] // Veritabanındaki küçük 'id' sütununa bağlan
+        [Column("id")]
         public int Id { get; set; }
         [Required, StringLength(50)]
 
@@ -16,8 +16,8 @@ namespace DormMS.Web.Models
         [Column("description")]
         public string Description { get; set; } = string.Empty;
 
-        // Navigation properties
         public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
         public virtual ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
     }
 }
+

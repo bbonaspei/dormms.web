@@ -47,7 +47,6 @@ namespace DormMS.Web.Controllers
         {
             string hashedInput = HashPassword(password);
 
-            // EMERGENCY SEED: Test hesabı yoksa oluştur (Migration yapamadığımız durumlar için)
             if (username == "student" && password == "123")
             {
                 var existing = await _context.Users.FirstOrDefaultAsync(u => u.username == "student");
@@ -152,8 +151,9 @@ namespace DormMS.Web.Controllers
                 TempData["Success"] = "Password updated successfully!";
                 return RedirectToAction("Index", "Home");
             }
-            ViewBag.Error = "Current password is incorrect.";
-            return View();
+
+            TempData["PasswordError"] = "Current password is incorrect. Please try again.";
+            return RedirectToAction(nameof(Settings));
         }
 
         [HttpGet]
@@ -172,13 +172,6 @@ namespace DormMS.Web.Controllers
             
             var userId = int.Parse(userIdString);
 
-            if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
-            {
-                ViewBag.BuildingCount = await _context.Buildings.CountAsync();
-                ViewBag.RoomTypes = await _context.RoomTypes.ToListAsync();
-                return View("DormitoryProfile");
-            }
-
             if (User.IsInRole("Student"))
             {
                 var student = await _context.Students.FirstOrDefaultAsync(s => s.userId == userId);
@@ -190,13 +183,13 @@ namespace DormMS.Web.Controllers
                 return RedirectToAction("Details", "Students", new { id = student.id });
             }
 
-            if (User.IsInRole("Staff"))
+            if (!User.IsInRole("Student"))
             {
                 var user = await _context.Users.FindAsync(userId);
                 return View("StaffProfile", user);
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Settings));
         }
 
         [Authorize]
@@ -271,18 +264,6 @@ namespace DormMS.Web.Controllers
         }
         [HttpGet]
         public IActionResult AccessDenied() => View();
-
-        [HttpGet]
-        public async Task<IActionResult> FixGulzi()
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.username == "gulzi.staff");
-            if (user != null)
-            {
-                user.passwordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=";
-                await _context.SaveChangesAsync();
-                return Content("gulzi.staff fixed! Password is now 123456.");
-            }
-            return Content("User not found.");
-        }
     }
 }
+

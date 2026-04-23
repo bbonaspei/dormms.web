@@ -1,0 +1,157 @@
+﻿@model IEnumerable<DormMS.Web.Models.Penalty>
+
+@{
+    ViewData["Title"] = "Penalty Management";
+}
+
+<div class="container-fluid px-lg-5 mt-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-md-7">
+            <h1 style="color: #0f172a; font-weight: 950; font-size: 3.5rem; letter-spacing: -3px; margin: 0;">
+                Penalty <span style="color: #f43f5e;">Audit.</span>
+            </h1>
+            <p class="text-secondary fw-bold mt-2 fs-5">Monitor and manage administrative sanctions and late fees.</p>
+        </div>
+        <div class="col-md-5 text-end d-flex justify-content-end gap-3">
+            <a asp-action="Archive" class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-bold shadow-sm d-inline-flex align-items-center">
+                <i class="bi bi-archive me-2"></i> View Archive
+            </a>
+            <a asp-action="Create" class="btn-premium px-5 py-3 fs-5 shadow-sm">
+                <i class="bi bi-plus-circle-fill me-2"></i> Apply New Penalty
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow border-0 bg-white" style="border-radius: 35px; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light" style="border-bottom: 2px solid #f1f5f9;">
+                    <tr class="small text-muted fw-900 text-uppercase" style="letter-spacing: 1px;">
+                        <th class="ps-5 py-4">Resident</th>
+                        <th class="py-4">Type / Reason</th>
+                        <th class="py-4">Applied Date</th>
+                        <th class="py-4 text-center">Status</th>
+                        <th class="py-4 text-end">Amount</th>
+                        <th class="pe-5 py-4 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model.OrderByDescending(p => p.appliedDate))
+                        {
+                            <tr style="border-bottom: 1px solid #f8fafc;">
+                                <td class="ps-5 py-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="user-avatar-btn" style="width:40px; height:40px; font-size:14px; background:#fff1f2; color:#f43f5e; border:none !important; font-weight: 900;">
+                                            @(item.Student?.User?.firstName?[0])@(item.Student?.User?.lastName?[0])
+                                        </div>
+                                        <div>
+                                            <div class="fw-900 text-slate-800">@item.Student?.User?.firstName @item.Student?.User?.lastName</div>
+                                            <div class="text-muted small" style="font-size: 11px;">#@item.Student?.studentId</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">@item.penaltyType</div>
+                                    <div class="text-muted small">@item.reason</div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">@item.appliedDate.ToString("dd MMM, yyyy")</div>
+                                    <div class="text-muted small">@item.appliedDate.ToString("HH:mm")</div>
+                                </td>
+                                <td class="text-center">
+                                    @if (item.status == "Pending")
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1 fw-bold">UNRESOLVED</span>
+                                    }
+                                    else if (item.status == "Paid")
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold">RESOLVED</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-dark border rounded-pill px-3 py-1 fw-bold">@item.status?.ToUpper()</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="fw-900 text-danger fs-5">@item.amount.ToString("N2") TL</div>
+                                </td>
+                                <td class="pe-5 text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        @if (item.status == "Pending")
+                                        {
+                                            <form asp-action="Resolve" asp-route-id="@item.id" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold">Resolve</button>
+                                            </form>
+                                        }
+                                        <form asp-action="Delete" asp-route-id="@item.id" method="post" class="d-inline archive-form">
+                                            @Html.AntiForgeryToken()
+                                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold archive-btn">Archive</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted fw-bold">
+                                <div class="mb-3 text-success"><i class="bi bi-shield-check display-4"></i></div>
+                                No active penalties found in the system.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const archiveButtons = document.querySelectorAll('.archive-btn');
+            
+            archiveButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const form = this.closest('.archive-form');
+                    
+                    Swal.fire({
+                        title: 'Confirm Archive',
+                        text: "This penalty record will be moved to the historical archive.",
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonColor: '#6366f1',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Yes, Archive it!',
+                        cancelButtonText: 'Cancel',
+                        borderRadius: '25px',
+                        customClass: {
+                            confirmButton: 'rounded-pill px-4 py-2 fw-bold',
+                            cancelButton: 'rounded-pill px-4 py-2 fw-bold'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}
+
+<style>
+    .bg-warning-subtle { background: rgba(251, 191, 36, 0.1) !important; }
+    .text-warning { color: #d97706 !important; }
+    .bg-success-subtle { background: rgba(16, 185, 129, 0.1) !important; }
+    .text-success { color: #059669 !important; }
+    .user-avatar-btn { display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+</style>
+
+
+
+

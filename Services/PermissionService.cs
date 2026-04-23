@@ -15,7 +15,7 @@ namespace DormMS.Web.Services
 
         public async Task<bool> HasPermissionAsync(int userId, string permissionName)
         {
-            // Kullanıcının rollerini bul, o rollerin yetkileri arasında aranan yetki var mı kontrol et
+
             var permissions = await (from ur in _context.UserRoles
                                      join rp in _context.RolePermissions on ur.RoleId equals rp.RoleId
                                      join p in _context.Permissions on rp.PermissionId equals p.Id
@@ -26,3 +26,4 @@ namespace DormMS.Web.Services
         }
     }
 }
+

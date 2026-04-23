@@ -14,5 +14,8 @@ namespace DormMS.Web.Models
         [Column("has_bathroom")] public bool hasBathroom { get; set; }
         [Column("has_air_conditioner")] public bool hasAirConditioner { get; set; }
         [Column("base_price_per_month")] public decimal basePrice { get; set; }
+        [Column("fee_id")] public int? feeId { get; set; }
+        [ForeignKey("feeId")] public virtual Fee? Fee { get; set; }
     }
 }
+

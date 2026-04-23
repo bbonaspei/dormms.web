@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = "Student Portal";
 
-    // Parayı ekrandaki tasarıma uydurmak için Dolar ve Cent olarak ayırıyoruz (Örn: $450 .00)
     var amountStr = Model.TotalUpcomingDue.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
     var dollars = amountStr.Split('.')[0];
     var cents = amountStr.Split('.')[1];
@@ -10,7 +9,6 @@
 
 <div class="container-fluid px-4 mt-5">
 
-    <!-- GİRİŞ KARŞILAMASI -->
     <div class="row mb-5 align-items-center">
         <div class="col-auto">
             @if (!string.IsNullOrEmpty(Model.ProfilePicture))
@@ -35,10 +33,8 @@
         </div>
     </div>
 
-    <!-- HIZLI İSTATİSTİKLER (DİNAMİK) -->
     <div class="row g-4 mb-5">
 
-        <!-- ODA DURUMU -->
         <div class="col-md-4">
             <div class="stat-card-new h-100 alert-border-blue d-flex align-items-center gap-4">
                 <div class="icon-box icon-blue" style="width: 60px; height: 60px; font-size: 28px;">
@@ -61,7 +57,6 @@
             </div>
         </div>
 
-        <!-- FİNANS DURUMU -->
         <div class="col-md-4">
             <div class="stat-card-new h-100 alert-border-orange d-flex align-items-center gap-4">
                 <div class="icon-box icon-orange" style="width: 60px; height: 60px; font-size: 28px;">
@@ -69,7 +64,7 @@
                 </div>
                 <div>
                     <h5 class="stat-title-premium mb-1">Upcoming Due</h5>
-                    <div class="stat-value-premium" style="font-size: 1.8rem;">$@dollars<span class="stat-unit-label">.@cents</span></div>
+                    <div class="stat-value-premium" style="font-size: 1.8rem;">@dollars<span class="stat-unit-label">.@cents</span> TL</div>
 
                     @if (Model.TotalUpcomingDue > 0)
                     {
@@ -94,7 +89,6 @@
             </div>
         </div>
 
-        <!-- ARIZA DURUMU -->
         <div class="col-md-4">
             <div class="stat-card-new h-100 alert-border-red d-flex align-items-center gap-4">
                 <div class="icon-box icon-red" style="width: 60px; height: 60px; font-size: 28px;">
@@ -110,15 +104,12 @@
 
     </div>
 
-    <!-- ALT BÖLÜM: AKSİYONLAR VE DETAYLAR -->
     <div class="row g-4">
 
-        <!-- SOL: ODA DETAYLARI KARTI -->
         <div class="col-lg-7">
-            <!-- KAYMA HATASI BURADA ÇÖZÜLDÜ: overflow-hidden ve ikon pozisyonu revize edildi -->
+            
             <div class="profile-header-premium h-100 position-relative overflow-hidden" style="z-index: 1;">
 
-                <!-- ARKA PLAN İKONU (SABİT VE TAŞMAZ) -->
                 <div class="position-absolute opacity-10" style="bottom: -30px; right: -20px; z-index: -1;">
                     <i class="bi bi-house-door-fill" style="font-size: 160px; color: #6366f1; transform: rotate(-10deg); display: block;"></i>
                 </div>
@@ -154,12 +145,10 @@
             </div>
         </div>
 
-        <!-- SAĞ: HIZLI İŞLEMLER -->
         <div class="col-lg-5">
             <div class="info-section-card h-100 bg-glass-dark">
                 <h6 class="section-title-premium mb-4"><i class="bi bi-lightning-charge-fill text-warning"></i> Quick Actions</h6>
 
-                <!-- Ödeme Yap Butonu -->
                 <a asp-controller="Payments" asp-action="Index" class="portal-item text-decoration-none">
                     <div class="icon-box icon-green" style="width: 40px; height: 40px; font-size: 18px;">
                         <i class="bi bi-credit-card-fill"></i>
@@ -171,7 +160,6 @@
                     <i class="bi bi-chevron-right ms-auto opacity-50"></i>
                 </a>
 
-                <!-- Arıza Bildir Butonu -->
                 <a asp-controller="Maintenance" asp-action="Create" class="portal-item text-decoration-none">
                     <div class="icon-box icon-red" style="width: 40px; height: 40px; font-size: 18px;">
                         <i class="bi bi-wrench-adjustable"></i>
@@ -183,7 +171,6 @@
                     <i class="bi bi-chevron-right ms-auto opacity-50"></i>
                 </a>
 
-                <!-- Belgelerim Butonu -->
                 <a asp-controller="Account" asp-action="MyProfile" class="portal-item text-decoration-none">
                     <div class="icon-box icon-blue" style="width: 40px; height: 40px; font-size: 18px;">
                         <i class="bi bi-file-earmark-text-fill"></i>
@@ -195,7 +182,6 @@
                     <i class="bi bi-chevron-right ms-auto opacity-50"></i>
                 </a>
 
-                <!-- ODA GÖZ AT BUTONU (YENİ) -->
                 @if (!Model.HasActiveLease)
                 {
                     <a asp-controller="Rooms" asp-action="Browse" class="portal-item text-decoration-none mb-0 bg-primary text-white border-0 shadow-lg">
@@ -227,3 +213,6 @@
         </div>
     </div>
 </div>
+
+
+

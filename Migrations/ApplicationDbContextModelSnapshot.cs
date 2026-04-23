@@ -92,13 +92,35 @@ namespace DormMS.Web.Migrations
                         new
                         {
                             id = 1,
-                            createdAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6171),
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6844),
                             isCurrent = true,
                             roomId = 1,
                             securityDeposit = 1000m,
-                            startDate = new DateTime(2026, 2, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6172),
+                            startDate = new DateTime(2026, 2, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6846),
                             status = "Checked-In",
                             studentId = 1
+                        },
+                        new
+                        {
+                            id = 2,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6853),
+                            isCurrent = true,
+                            roomId = 2,
+                            securityDeposit = 800m,
+                            startDate = new DateTime(2026, 3, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6854),
+                            status = "Checked-In",
+                            studentId = 2
+                        },
+                        new
+                        {
+                            id = 3,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6856),
+                            isCurrent = true,
+                            roomId = 4,
+                            securityDeposit = 800m,
+                            startDate = new DateTime(2026, 4, 13, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6857),
+                            status = "Checked-In",
+                            studentId = 3
                         });
                 });
 
@@ -144,6 +166,18 @@ namespace DormMS.Web.Migrations
                     b.HasIndex("userId");
 
                     b.ToTable("Audit_logs");
+
+                    b.HasData(
+                        new
+                        {
+                            id = 1,
+                            action = "SYSTEM",
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6936),
+                            entityId = 1,
+                            entityType = "Database",
+                            newValues = "Seeded",
+                            oldValues = "None"
+                        });
                 });
 
             modelBuilder.Entity("DormMS.Web.Models.Building", b =>
@@ -189,10 +223,19 @@ namespace DormMS.Web.Migrations
                         {
                             id = 1,
                             buildingCode = "A",
-                            buildingName = "Alpha Block",
+                            buildingName = "A Blok (Merkez)",
                             hasElevator = true,
                             status = "Active",
                             totalFloors = 4
+                        },
+                        new
+                        {
+                            id = 2,
+                            buildingCode = "B",
+                            buildingName = "B Blok (Ek Bina)",
+                            hasElevator = false,
+                            status = "Active",
+                            totalFloors = 3
                         });
                 });
 
@@ -273,9 +316,17 @@ namespace DormMS.Web.Migrations
                         new
                         {
                             id = 1,
-                            amount = 850m,
-                            feeCategory = "Accommodation",
-                            feeName = "Monthly Rent",
+                            amount = 1200m,
+                            feeCategory = "Konaklama",
+                            feeName = "Aylık Kira",
+                            isRecurring = true
+                        },
+                        new
+                        {
+                            id = 2,
+                            amount = 450m,
+                            feeCategory = "Beslenme",
+                            feeName = "Yemek Bedeli",
                             isRecurring = true
                         });
                 });
@@ -346,6 +397,45 @@ namespace DormMS.Web.Migrations
                     b.HasIndex("studentId");
 
                     b.ToTable("Maintenance_requests");
+
+                    b.HasData(
+                        new
+                        {
+                            id = 1,
+                            description = "Klima kumandası çalışmıyor.",
+                            issueCategory = "Elektrik",
+                            priority = "High",
+                            requestDate = new DateTime(2026, 4, 21, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6894),
+                            requestNumber = "MR-001",
+                            roomId = 1,
+                            status = "Pending",
+                            studentId = 1
+                        },
+                        new
+                        {
+                            id = 2,
+                            description = "Dolap kapağı sallanıyor.",
+                            issueCategory = "Mobilya",
+                            priority = "Medium",
+                            requestDate = new DateTime(2026, 4, 18, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6897),
+                            requestNumber = "MR-002",
+                            roomId = 2,
+                            status = "In Progress",
+                            studentId = 2
+                        },
+                        new
+                        {
+                            id = 3,
+                            completedDate = new DateTime(2026, 4, 15, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6900),
+                            description = "Musluk sökülmüş.",
+                            issueCategory = "Tesisat",
+                            priority = "Low",
+                            requestDate = new DateTime(2026, 4, 13, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6899),
+                            requestNumber = "MR-003",
+                            roomId = 4,
+                            status = "Completed",
+                            studentId = 3
+                        });
                 });
 
             modelBuilder.Entity("DormMS.Web.Models.Notification", b =>
@@ -448,6 +538,30 @@ namespace DormMS.Web.Migrations
                     b.HasIndex("studentId");
 
                     b.ToTable("Payments");
+
+                    b.HasData(
+                        new
+                        {
+                            id = 1,
+                            amount = 1200m,
+                            paymentDate = new DateTime(2026, 4, 18, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6918),
+                            paymentMethod = "Credit Card",
+                            paymentReference = "",
+                            status = "Completed",
+                            studentId = 1,
+                            transactionId = "TXN1001"
+                        },
+                        new
+                        {
+                            id = 2,
+                            amount = 950m,
+                            paymentDate = new DateTime(2026, 4, 20, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6921),
+                            paymentMethod = "Bank Transfer",
+                            paymentReference = "",
+                            status = "Completed",
+                            studentId = 2,
+                            transactionId = "TXN1002"
+                        });
                 });
 
             modelBuilder.Entity("DormMS.Web.Models.Penalty", b =>
@@ -546,13 +660,13 @@ namespace DormMS.Web.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "Sistem yöneticisi",
+                            Description = "Sistem Yöneticisi",
                             RoleName = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            Description = "Yurt müdürü",
+                            Description = "Yurt Müdürü",
                             RoleName = "DormManager"
                         },
                         new
@@ -621,6 +735,10 @@ namespace DormMS.Web.Migrations
                         .HasColumnType("int")
                         .HasColumnName("floor_number");
 
+                    b.Property<bool>("hasBathroom")
+                        .HasColumnType("bit")
+                        .HasColumnName("has_bathroom");
+
                     b.Property<string>("notes")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("notes");
@@ -656,13 +774,70 @@ namespace DormMS.Web.Migrations
                             id = 1,
                             buildingId = 1,
                             capacity = 1,
-                            createdAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6151),
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6739),
                             currentOccupancy = 1,
                             floorNumber = 1,
+                            hasBathroom = false,
                             roomNumber = "101",
                             roomTypeId = 1,
                             status = "Occupied",
-                            updatedAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6154)
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6743)
+                        },
+                        new
+                        {
+                            id = 2,
+                            buildingId = 1,
+                            capacity = 2,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6749),
+                            currentOccupancy = 1,
+                            floorNumber = 1,
+                            hasBathroom = false,
+                            roomNumber = "102",
+                            roomTypeId = 2,
+                            status = "Available",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6750)
+                        },
+                        new
+                        {
+                            id = 3,
+                            buildingId = 1,
+                            capacity = 3,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6821),
+                            currentOccupancy = 0,
+                            floorNumber = 1,
+                            hasBathroom = false,
+                            roomNumber = "103",
+                            roomTypeId = 3,
+                            status = "Available",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6821)
+                        },
+                        new
+                        {
+                            id = 4,
+                            buildingId = 2,
+                            capacity = 2,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6823),
+                            currentOccupancy = 1,
+                            floorNumber = 2,
+                            hasBathroom = false,
+                            roomNumber = "201",
+                            roomTypeId = 2,
+                            status = "Available",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6824)
+                        },
+                        new
+                        {
+                            id = 5,
+                            buildingId = 2,
+                            capacity = 4,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6826),
+                            currentOccupancy = 0,
+                            floorNumber = 2,
+                            hasBathroom = false,
+                            roomNumber = "202",
+                            roomTypeId = 4,
+                            status = "Available",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6826)
                         });
                 });
 
@@ -689,6 +864,10 @@ namespace DormMS.Web.Migrations
                     b.Property<string>("description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("feeId")
+                        .HasColumnType("int")
+                        .HasColumnName("fee_id");
+
                     b.Property<bool>("hasAirConditioner")
                         .HasColumnType("bit")
                         .HasColumnName("has_air_conditioner");
@@ -704,6 +883,8 @@ namespace DormMS.Web.Migrations
 
                     b.HasKey("id");
 
+                    b.HasIndex("feeId");
+
                     b.ToTable("RoomTypes");
 
                     b.HasData(
@@ -713,10 +894,10 @@ namespace DormMS.Web.Migrations
                             basePrice = 1200m,
                             bedCount = 1,
                             capacity = 1,
-                            description = "Premium privacy and high-end comfort.",
+                            description = "Yüksek konfor ve gizlilik.",
                             hasAirConditioner = false,
                             hasBathroom = true,
-                            typeName = "Executive Single"
+                            typeName = "VİP Tek Kişilik"
                         },
                         new
                         {
@@ -724,10 +905,10 @@ namespace DormMS.Web.Migrations
                             basePrice = 950m,
                             bedCount = 2,
                             capacity = 2,
-                            description = "Perfect for friends and shared living.",
+                            description = "Arkadaşlar için ideal paylaşımlı yaşam.",
                             hasAirConditioner = false,
                             hasBathroom = true,
-                            typeName = "Collaborative Twin"
+                            typeName = "Standart Çift Kişilik"
                         },
                         new
                         {
@@ -735,10 +916,10 @@ namespace DormMS.Web.Migrations
                             basePrice = 750m,
                             bedCount = 3,
                             capacity = 3,
-                            description = "Spacious shared living for groups.",
+                            description = "Geniş ve sosyal oda seçeneği.",
                             hasAirConditioner = false,
                             hasBathroom = true,
-                            typeName = "Triple Shared"
+                            typeName = "Üç Kişilik Oda"
                         },
                         new
                         {
@@ -746,10 +927,10 @@ namespace DormMS.Web.Migrations
                             basePrice = 600m,
                             bedCount = 4,
                             capacity = 4,
-                            description = "Economical shared housing.",
+                            description = "Ekonomik paylaşımlı konaklama.",
                             hasAirConditioner = false,
                             hasBathroom = false,
-                            typeName = "Standard Quad"
+                            typeName = "Dört Kişilik Oda"
                         },
                         new
                         {
@@ -757,10 +938,10 @@ namespace DormMS.Web.Migrations
                             basePrice = 450m,
                             bedCount = 6,
                             capacity = 6,
-                            description = "Affordable community living.",
+                            description = "Bütçe dostu toplu yaşam.",
                             hasAirConditioner = false,
                             hasBathroom = false,
-                            typeName = "Budget Shared"
+                            typeName = "Ekonomik Koğuş"
                         });
                 });
 
@@ -855,11 +1036,47 @@ namespace DormMS.Web.Migrations
                         new
                         {
                             id = 1,
-                            createdAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6083),
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6643),
                             status = "Active",
                             studentId = "STU001",
-                            updatedAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6083),
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6644),
                             userId = 3
+                        },
+                        new
+                        {
+                            id = 2,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6646),
+                            status = "Active",
+                            studentId = "STU002",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6647),
+                            userId = 4
+                        },
+                        new
+                        {
+                            id = 3,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6649),
+                            status = "Active",
+                            studentId = "STU003",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6650),
+                            userId = 5
+                        },
+                        new
+                        {
+                            id = 4,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6652),
+                            status = "Active",
+                            studentId = "STU004",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6652),
+                            userId = 6
+                        },
+                        new
+                        {
+                            id = 5,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6654),
+                            status = "Active",
+                            studentId = "STU005",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6655),
+                            userId = 7
                         });
                 });
 
@@ -1042,38 +1259,86 @@ namespace DormMS.Web.Migrations
                         new
                         {
                             Id = 1,
-                            createdAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6059),
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6594),
                             email = "admin@dorm.com",
-                            firstName = "System",
+                            firstName = "Sistem",
                             isActive = true,
-                            lastName = "Admin",
+                            lastName = "Yöneticisi",
                             passwordHash = "pmWkWSBCL51Bfkhn79xPuKBKHz//H6B+mY6G9/eieuM=",
-                            updatedAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6060),
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6594),
                             username = "admin"
                         },
                         new
                         {
                             Id = 2,
-                            createdAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6063),
-                            email = "staff@dorm.com",
-                            firstName = "John",
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6598),
+                            email = "personel@dorm.com",
+                            firstName = "Mehmet",
                             isActive = true,
-                            lastName = "Staff",
+                            lastName = "Tekniker",
                             passwordHash = "pmWkWSBCL51Bfkhn79xPuKBKHz//H6B+mY6G9/eieuM=",
-                            updatedAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6063),
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6599),
                             username = "staff"
                         },
                         new
                         {
                             Id = 3,
-                            createdAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6065),
-                            email = "student@dorm.com",
-                            firstName = "Emily",
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6601),
+                            email = "ayse@email.com",
+                            firstName = "Ayşe",
                             isActive = true,
-                            lastName = "Resident",
+                            lastName = "Demir",
                             passwordHash = "pmWkWSBCL51Bfkhn79xPuKBKHz//H6B+mY6G9/eieuM=",
-                            updatedAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6066),
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6602),
                             username = "student"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6605),
+                            email = "ahmet@email.com",
+                            firstName = "Ahmet",
+                            isActive = true,
+                            lastName = "Yılmaz",
+                            passwordHash = "pmWkWSBCL51Bfkhn79xPuKBKHz//H6B+mY6G9/eieuM=",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6605),
+                            username = "ahmet"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6608),
+                            email = "fatma@email.com",
+                            firstName = "Fatma",
+                            isActive = true,
+                            lastName = "Kaya",
+                            passwordHash = "pmWkWSBCL51Bfkhn79xPuKBKHz//H6B+mY6G9/eieuM=",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6608),
+                            username = "fatma"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6611),
+                            email = "can@email.com",
+                            firstName = "Can",
+                            isActive = true,
+                            lastName = "Yıldız",
+                            passwordHash = "pmWkWSBCL51Bfkhn79xPuKBKHz//H6B+mY6G9/eieuM=",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6611),
+                            username = "can"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            createdAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6614),
+                            email = "elif@email.com",
+                            firstName = "Elif",
+                            isActive = true,
+                            lastName = "Şahin",
+                            passwordHash = "pmWkWSBCL51Bfkhn79xPuKBKHz//H6B+mY6G9/eieuM=",
+                            updatedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6614),
+                            username = "elif"
                         });
                 });
 
@@ -1102,26 +1367,50 @@ namespace DormMS.Web.Migrations
                         {
                             UserId = 1,
                             RoleId = 1,
-                            AssignedAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6095)
+                            AssignedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6671)
                         },
                         new
                         {
                             UserId = 2,
                             RoleId = 4,
-                            AssignedAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6097)
+                            AssignedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6673)
                         },
                         new
                         {
                             UserId = 3,
                             RoleId = 3,
-                            AssignedAt = new DateTime(2026, 4, 21, 21, 10, 48, 761, DateTimeKind.Local).AddTicks(6097)
+                            AssignedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6674)
+                        },
+                        new
+                        {
+                            UserId = 4,
+                            RoleId = 3,
+                            AssignedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6675)
+                        },
+                        new
+                        {
+                            UserId = 5,
+                            RoleId = 3,
+                            AssignedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6676)
+                        },
+                        new
+                        {
+                            UserId = 6,
+                            RoleId = 3,
+                            AssignedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6677)
+                        },
+                        new
+                        {
+                            UserId = 7,
+                            RoleId = 3,
+                            AssignedAt = new DateTime(2026, 4, 23, 3, 32, 58, 687, DateTimeKind.Local).AddTicks(6678)
                         });
                 });
 
             modelBuilder.Entity("DormMS.Web.Models.Allocation", b =>
                 {
                     b.HasOne("DormMS.Web.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("Allocations")
                         .HasForeignKey("roomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1162,7 +1451,7 @@ namespace DormMS.Web.Migrations
                         .HasForeignKey("assignedTo");
 
                     b.HasOne("DormMS.Web.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("MaintenanceRequests")
                         .HasForeignKey("roomId");
 
                     b.HasOne("DormMS.Web.Models.Student", "Student")
@@ -1243,6 +1532,15 @@ namespace DormMS.Web.Migrations
                     b.Navigation("RoomType");
                 });
 
+            modelBuilder.Entity("DormMS.Web.Models.RoomType", b =>
+                {
+                    b.HasOne("DormMS.Web.Models.Fee", "Fee")
+                        .WithMany()
+                        .HasForeignKey("feeId");
+
+                    b.Navigation("Fee");
+                });
+
             modelBuilder.Entity("DormMS.Web.Models.Student", b =>
                 {
                     b.HasOne("DormMS.Web.Models.Room", "Room")
@@ -1319,6 +1617,13 @@ namespace DormMS.Web.Migrations
                     b.Navigation("RolePermissions");
 
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("DormMS.Web.Models.Room", b =>
+                {
+                    b.Navigation("Allocations");
+
+                    b.Navigation("MaintenanceRequests");
                 });
 
             modelBuilder.Entity("DormMS.Web.Models.User", b =>

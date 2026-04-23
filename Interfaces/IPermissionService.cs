@@ -5,3 +5,4 @@
         Task<bool> HasPermissionAsync(int userId, string permissionName);
     }
 }
+

@@ -2,13 +2,13 @@
 
 namespace DormMS.Web.Models
 {
-    [Table("User_roles")] // SQL'deki tablo adıyla birebir eşleşir
+    [Table("User_roles")]
     public class UserRole
     {
-        [Column("userId")] // SQL'deki sütun adıyla eşleşir
+        [Column("userId")]
         public int UserId { get; set; }
 
-        [Column("roleId")] // SQL'deki sütun adıyla eşleşir
+        [Column("roleId")]
         public int RoleId { get; set; }
 
         [ForeignKey("UserId")]
@@ -21,3 +21,4 @@ namespace DormMS.Web.Models
         public DateTime AssignedAt { get; set; } = DateTime.Now;
     }
 }
+

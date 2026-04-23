@@ -1,4 +1,4 @@
-using DormMS.Web.Data;
+﻿using DormMS.Web.Data;
 using DormMS.Web.Interfaces;
 using DormMS.Web.Models;
 using Microsoft.EntityFrameworkCore;
@@ -40,3 +40,4 @@ namespace DormMS.Web.Repositories
         }
     }
 }
+

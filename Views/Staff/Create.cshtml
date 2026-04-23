@@ -22,7 +22,6 @@
         <form asp-action="Create">
             <div class="row g-4 text-start">
 
-                <!-- KİŞİSEL BİLGİLER -->
                 <div class="col-12"><h6 class="section-title-premium"><i class="bi bi-person-vcard me-2"></i>PERSONAL IDENTITY</h6></div>
 
                 <div class="col-md-6">
@@ -38,7 +37,6 @@
                     <input asp-for="email" type="email" class="dorm-input-premium" placeholder="staff@dormms.system" required />
                 </div>
 
-                <!-- GÖREV BİLGİLERİ -->
                 <div class="col-12 mt-5"><h6 class="section-title-premium"><i class="bi bi-person-workspace me-2"></i>ROLE & DEPARTMENT</h6></div>
 
                 <div class="col-md-6">
@@ -53,7 +51,6 @@
                 </div>
             </div>
 
-            <!-- BUTONLAR -->
             <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top gap-3">
                 <a asp-action="Index" class="btn-discard-premium">CANCEL</a>
                 <button type="submit" class="btn-premium px-5" style="background:linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;">
@@ -69,3 +66,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+

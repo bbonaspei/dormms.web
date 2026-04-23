@@ -1,0 +1,116 @@
+﻿@model DormMS.Web.Models.RoomType
+
+<div class="container-fluid px-5">
+    <div class="mb-5 pt-3">
+        <a asp-action="Index" class="btn-back-premium text-decoration-none">
+            <i class="bi bi-arrow-left"></i> BACK TO ROOM TYPES
+        </a>
+    </div>
+
+    <div class="text-center mb-5">
+        <h1 style="color: #312e81; font-weight: 900; font-size: 3.2rem; letter-spacing: -2px;">
+            Define <span style="color: #6366f1;">New Category.</span>
+        </h1>
+        <p class="text-muted">Link this room type to the official fee structure for consistent billing.</p>
+    </div>
+
+    <div class="form-card-premium mx-auto" style="max-width: 800px;">
+        <form asp-action="Create">
+            <div class="row g-4">
+                <div class="col-md-12">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Category Name</label>
+                        <input asp-for="typeName" class="dorm-input-premium" placeholder="e.g. Diamond Single Suite" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Link to Fee Structure</label>
+                        <select asp-for="feeId" class="dorm-input-premium" id="feeSelect">
+                            <option value="">-- No Linked Fee (Manual Price) --</option>
+                            @if (ViewBag.Fees != null)
+                            {
+                                foreach (var fee in (IEnumerable<DormMS.Web.Models.Fee>)ViewBag.Fees)
+                                {
+                                    <option value="@fee.id" data-amount="@fee.amount.ToString(System.Globalization.CultureInfo.InvariantCulture)">@fee.feeName (@(fee.amount) TL @(fee.isRecurring ? "/mo" : "once"))</option>
+                                }
+                            }
+                        </select>
+                        <small class="text-primary fw-bold mt-1 d-block">Linking ensures billing automation is accurate.</small>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Monthly Base Price (TL)</label>
+                        <input asp-for="basePrice" type="number" step="0.01" class="dorm-input-premium" id="basePriceInput" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Occupancy Capacity</label>
+                        <input asp-for="capacity" type="number" min="1" class="dorm-input-premium" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Bed Count</label>
+                        <input asp-for="bedCount" type="number" min="1" class="dorm-input-premium" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Bathroom Configuration</label>
+                        <select asp-for="hasBathroom" class="dorm-input-premium">
+                            <option value="true">Private Bathroom</option>
+                            <option value="false">Common / Shared</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="input-wrapper-premium">
+                        <label class="label-premium">Description & Amenities</label>
+                        <textarea asp-for="description" class="dorm-input-premium" style="height: 100px;" placeholder="Describe the room features..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                <a asp-action="Index" class="btn-discard-premium text-decoration-none">DISCARD</a>
+                <button type="submit" class="btn-premium">
+                    <i class="bi bi-shield-check me-2"></i> Save Room Type
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const feeSelect = document.getElementById('feeSelect');
+        const basePriceInput = document.getElementById('basePriceInput');
+
+        feeSelect.addEventListener('change', function() {
+            var selectedOption = this.options[this.selectedIndex];
+            var amount = selectedOption.getAttribute('data-amount');
+            if (amount) {
+                basePriceInput.value = amount;
+                basePriceInput.readOnly = true;
+                basePriceInput.style.backgroundColor = '#f8fafc';
+            } else {
+                basePriceInput.readOnly = false;
+                basePriceInput.style.backgroundColor = '';
+            }
+        });
+
+        if (feeSelect.value) feeSelect.dispatchEvent(new Event('change'));
+    </script>
+}
+
+
+

@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="~/css/layout.css">
     <link rel="stylesheet" href="~/css/components.css?v=@DateTime.Now.Ticks">
     <style>
-        /* INLINE UI FIX FOR ROOM CARDS (FORCING SIZES) */
+        
         .room-slider-container {
             display: flex !important;
             gap: 30px !important;
@@ -48,7 +48,6 @@
         <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
     </div>
 
-    <!-- Floating Navbar -->
     <nav class="container mt-4 py-3 px-4 d-flex justify-content-between align-items-center"
          style="background: rgba(255,255,255,0.6); backdrop-filter: blur(20px); border-radius: 100px; border: 1px solid white; position: sticky; top: 20px; z-index: 1000;">
         <div class="brand-wrapper">
@@ -65,7 +64,6 @@
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
     <section class="container py-5 mt-5">
         <div class="row align-items-center">
             <div class="col-lg-6 text-start">
@@ -89,7 +87,6 @@
         </div>
     </section>
 
-    <!-- ROOM SHOWCASE -->
     <section id="rooms" class="container-fluid py-5 mt-5">
         <div class="container"><h2 class="fw-black display-5 mb-5" style="letter-spacing: -2px; color: #1e293b;">Room <span style="color: var(--indigo);">Showcase.</span></h2></div>
 
@@ -109,7 +106,7 @@
                         var roomLabel = type.capacity + " PERSON" + (type.capacity > 1 ? "S" : "");
 
                         <div class="room-card-premium">
-                            <!-- openGallery içindeki klasör ismine dikkat -->
+                            
                             <div class="room-image-frame position-relative" onclick="openGallery('room' + @counter, 3)" style="height: 240px; overflow: hidden;">
                                 <img src="/images/rooms/room@(counter > 5 ? 1 : counter)/1.jpg" class="w-100 h-100" style="object-fit: cover !important; display: block;" onerror="this.src='https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80'">
                                 <div class="image-overlay-pro"><i class="bi bi-images me-2"></i> View Photos</div>
@@ -125,7 +122,7 @@
                                     <p class="small text-muted mb-0">@(type.description ?? "Premium living space.")</p>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
-                                    <span class="fw-900 fs-4 text-primary">$@roomPrice</span>
+                                    <span class="fw-900 fs-4 text-primary">@roomPrice TL</span>
                                     <span class="badge rounded-pill bg-dark py-1 px-3" style="font-size: 10px;">@roomLabel</span>
                                 </div>
                             </div>
@@ -146,7 +143,6 @@
         </div>
     </section>
 
-    <!-- LOCATION -->
     <section id="location" class="container py-5 mt-5 mb-5">
         <div class="contact-card-premium" style="background: #1e293b; border-radius: 45px; padding: 60px;">
             <div class="row align-items-center">
@@ -167,7 +163,6 @@
         </div>
     </section>
 
-    <!-- GALLERY MODAL -->
     <div class="modal fade" id="galleryModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content bg-transparent border-0">
@@ -196,10 +191,13 @@
             updateModal();
         }
         function updateModal() {
-            // DOSYA YOLU DÜZELTİLDİ: /images/rooms/room1/1.jpg
+
             document.getElementById('modalImage').src = "/images/rooms/" + folder + "/" + idx + ".jpg";
         }
         function scrollSlider(a) { document.getElementById('roomSlider').scrollBy({ left: a, behavior: 'smooth' }); }
     </script>
 </body>
 </html>
+
+
+

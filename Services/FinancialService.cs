@@ -44,7 +44,6 @@ namespace DormMS.Web.Services
                 fee.status = "Paid";
                 await _studentFeeRepo.UpdateAsync(fee);
 
-                // Bu faturaya bağlı tüm cezaları "Paid" yap (YENİ)
                 var penalties = await _penaltyRepo.GetByStudentIdAsync(payment.studentId);
                 var feePenalties = penalties.Where(p => p.reason != null && p.reason.Contains($"Fee #{feeId}")).ToList();
                 foreach (var p in feePenalties)
@@ -54,10 +53,9 @@ namespace DormMS.Web.Services
                 }
             }
 
-            await _notificationService.SendNotificationAsync(payment.studentId, "Payment Success", $"Amount: ${payment.amount}", "Success");
+            await _notificationService.SendNotificationToStudentAsync(payment.studentId, "Payment Success", $"Amount: TL{payment.amount}", "Success");
 
-            // LOG: Ödeme Tahsilatı
-            await _audit.LogActionAsync("CREATE", "Payment", payment.id, null, $"Collected ${payment.amount}");
+            await _audit.LogActionAsync("CREATE", "Payment", payment.id, null, $"Collected TL{payment.amount}");
 
             return true;
         }
@@ -78,7 +76,6 @@ namespace DormMS.Web.Services
                 };
                 await _studentFeeRepo.AddAsync(charge);
 
-                // LOG: Borçlandırma
                 await _audit.LogActionAsync("CREATE", "Fee", charge.id, null, $"Rent charge created for Student #{studentId}");
             }
         }
@@ -90,27 +87,24 @@ namespace DormMS.Web.Services
 
         public async Task SyncStudentChargesAsync(int studentId)
         {
-            // 1. Öğrencinin aktif konaklama (allocation) kaydını bul
+
             var allocation = await _allocationRepo.GetActiveByStudentIdAsync(studentId);
 
             if (allocation == null) return;
 
-            // 2. Kira periyodunu belirle (Sözleşme başlangıcından bugüne)
             var startDate = allocation.startDate;
             var endDate = allocation.endDate ?? DateTime.Now;
             var checkLimit = DateTime.Now > endDate ? endDate : DateTime.Now;
 
-            // 3. Mevcut kira ücretlerini çek
             var existingCharges = await _studentFeeRepo.GetByStudentIdAsync(studentId);
             var rentCharges = existingCharges.Where(f => f.feeId == 1);
 
-            // 4. Her ay için kontrol et
             var tempDate = new DateTime(startDate.Year, startDate.Month, 1);
             var limitDate = new DateTime(checkLimit.Year, checkLimit.Month, 1);
 
             while (tempDate <= limitDate)
             {
-                // Bu ay için borç var mı?
+
                 bool hasCharge = rentCharges.Any(f => f.dueDate.Year == tempDate.Year && f.dueDate.Month == tempDate.Month);
 
                 if (!hasCharge)
@@ -118,10 +112,10 @@ namespace DormMS.Web.Services
                     var newCharge = new StudentFee
                     {
                         studentId = studentId,
-                        feeId = 1, // Rent Fee
+                        feeId = allocation.Room?.RoomType?.feeId ?? 1,
                         amount = allocation.Room?.RoomType?.basePrice ?? 0,
                         status = "Unpaid",
-                        dueDate = new DateTime(tempDate.Year, tempDate.Month, 1).AddDays(4) // Ayın 5'i son ödeme gibi
+                        dueDate = new DateTime(tempDate.Year, tempDate.Month, 1).AddDays(4)
                     };
                     await _studentFeeRepo.AddAsync(newCharge);
                     
@@ -131,11 +125,9 @@ namespace DormMS.Web.Services
                 tempDate = tempDate.AddMonths(1);
             }
 
-            // 5. GECİKME CEZALARINI HESAPLA (YENİ EKLENDİ)
             await CalculateLatePenaltiesAsync();
         }
 
-        // RAPOR UYUMU (Sayfa 6): Gecikme faizi hesaplama (Haftalık %5)
         public async Task CalculateLatePenaltiesAsync()
         {
             var overdueFees = (await _studentFeeRepo.GetAllAsync())
@@ -143,7 +135,7 @@ namespace DormMS.Web.Services
 
             foreach (var fee in overdueFees)
             {
-                // Kaç hafta gecikti?
+
                 var daysOverdue = (DateTime.Now - fee.dueDate).Days;
                 var weeksOverdue = (int)Math.Floor((double)daysOverdue / 7);
 
@@ -162,15 +154,14 @@ namespace DormMS.Web.Services
                             {
                                 studentId = fee.studentId,
                                 penaltyType = "Late Fee",
-                                amount = fee.amount * 0.05m, // Haftalık %5
+                                amount = fee.amount * 0.05m,
                                 appliedDate = DateTime.Now,
                                 reason = weekReason,
                                 status = "Pending"
                             };
                             await _penaltyRepo.AddPenaltyAsync(penalty);
-                            
-                            // Bildirim Gönder
-                            await _notificationService.SendNotificationAsync(
+
+                            await _notificationService.SendNotificationToStudentAsync(
                                 fee.studentId, 
                                 "New Penalty Applied", 
                                 $"A 5% late fee penalty (Week {i}) has been added due to overdue payment.", 
@@ -184,3 +175,4 @@ namespace DormMS.Web.Services
         }
     }
 }
+

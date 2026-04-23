@@ -1,14 +1,13 @@
 ﻿@model DormMS.Web.Models.Room
 
 <div class="container-fluid px-5">
-    <!-- Back Navigation (Daha solda ve aşağıda) -->
+    
     <div class="mb-5 pt-3">
         <a asp-action="Index" class="btn-back-premium text-decoration-none">
             <i class="bi bi-arrow-left"></i> BACK TO INVENTORY
         </a>
     </div>
 
-    <!-- Page Header -->
     <div class="text-center mb-5">
         <h1 style="color: #312e81; font-weight: 900; font-size: 3.2rem; letter-spacing: -2px;">
             Register <span style="color: #6366f1;">New Unit.</span>
@@ -16,15 +15,15 @@
         <p class="text-muted">Initialize a high-end residential space in the system.</p>
     </div>
 
-    <!-- Premium Form Card -->
     <div class="form-card-premium">
         <form asp-action="Create">
             <div class="row">
 
                 <div class="col-md-12">
                     <div class="input-wrapper-premium">
-                        <label class="label-premium">Unit Number / Door Label</label>
+                        <label class="label-premium">Room Number / Identification</label>
                         <input asp-for="roomNumber" class="dorm-input-premium" placeholder="e.g. 101-A" required />
+                        <span asp-validation-for="roomNumber" class="text-danger small fw-bold"></span>
                     </div>
                 </div>
 
@@ -39,7 +38,7 @@
 
                 <div class="col-md-6">
                     <div class="input-wrapper-premium">
-                        <label class="label-premium">Classification</label>
+                        <label class="label-premium">Room Category</label>
                         <select asp-for="roomTypeId" class="dorm-input-premium" asp-items="ViewBag.roomTypeId">
                             <option value="">Select Type...</option>
                         </select>
@@ -49,22 +48,23 @@
                 <div class="col-md-6">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Floor Level</label>
-                        <!-- min="0" ile negatif engellendi -->
                         <input asp-for="floorNumber" type="number" min="0" class="dorm-input-premium" placeholder="1" required />
+                        <span asp-validation-for="floorNumber" class="text-danger small fw-bold"></span>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Max Capacity</label>
-                        <!-- min="1" ile negatif engellendi -->
                         <input asp-for="capacity" type="number" min="1" class="dorm-input-premium" placeholder="1" required />
+                        <span asp-validation-for="capacity" class="text-danger small fw-bold"></span>
                     </div>
                 </div>
 
+                <input type="hidden" asp-for="hasBathroom" />
+
             </div>
 
-            <!-- Action Buttons -->
             <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top" style="border-color: #f1f5f9 !important;">
                 <a asp-action="Index" class="btn-discard-premium text-decoration-none">
                     DISCARD CHANGES
@@ -81,4 +81,51 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        const buildings = @Html.Raw(ViewBag.BuildingsJson ?? "[]");
+        const roomTypes = @Html.Raw(ViewBag.RoomTypesJson ?? "[]");
+
+        const buildingSelect = document.getElementById('buildingId');
+        const floorInput = document.getElementById('floorNumber');
+        const typeSelect = document.getElementById('roomTypeId');
+        const capacityInput = document.getElementById('capacity');
+        const bathroomSelect = document.getElementById('hasBathroom');
+
+        buildingSelect.addEventListener('change', function() {
+            const buildingId = parseInt(this.value);
+            const building = buildings.find(b => b.id === buildingId);
+            if (building) {
+                floorInput.max = building.totalFloors;
+                const currentFloor = parseInt(floorInput.value);
+                if (currentFloor > building.totalFloors) {
+                    floorInput.value = building.totalFloors;
+                }
+            } else {
+                floorInput.removeAttribute('max');
+            }
+        });
+
+        typeSelect.addEventListener('change', function() {
+            const typeId = parseInt(this.value);
+            const type = roomTypes.find(t => t.id === typeId);
+            if (type) {
+                capacityInput.value = type.capacity;
+                capacityInput.readOnly = true;
+                capacityInput.style.backgroundColor = '#f8fafc';
+                capacityInput.style.color = '#64748b';
+
+                bathroomSelect.value = type.hasBathroom.toString();
+            } else {
+                capacityInput.readOnly = false;
+                capacityInput.style.backgroundColor = '';
+                capacityInput.style.color = '';
+            }
+        });
+
+        if (buildingSelect.value) buildingSelect.dispatchEvent(new Event('change'));
+        if (typeSelect.value) typeSelect.dispatchEvent(new Event('change'));
+    </script>
 }
+
+
+

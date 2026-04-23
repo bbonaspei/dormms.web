@@ -8,7 +8,7 @@ namespace DormMS.Web.Models
     {
         [Key]
         [Column("id")]
-        public int Id { get; set; } // Büyük I yaptık, daha profesyonel
+        public int Id { get; set; }
 
         [Column("username")]
         public string username { get; set; } = string.Empty;
@@ -40,10 +40,11 @@ namespace DormMS.Web.Models
         [Column("createdAt")]
         public DateTime createdAt { get; set; } = DateTime.Now;
 
-        // HATAYI ÇÖZEN SATIR: Rapor Sayfa 10'da istenen güncelleme tarihi
         [Column("updatedAt")]
         public DateTime updatedAt { get; set; } = DateTime.Now;
 
         public virtual ICollection<UserRole>? UserRoles { get; set; }
+        public virtual ICollection<Notification>? Notifications { get; set; }
     }
 }
+

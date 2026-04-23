@@ -21,16 +21,17 @@ namespace DormMS.Web.Models
         [Column("message")]
         public string message { get; set; } = string.Empty;
 
-        [Column("type")] // Success, Warning, Info, Error
+        [Column("type")]
         public string type { get; set; } = "Info";
 
         [Column("is_read")]
         public bool isRead { get; set; } = false;
 
-        [Column("target_url")] // Tıklanınca gidilecek adres (Örn: /Payments/Index)
+        [Column("target_url")]
         public string? targetUrl { get; set; }
 
         [Column("created_at")]
         public DateTime createdAt { get; set; } = DateTime.Now;
     }
 }
+

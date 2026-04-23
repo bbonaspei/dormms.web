@@ -11,7 +11,7 @@ namespace DormMS.Web.Models
         public int id { get; set; }
 
         [Required]
-        [Column("fee_name")] // SQL'deki kolon ismiyle eşleşir
+        [Column("fee_name")]
         public string feeName { get; set; } = string.Empty;
 
         [Column("fee_category")]
@@ -28,5 +28,8 @@ namespace DormMS.Web.Models
 
         [Column("description")]
         public string? description { get; set; }
+
+        public virtual ICollection<RoomType>? RoomTypes { get; set; }
     }
 }
+

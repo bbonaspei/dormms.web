@@ -5,14 +5,13 @@
 }
 
 <div class="container mt-5">
-    <!-- Geri Butonu -->
+    
     <div class="mb-4">
         <a asp-action="Index" class="btn-back-premium shadow-sm text-decoration-none">
             <i class="bi bi-arrow-left"></i> BACK TO INFRASTRUCTURE
         </a>
     </div>
 
-    <!-- BAŞLIK: Register Building. -->
     <div class="text-center mb-5">
         <h1 style="color: #312e81; font-weight: 900; font-size: 3.5rem; letter-spacing: -3px; line-height: 1;">
             Register <span style="color: #6366f1;">Building.</span>
@@ -25,7 +24,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row g-4">
-                <!-- Bina Adı -->
+                
                 <div class="col-md-8">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Building Name</label>
@@ -34,7 +33,6 @@
                     </div>
                 </div>
 
-                <!-- Blok Kodu -->
                 <div class="col-md-4">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Block Code</label>
@@ -43,7 +41,6 @@
                     </div>
                 </div>
 
-                <!-- Adres -->
                 <div class="col-12">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Physical Location / Address</label>
@@ -51,7 +48,6 @@
                     </div>
                 </div>
 
-                <!-- Kat Sayısı -->
                 <div class="col-md-6">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Total Floor Levels</label>
@@ -59,7 +55,6 @@
                     </div>
                 </div>
 
-                <!-- Başlangıç Durumu -->
                 <div class="col-md-6">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Operational Status</label>
@@ -71,7 +66,6 @@
                     </div>
                 </div>
 
-                <!-- YUVARLATILMIŞ PREMIUM TOGGLE (Asansör) -->
                 <div class="col-12">
                     <div class="p-4 bg-light rounded-4 border d-flex align-items-center justify-content-between shadow-sm">
                         <div>
@@ -86,7 +80,6 @@
                 </div>
             </div>
 
-            <!-- BUTONLAR (Hizalama Edit ile aynı yapıldı) -->
             <div class="d-flex gap-3 mt-5 pt-4 border-top">
                 <button type="submit" class="btn-premium flex-grow-1 justify-content-center">
                     <i class="bi bi-building-add me-2 fs-5"></i> COMPLETE REGISTRATION
@@ -104,3 +97,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+

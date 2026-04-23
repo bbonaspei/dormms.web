@@ -28,6 +28,7 @@ namespace DormMS.Web.Models
         public string? reason { get; set; }
 
         [Column("status")]
-        public string status { get; set; } = "Pending"; // Pending, Paid, Waived
+        public string status { get; set; } = "Pending";
     }
 }
+

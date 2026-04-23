@@ -40,5 +40,15 @@ namespace DormMS.Web.Services
             var note = await _context.Notifications.FindAsync(notificationId);
             if (note != null) { note.isRead = true; await _context.SaveChangesAsync(); }
         }
+
+        public async Task SendNotificationToStudentAsync(int studentId, string title, string message, string type, string targetUrl = "#")
+        {
+            var student = await _context.Students.FindAsync(studentId);
+            if (student != null)
+            {
+                await SendNotificationAsync(student.userId, title, message, type, targetUrl);
+            }
+        }
     }
 }
+

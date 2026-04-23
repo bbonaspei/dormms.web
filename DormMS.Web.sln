@@ -5,8 +5,6 @@ VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DormMS.Web", "DormMS.Web.csproj", "{10B09ED0-7BD4-40A9-AB27-08D35F8A2A78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DormMS.Tests", "DormMS.Tests\DormMS.Tests.csproj", "{A67620ED-139A-425A-93D7-229F6F93FDB8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,18 +27,6 @@ Global
 		{10B09ED0-7BD4-40A9-AB27-08D35F8A2A78}.Release|x64.Build.0 = Release|Any CPU
 		{10B09ED0-7BD4-40A9-AB27-08D35F8A2A78}.Release|x86.ActiveCfg = Release|Any CPU
 		{10B09ED0-7BD4-40A9-AB27-08D35F8A2A78}.Release|x86.Build.0 = Release|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Debug|x64.Build.0 = Debug|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Debug|x86.Build.0 = Debug|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Release|x64.ActiveCfg = Release|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Release|x64.Build.0 = Release|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Release|x86.ActiveCfg = Release|Any CPU
-		{A67620ED-139A-425A-93D7-229F6F93FDB8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

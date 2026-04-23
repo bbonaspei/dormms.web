@@ -4,11 +4,10 @@
     ViewData["Title"] = "Room Details";
 }
 
-<!-- Modern Onay Kutuları İçin Gerekli Kütüphane -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container mt-5">
-    <!-- Geri Butonu -->
+    
     <div class="mb-4">
         <a asp-action="Index" class="btn-back-premium text-decoration-none shadow-sm">
             <i class="bi bi-arrow-left"></i> Back to Inventory
@@ -16,7 +15,7 @@
     </div>
 
     <div class="form-card-premium shadow-sm">
-        <!-- BAŞLIK BÖLÜMÜ (İki Renkli ve Büyük Tasarım) -->
+        
         <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-4">
             <div>
                 <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin: 0;">
@@ -25,7 +24,6 @@
                 <p class="text-muted fw-bold mt-1 mb-0">Unit Specification & Operational Status</p>
             </div>
 
-            <!-- DURUM ROZETİ (GÜNCELLENDİ: Yeni Renk Sistemi) -->
             <span class="badge @(Model.status == "Available" ? "badge-available" :
                                                    Model.status == "Occupied" ? "badge-occupied" :
                                                    Model.status == "Maintenance" ? "badge-maintenance" : "badge-archived")"
@@ -35,7 +33,7 @@
         </div>
 
         <div class="row g-4">
-            <!-- Sol Sütun: Temel Bilgiler -->
+            
             <div class="col-md-6">
                 <div class="input-wrapper-premium">
                     <label class="label-premium">Building Location</label>
@@ -47,31 +45,110 @@
 
                 <div class="input-wrapper-premium">
                     <label class="label-premium">Room Classification</label>
-                    <div class="dorm-input-premium d-flex align-items-center">
-                        <i class="bi bi-tag me-2 text-primary"></i>
-                        @Model.RoomType?.typeName
+                    <div class="dorm-input-premium d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-tag me-2 text-primary"></i>
+                            @Model.RoomType?.typeName
+                        </div>
+                        @if(Model.RoomType?.hasBathroom == true) {
+                            <span class="badge bg-primary-subtle text-primary border border-primary fw-bold" style="font-size: 10px;">
+                                <i class="bi bi-water me-1"></i> PRIVATE BATH
+                            </span>
+                        } else {
+                            <span class="badge bg-light text-muted border fw-bold" style="font-size: 10px;">
+                                <i class="bi bi-slash-circle me-1"></i> SHARED BATH
+                            </span>
+                        }
                     </div>
                 </div>
             </div>
 
-            <!-- Sağ Sütun: Kapasite ve Doluluk -->
             <div class="col-md-6">
                 <div class="occupancy-glass-card h-100 d-flex flex-column justify-content-center">
                     <label class="label-premium">Occupancy Status</label>
                     <div class="d-flex justify-content-between align-items-end mb-2">
-                        <span class="stat-value-premium">@Model.currentOccupancy</span>
+                        <span class="stat-value-premium">@(Model.currentOccupancy ?? 0)</span>
                         <span class="text-muted fw-bold">/ @Model.capacity Residents</span>
                     </div>
                     <div class="progress" style="height: 10px; border-radius: 10px; background: #e2e8f0;">
                         @{
-                            var percent = Model.capacity > 0 ? (Model.currentOccupancy * 100) / Model.capacity : 0;
+                            var percent = Model.capacity > 0 ? ((Model.currentOccupancy ?? 0) * 100) / Model.capacity : 0;
                         }
                         <div class="progress-premium-bar" style="width: @percent%"></div>
                     </div>
                 </div>
             </div>
+            
+            <div class="col-lg-7">
+                <div class="section-title-premium mt-4">
+                    <i class="bi bi-people"></i> Current Residents
+                </div>
+                <div class="table-responsive bg-white rounded-4 border p-2">
+                    <table class="table table-hover align-middle m-0">
+                        <thead class="small text-muted">
+                            <tr><th>RESIDENT</th><th>STATUS</th><th class="text-end">ACTIONS</th></tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Allocations != null && Model.Allocations.Any())
+                            {
+                                foreach (var acc in Model.Allocations)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle-sm bg-primary-subtle text-primary fw-bold me-2">
+                                                    @(acc.Student?.User?.firstName?[0])
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark small">@acc.Student?.User?.firstName @acc.Student?.User?.lastName</div>
+                                                    <div class="text-muted" style="font-size: 10px;">@acc.Student?.studentId</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge @(acc.status == "Checked-In" ? "bg-success-subtle text-success" : "bg-warning-subtle text-warning") rounded-pill px-2" style="font-size: 9px;">@acc.status</span></td>
+                                        <td class="text-end">
+                                            <a asp-controller="Students" asp-action="Details" asp-route-id="@acc.studentId" class="btn btn-sm btn-light rounded-circle shadow-none"><i class="bi bi-eye"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="3" class="text-center py-4 text-muted small">No active residents recorded.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <!-- ADMIN NOTLARI (YENİ EKLENDİ: Sadece not varsa görünür) -->
+            <div class="col-lg-5">
+                <div class="section-title-premium mt-4 text-danger">
+                    <i class="bi bi-wrench-adjustable"></i> Facility Backlog
+                </div>
+                <div class="maintenance-summary-list bg-white rounded-4 border p-3">
+                    @if (Model.MaintenanceRequests != null && Model.MaintenanceRequests.Any())
+                    {
+                        foreach (var req in Model.MaintenanceRequests.Take(5))
+                        {
+                            <div class="d-flex align-items-center justify-content-between p-2 mb-2 rounded-3 @(req.status == "Pending" ? "bg-danger-subtle" : "bg-light")">
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold text-dark small text-truncate">@req.issueCategory</div>
+                                    <div class="text-muted" style="font-size: 10px;">@req.requestDate?.ToString("dd MMM yyyy")</div>
+                                </div>
+                                <span class="badge @(req.priority == "High" ? "bg-danger" : "bg-warning text-dark") rounded-pill" style="font-size: 8px;">@req.priority</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-shield-check display-6 text-success opacity-50 mb-2 d-block"></i>
+                            <p class="text-muted small m-0">No open maintenance issues.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
             @if (!string.IsNullOrEmpty(Model.notes))
             {
                 <div class="col-12 mt-4">
@@ -85,7 +162,6 @@
             }
         </div>
 
-        <!-- ALT AKSİYON BUTONLARI -->
         <div class="d-flex align-items-stretch gap-3 mt-5">
             <a asp-action="Edit" asp-route-id="@Model.id" class="btn-premium flex-grow-1 d-flex align-items-center justify-content-center text-center text-decoration-none shadow-sm">
                 <i class="bi bi-pencil-square me-2"></i> Edit Room
@@ -114,7 +190,6 @@
     </div>
 </div>
 
-<!-- Onay Kutusu Scriptleri -->
 <script>
     function confirmArchive() {
         Swal.fire({
@@ -144,3 +219,5 @@
         }).then((result) => { if (result.isConfirmed) { document.getElementById('restoreForm').submit(); } })
     }
 </script>
+
+

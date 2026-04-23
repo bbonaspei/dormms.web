@@ -2,14 +2,12 @@
 
 <div class="container-fluid px-5" style="position: relative; min-height: 85vh;">
 
-    <!-- GERİ BUTONU -->
     <div style="position: absolute; left: 0; top: 15px;">
         <a asp-action="Index" class="btn-back-premium text-decoration-none shadow-sm">
             <i class="bi bi-arrow-left"></i> BACK TO LOGS
         </a>
     </div>
 
-    <!-- SAYFA BAŞLIĞI -->
     <div class="text-center" style="margin-top: 80px; margin-bottom: 50px;">
         <h1 style="color: #312e81; font-weight: 900; font-size: 3.5rem; letter-spacing: -3px; line-height: 1;">
             Issue <span style="color: #f43f5e;">Reporting.</span>
@@ -17,14 +15,13 @@
         <p class="text-muted mt-2 fw-bold">Formalize facility maintenance requests for institutional tracking.</p>
     </div>
 
-    <!-- PREMIUM FORM KARTI -->
     <div class="form-card-premium" style="max-width: 850px; margin: 0 auto; border: 1px solid rgba(0,0,0,0.02) !important;">
-        <form asp-action="Create">
+        <form asp-action="Create" onsubmit="enableRoomBeforeSubmit()">
             <div class="row g-4 text-start">
 
                 @if (ViewBag.IsStudent)
                 {
-                    <!-- ÖĞRENCİ İÇİN OTOMATİK DOLDURULAN VE GİZLİ ALANLAR -->
+                    
                     <input type="hidden" asp-for="studentId" value="@ViewBag.StudentId" />
                     <input type="hidden" asp-for="roomId" value="@ViewBag.RoomId" />
 
@@ -47,11 +44,11 @@
                 }
                 else
                 {
-                    <!-- ADMİN İÇİN SEÇİM LİSTELERİ -->
+                    
                     <div class="col-md-6">
                         <div class="input-wrapper-premium">
                             <label class="label-premium" style="color:#f43f5e;">Reporting Resident</label>
-                            <select asp-for="studentId" class="dorm-input-premium" asp-items="ViewBag.studentId">
+                            <select id="studentSelect" asp-for="studentId" class="dorm-input-premium" asp-items="ViewBag.studentId" onchange="autoSelectRoom(this)">
                                 <option value="">Admin / General (Facility)</option>
                             </select>
                             <small class="text-muted d-block mt-1">Leave as 'Admin / General' for non-student issues.</small>
@@ -61,13 +58,57 @@
                     <div class="col-md-6">
                         <div class="input-wrapper-premium">
                             <label class="label-premium" style="color:#f43f5e;">Affected Unit (Room)</label>
-                            <select asp-for="roomId" class="dorm-input-premium" asp-items="ViewBag.roomId">
+                            <select id="roomSelect" asp-for="roomId" class="dorm-input-premium" asp-items="ViewBag.roomId">
                                 <option value="">General Facility / Non-Room</option>
                             </select>
-                            <small class="text-muted d-block mt-1">Select a room or leave as 'General Facility'.</small>
+                            <small id="roomHint" class="text-muted d-block mt-1">Select a room or leave as 'General Facility'.</small>
                             <span asp-validation-for="roomId" class="text-danger small fw-bold"></span>
                         </div>
                     </div>
+
+                    <script>
+                        const studentRoomMap = @Html.Raw(ViewBag.StudentRoomMapJson ?? "{}");
+
+                        function autoSelectRoom(studentSelect) {
+                            const studentId = parseInt(studentSelect.value);
+                            const roomSelect = document.getElementById('roomSelect');
+                            const roomHint = document.getElementById('roomHint');
+
+                            if (!studentId) {
+
+                                roomSelect.disabled = false;
+                                roomSelect.style.background = '';
+                                roomSelect.style.cursor = '';
+                                roomHint.innerHTML = 'Select a room or leave as \'General Facility\'.';
+                                roomHint.className = 'text-muted d-block mt-1';
+                                return;
+                            }
+
+                            const roomId = studentRoomMap[studentId];
+                            if (roomId) {
+
+                                roomSelect.value = roomId;
+                                roomSelect.disabled = true;
+                                roomSelect.style.background = '#f1f5f9';
+                                roomSelect.style.cursor = 'not-allowed';
+                                roomHint.innerHTML = '<i class="bi bi-lock-fill me-1 text-primary"></i> Auto-selected from student\'s active allocation.';
+                                roomHint.className = 'text-primary fw-bold d-block mt-1';
+                            } else {
+
+                                roomSelect.value = '';
+                                roomSelect.disabled = false;
+                                roomSelect.style.background = '';
+                                roomSelect.style.cursor = '';
+                                roomHint.innerHTML = '<i class="bi bi-exclamation-circle me-1 text-warning"></i> This student has no active room allocation.';
+                                roomHint.className = 'text-warning fw-bold d-block mt-1';
+                            }
+                        }
+                        function enableRoomBeforeSubmit() {
+
+                            const roomSelect = document.getElementById('roomSelect');
+                            if (roomSelect) roomSelect.disabled = false;
+                        }
+                    </script>
                 }
 
                 <div class="col-md-6">
@@ -107,7 +148,6 @@
 
             </div>
 
-            <!-- BUTONLAR -->
             <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top" style="border-color: #f1f5f9 !important;">
                 <a asp-action="Index" class="btn-discard-premium">
                     DISCARD
@@ -135,3 +175,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+

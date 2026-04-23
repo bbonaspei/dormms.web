@@ -25,8 +25,13 @@ namespace DormMS.Web.Repositories
         public async Task<Room> GetByIdAsync(int id)
         {
             return await _context.Rooms
-                .Include(r => r.Building)  // Bina bilgilerini de getir
-                .Include(r => r.RoomType)  // Oda tipi bilgilerini de getir
+                .Include(r => r.Building)
+                .Include(r => r.RoomType)
+                .Include(r => r.Allocations.Where(a => a.isCurrent))
+                    .ThenInclude(a => a.Student)
+                        .ThenInclude(s => s.User)
+                .Include(r => r.MaintenanceRequests.OrderByDescending(m => m.requestDate))
+                    .ThenInclude(m => m.Staff)
                 .FirstOrDefaultAsync(r => r.id == id);
         }
 
@@ -55,3 +60,4 @@ namespace DormMS.Web.Repositories
         public async Task<Room?> GetRoomWithDetailsAsync(int id) => await GetByIdAsync(id);
     }
 }
+

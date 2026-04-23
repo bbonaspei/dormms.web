@@ -5,14 +5,13 @@
 }
 
 <div class="container mt-5">
-    <!-- 1. GERİ BUTONU (Eksikti, Eklendi) -->
+    
     <div class="mb-4">
         <a asp-action="Index" class="btn-back-premium shadow-sm text-decoration-none">
             <i class="bi bi-arrow-left"></i> BACK TO STRUCTURE
         </a>
     </div>
 
-    <!-- 2. FORM KARTI (Ferahlatıldı) -->
     <div class="form-card-premium shadow-sm border-top border-5 border-primary">
         <h2 class="fw-900 text-dark mb-4" style="letter-spacing:-1px;">
             Adjust Fee <span style="color:#6366f1;">Policy.</span>
@@ -23,7 +22,7 @@
             <input type="hidden" asp-for="id" />
 
             <div class="row g-4">
-                <!-- Ücret Adı -->
+                
                 <div class="col-md-8">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Fee Identifier / Name</label>
@@ -32,16 +31,14 @@
                     </div>
                 </div>
 
-                <!-- Tutar -->
                 <div class="col-md-4">
                     <div class="input-wrapper-premium">
-                        <label class="label-premium">Standard Rate ($)</label>
+                        <label class="label-premium">Standard Rate (TL)</label>
                         <input asp-for="amount" type="number" step="0.01" class="dorm-input-premium" required />
                         <span asp-validation-for="amount" class="text-danger"></span>
                     </div>
                 </div>
 
-                <!-- Kategori (Raporla Uyumlu) -->
                 <div class="col-md-6">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Institutional Category</label>
@@ -55,7 +52,6 @@
                     </div>
                 </div>
 
-                <!-- Döngü -->
                 <div class="col-md-6">
                     <div class="input-wrapper-premium">
                         <label class="label-premium">Billing Cycle</label>
@@ -67,7 +63,6 @@
                 </div>
             </div>
 
-            <!-- BUTONLAR (Hizalama Düzeltildi) -->
             <div class="d-flex gap-3 mt-5 pt-4 border-top">
                 <button type="submit" class="btn-premium flex-grow-1 justify-content-center">
                     <i class="bi bi-check2-circle me-2"></i> UPDATE CATEGORY
@@ -85,3 +80,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+

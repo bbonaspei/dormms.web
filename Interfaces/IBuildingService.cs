@@ -11,3 +11,4 @@ namespace DormMS.Web.Interfaces
         Task DeleteBuildingAsync(int id);
     }
 }
+

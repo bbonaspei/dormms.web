@@ -9,19 +9,20 @@ namespace DormMS.Web.Models
         [Key]
         public int id { get; set; }
 
-        public int? userId { get; set; } // İşlemi yapan kişi
+        public int? userId { get; set; }
         [ForeignKey("userId")]
         public virtual User? User { get; set; }
 
-        public string action { get; set; } = ""; // "CREATE", "UPDATE", "DELETE"
-        public string entityType { get; set; } = ""; // "Room", "Student", "Payment"
-        public int entityId { get; set; } // Hangi ID'li kayıt değişti?
+        public string action { get; set; } = "";
+        public string entityType { get; set; } = "";
+        public int entityId { get; set; }
 
-        public string? oldValues { get; set; } // Değişmeden önceki hali
-        public string? newValues { get; set; } // Değiştikten sonraki hali
+        public string? oldValues { get; set; }
+        public string? newValues { get; set; }
 
         public string? ipAddress { get; set; }
-        public string? userAgent { get; set; } // Hangi tarayıcıdan yaptı?
+        public string? userAgent { get; set; }
         public DateTime createdAt { get; set; } = DateTime.Now;
     }
 }
+

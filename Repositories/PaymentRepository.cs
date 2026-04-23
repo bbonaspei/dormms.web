@@ -1,4 +1,4 @@
-using DormMS.Web.Data;
+﻿using DormMS.Web.Data;
 using DormMS.Web.Interfaces;
 using DormMS.Web.Models;
 using Microsoft.EntityFrameworkCore;
@@ -28,3 +28,4 @@ namespace DormMS.Web.Repositories
             => await _context.Payments.Where(p => p.studentId == studentId).ToListAsync();
     }
 }
+

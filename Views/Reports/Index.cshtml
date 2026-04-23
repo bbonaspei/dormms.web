@@ -1,4 +1,4 @@
-@{
+﻿@{
     ViewData["Title"] = "Reports Management";
 }
 
@@ -13,7 +13,7 @@
     <div class="row mt-3">
         @if (!User.IsInRole("Finance"))
         {
-            <!-- Occupancy Report -->
+            
             <div class="col-md-4 mb-4">
                 <div class="card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
@@ -28,7 +28,6 @@
             </div>
         }
 
-        <!-- Financial Report -->
         <div class="col-md-4 mb-4">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center p-4">
@@ -44,7 +43,7 @@
 
         @if (!User.IsInRole("Finance"))
         {
-            <!-- Maintenance Report -->
+            
             <div class="col-md-4 mb-4">
                 <div class="card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
@@ -60,3 +59,6 @@
         }
     </div>
 </div>
+
+
+

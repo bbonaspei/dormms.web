@@ -31,8 +31,13 @@ namespace DormMS.Web.Controllers
         public async Task<IActionResult> Create(int? studentId)
         {
             var students = await _studentService.GetStudentListAsync();
+            var activeAllocations = await _allocationService.GetActiveAllocationsAsync();
+            var assignedStudentIds = activeAllocations.Select(a => a.studentId).ToList();
+
+            var eligibleStudents = students.Where(s => !assignedStudentIds.Contains(s.id) || s.id == studentId).ToList();
+
             var rooms = await _roomService.GetAvailableRoomsAsync();
-            ViewBag.studentId = new SelectList(students, "id", "studentId", studentId);
+            ViewBag.studentId = new SelectList(eligibleStudents, "id", "studentId", studentId);
             ViewBag.roomId = new SelectList(rooms.Where(r => r.status == "Available"), "id", "roomNumber");
             return View();
         }
@@ -47,11 +52,22 @@ namespace DormMS.Web.Controllers
 
             if (result)
             {
-                // OTOMATİK BORÇLANDIRMA SİNKRONİZASYONU
                 await _financialService.SyncStudentChargesAsync(allocation.studentId);
                 TempData["Success"] = "Student assigned to unit and billing synchronized.";
                 return RedirectToAction(nameof(Index));
             }
+
+            ModelState.AddModelError("", "Unable to create allocation. The student may already have an active residency or the room is full/unavailable.");
+            
+            var students = await _studentService.GetStudentListAsync();
+            var activeAllocations = await _allocationService.GetActiveAllocationsAsync();
+            var assignedStudentIds = activeAllocations.Select(a => a.studentId).ToList();
+            var eligibleStudents = students.Where(s => !assignedStudentIds.Contains(s.id) || s.id == allocation.studentId).ToList();
+            var rooms = await _roomService.GetAvailableRoomsAsync();
+            
+            ViewBag.studentId = new SelectList(eligibleStudents, "id", "studentId", allocation.studentId);
+            ViewBag.roomId = new SelectList(rooms.Where(r => r.status == "Available"), "id", "roomNumber", allocation.roomId);
+            
             return View(allocation);
         }
 
@@ -65,3 +81,4 @@ namespace DormMS.Web.Controllers
         }
     }
 }
+

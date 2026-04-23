@@ -28,34 +28,30 @@ namespace DormMS.Web.Controllers
         [Authorize(Roles = "Admin,Manager,DormManager,Student,Finance")]
         public async Task<IActionResult> Index(int? studentId)
         {
-            // 1. Giriş yapan kullanıcının ID'sini al
+
             var userIdStr = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
 
             var userId = int.Parse(userIdStr);
 
-            // 2. Tüm finansal hareketleri çek
             var payments = await _financialService.GetAllTransactionsAsync();
 
-            // --- ROL BAZLI FİLTRELEME ---
             if (User.IsInRole("Student"))
             {
-                // Öğrenci sadece kendi ödemelerini görsün
+
                 var student = await _context.Students.FirstOrDefaultAsync(s => s.userId == userId);
                 if (student != null)
                 {
-                    // OTOMATİK BORÇLANDIRMA SİNKRONİZASYONU (SÖZLEŞMEYE GÖRE)
+
                     await _financialService.SyncStudentChargesAsync(student.id);
 
                     payments = payments.Where(p => p.studentId == student.id);
 
-                    // EKLEME: Öğrenci için bekleyen ve geçmiş borçları/ücretleri de çekiyoruz (FİNANS EKRANI İÇİN)
                     var allFees = await _context.StudentFees
                         .Include(f => f.Fee)
                         .Where(f => f.studentId == student.id)
                         .ToListAsync();
 
-                    // CEZALARI ÇEK (YENİ EKLENDİ)
                     var penalties = await _context.Penalties
                         .Where(p => p.studentId == student.id && p.status == "Pending")
                         .ToListAsync();
@@ -70,10 +66,9 @@ namespace DormMS.Web.Controllers
             }
             else if (studentId.HasValue)
             {
-                // OTOMATİK BORÇLANDIRMA SİNKRONİZASYONU (SÖZLEŞMEYE GÖRE)
+
                 await _financialService.SyncStudentChargesAsync(studentId.Value);
 
-                // Admin filtrelemesi
                 payments = payments.Where(p => p.studentId == studentId.Value);
                 
                 var penalties = await _context.Penalties
@@ -92,7 +87,6 @@ namespace DormMS.Web.Controllers
             return View(payments.ToList());
         }
 
-        // YENİ: Raporu Dışa Aktarma Metodu (Rapor Sayfa 5 Uyumlu)
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,DormManager,Finance")]
         public async Task<IActionResult> ExportReport()
@@ -109,7 +103,7 @@ namespace DormMS.Web.Controllers
             foreach (var item in payments)
             {
                 string studentName = $"{item.Student?.User?.firstName} {item.Student?.User?.lastName}";
-                sb.AppendLine(string.Format("{0,-15} | {1,-20} | {2,-15} | ${3,-10}",
+                sb.AppendLine(string.Format("{0,-15} | {1,-20} | {2,-15} | TL{3,-10}",
                     item.paymentReference,
                     studentName,
                     item.paymentDate.ToString("dd/MM/yyyy"),
@@ -134,7 +128,7 @@ namespace DormMS.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Payment payment, int feeId)
         {
-            // Güvenlik: Eğer öğrenciyse, sadece kendi adına ödeme yapabilir.
+
             if (User.IsInRole("Student"))
             {
                 var userIdStr = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
@@ -154,3 +148,4 @@ namespace DormMS.Web.Controllers
         }
     }
 }
+

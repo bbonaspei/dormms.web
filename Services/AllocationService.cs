@@ -9,7 +9,7 @@ namespace DormMS.Web.Services
     {
         private readonly IAllocationRepository _repo;
         private readonly ApplicationDbContext _context;
-        private readonly IAuditService _audit; // EKLENDİ
+        private readonly IAuditService _audit;
         private readonly INotificationService _notificationService;
 
         public AllocationService(IAllocationRepository repo, ApplicationDbContext context, IAuditService audit, INotificationService notificationService)
@@ -23,7 +23,10 @@ namespace DormMS.Web.Services
         public async Task<bool> CreateAllocationAsync(int studentId, int roomId, DateTime startDate, DateTime endDate, decimal deposit, string keyCard)
         {
             var room = await _context.Rooms.FindAsync(roomId);
-            if (room == null || room.currentOccupancy >= room.capacity) return false;
+            if (room == null || room.currentOccupancy >= room.capacity || room.status == "Occupied" || room.status == "Maintenance") return false;
+
+            var existing = await GetStudentActiveAllocationAsync(studentId);
+            if (existing != null) return false;
 
             var allocation = new Allocation
             {
@@ -51,10 +54,9 @@ namespace DormMS.Web.Services
             await _context.Allocations.AddAsync(allocation);
             await _context.SaveChangesAsync();
 
-            // LOG: Oda Atama
             await _audit.LogActionAsync("CREATE", "Allocation", allocation.id, null, $"Student #{studentId} assigned to Room #{roomId}");
 
-            await _notificationService.SendNotificationAsync(studentId, "Room Allocated", $"You have been assigned to Room #{roomId}.", "Success", "/Home/Index");
+            await _notificationService.SendNotificationToStudentAsync(studentId, "Room Allocated", $"You have been assigned to Room #{roomId}.", "Success", "/Home/Index");
 
             return true;
         }
@@ -67,7 +69,7 @@ namespace DormMS.Web.Services
         }
         public async Task<bool> TerminateAllocationAsync(int id)
         {
-            // 1. Atamayı oda ve öğrenci bilgileriyle beraber getir
+
             var allocation = await _context.Allocations
                 .Include(a => a.Room)
                 .Include(a => a.Student)
@@ -75,23 +77,20 @@ namespace DormMS.Web.Services
 
             if (allocation == null) return false;
 
-            // 2. ATAMA TABLOSUNU GÜNCELLE (Rapor Sayfa 17)
             allocation.actualCheckOut = DateTime.Now;
             allocation.isCurrent = false;
             allocation.status = "Completed";
 
-            // 3. ODA KAPASİTESİNİ GÜNCELLE
             if (allocation.Room != null)
             {
-                allocation.Room.currentOccupancy--; // 1 kişi çıktı
+                allocation.Room.currentOccupancy--;
                 if (allocation.Room.status == "Occupied")
-                    allocation.Room.status = "Available"; // Yer açıldığı için statü değişti
+                    allocation.Room.status = "Available";
             }
 
-            // 4. ÖĞRENCİ PROFİLİNİ GÜNCELLE
             if (allocation.Student != null)
             {
-                allocation.Student.roomId = null; // Artık bir odası yok
+                allocation.Student.roomId = null;
             }
 
             await _context.SaveChangesAsync();
@@ -100,9 +99,12 @@ namespace DormMS.Web.Services
 
         public async Task<bool> RequestAllocationAsync(int studentId, int roomId)
         {
-            // Check if already requested or allocated
+
             var existing = await GetStudentActiveAllocationAsync(studentId);
             if (existing != null) return false;
+
+            var room = await _context.Rooms.FindAsync(roomId);
+            if (room == null || room.currentOccupancy >= room.capacity || room.status == "Occupied" || room.status == "Maintenance") return false;
 
             var request = new Allocation
             {
@@ -129,3 +131,4 @@ namespace DormMS.Web.Services
         }
     }
 }
+

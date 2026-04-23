@@ -9,7 +9,7 @@
     </div>
 
     <div class="row g-4">
-        <!-- SOL: TALEP DETAYLARI -->
+        
         <div class="col-lg-8">
             <div class="stat-card-new shadow-sm border-0 p-5">
                 <div class="d-flex justify-content-between border-bottom pb-4 mb-4">
@@ -18,7 +18,7 @@
                         <span class="text-muted fw-bold small">Ref No: @Model.requestNumber</span>
                     </div>
                     <div class="text-end">
-                        <!-- DÜZELTİLEN SATIR 20 -->
+                        
                         <span class="status-indicator @(Model.status == "Pending" ? "status-pending" : (Model.status == "In Progress" ? "status-progress" : "status-completed")) fs-6 px-4 py-2">
                             @Model.status
                         </span>
@@ -67,11 +67,10 @@
             </div>
         </div>
 
-        <!-- SAĞ: AKSİYON PANELİ -->
         <div class="col-lg-4">
             @if (Model.status == "Completed")
             {
-                <!-- KAPALI KAYIT BİLGİSİ -->
+                
                 <div class="stat-card-new shadow-sm border-0 p-4 mb-4" style="border-top: 4px solid #94a3b8 !important;">
                     <h6 class="section-title-premium mb-4"><i class="bi bi-lock-fill"></i> RECORD CLOSED</h6>
                     <div class="p-3 rounded-4 text-center" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
@@ -102,7 +101,7 @@
             {
                 @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))
                 {
-                    <!-- PERSONEL ATAMA -->
+                    
                     <div class="stat-card-new shadow-sm border-0 p-4 mb-4">
                         <h6 class="section-title-premium mb-4"><i class="bi bi-person-plus-fill"></i> ASSIGN STAFF</h6>
 
@@ -132,7 +131,7 @@
                 }
                 else if (Model.Staff != null)
                 {
-                    <!-- ATANMIŞ PERSONEL BİLGİSİ (Öğrenci ve Staff için sadece okuma) -->
+                    
                     <div class="stat-card-new shadow-sm border-0 p-4 mb-4">
                         <h6 class="section-title-premium mb-4"><i class="bi bi-person-check-fill"></i> ASSIGNED PERSONNEL</h6>
                         <div class="p-3 bg-light rounded-3 d-flex align-items-center gap-3">
@@ -149,7 +148,7 @@
 
                 @if (!User.IsInRole("Student"))
                 {
-                    <!-- DURUM GÜNCELLEME (Öğrenci göremez) -->
+                    
                     <div class="stat-card-new shadow-sm border-0 p-4">
                         <h6 class="section-title-premium mb-4"><i class="bi bi-arrow-repeat"></i> UPDATE STATUS</h6>
                         <form asp-action="UpdateStatus" method="post">
@@ -174,3 +173,5 @@
         </div>
     </div>
 </div>
+
+

@@ -1,4 +1,4 @@
-@{
+﻿@{
     ViewData["Title"] = "Operations Center";
     var allTasks = ViewBag.AllTasks as IEnumerable<DormMS.Web.Models.MaintenanceRequest>;
     int currentUserId = ViewBag.CurrentUserId;
@@ -7,7 +7,7 @@
 }
 
 <div class="container-fluid px-4 mt-5">
-    <!-- KARŞILAMA VE DURUM -->
+    
     <div class="row mb-5 align-items-center">
         <div class="col-md-8">
             <h1 style="color: #312e81; font-weight: 900; font-size: 3rem; letter-spacing: -2.5px; margin-bottom: 5px;">
@@ -23,7 +23,6 @@
         </div>
     </div>
 
-    <!-- KRİTİK METRİKLER -->
     <div class="row g-4 mb-5">
         <div class="col-md-4">
             <div class="stat-card-new alert-border-blue d-flex flex-column h-100 p-4">
@@ -70,7 +69,7 @@
     </div>
 
     <div class="row g-4">
-        <!-- SOL: AKTİF GÖREVLERİM -->
+        
         <div class="col-lg-8">
             <div class="info-section-card shadow-sm border-0 h-100 bg-white p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -115,7 +114,6 @@
             </div>
         </div>
 
-        <!-- SAĞ: HIZLI AKSİYONLAR VE BİLGİ -->
         <div class="col-lg-4">
             <div class="info-section-card shadow-sm border-0 h-100 bg-glass-dark p-4">
                 <h6 class="section-title-premium mb-4"><i class="bi bi-lightning-charge-fill text-warning"></i> Operational Tools</h6>
@@ -144,3 +142,6 @@
         </div>
     </div>
 </div>
+
+
+

@@ -8,3 +8,4 @@ namespace DormMS.Web.Interfaces
         Task<IEnumerable<StudentDocument>> GetStudentDocumentsAsync(int studentId);
     }
 }
+

@@ -24,7 +24,6 @@ namespace DormMS.Web.Repositories
             await _context.SaveChangesAsync();
         }
 
-        // HATAYI ÇÖZEN GERÇEK KODLAR:
         public async Task UpdateAsync(Student student)
         {
             _context.Students.Update(student);
@@ -42,3 +41,4 @@ namespace DormMS.Web.Repositories
         }
     }
 }
+

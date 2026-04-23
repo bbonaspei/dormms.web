@@ -39,19 +39,15 @@ namespace DormMS.Web.Services
             request.requestNumber = "REQ-" + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
             request.requestDate = DateTime.Now;
 
-            // KESİN ÇÖZÜM BURASI: Formdan yanlışlıkla ID gelse bile burada eziyoruz.
-            // Yeni açılan iş kesinlikle sahipsiz ve "Pending" olmak ZORUNDADIR.
             request.status = "Pending";
             request.assignedTo = null;
             request.completedDate = null;
 
-            // 0 Gelen değerleri null'a çekerek "General / Admin" raporu olmasını sağla
             if (request.studentId == 0) request.studentId = null;
             if (request.roomId == 0) request.roomId = null;
 
             await _repository.AddAsync(request);
 
-            // RAPOR UYUMU (Sequence Diagram 1, Adım 11): Yöneticiye bildirim gönder
             await _notificationService.SendNotificationAsync(1, "New Maintenance Request", $"Request {request.requestNumber} needs attention.", "Alert", "/Maintenance/Index");
         }
 
@@ -66,7 +62,7 @@ namespace DormMS.Web.Services
 
                 if (request.studentId.HasValue)
                 {
-                    await _notificationService.SendNotificationAsync(
+                    await _notificationService.SendNotificationToStudentAsync(
                         request.studentId.Value, "Maintenance Update", $"Status is now: {newStatus}", "Info", "/Maintenance/Index");
                 }
             }
@@ -74,21 +70,29 @@ namespace DormMS.Web.Services
 
         public async Task DeleteRequestAsync(int id) => await _repository.DeleteAsync(id);
 
-        public async Task AssignStaffAsync(int requestId, int staffId)
+        public async Task<bool> AssignStaffAsync(int requestId, int staffId)
         {
             var request = await _repository.GetByIdAsync(requestId);
-            if (request != null)
-            {
-                request.assignedTo = staffId;
-                request.status = "In Progress"; // Admin birini atadığı an "In Progress" olur!
-                await _repository.UpdateAsync(request);
+            if (request == null) return false;
 
-                if (request.studentId.HasValue)
-                {
-                    await _notificationService.SendNotificationAsync(
-                        request.studentId.Value, "Staff Assigned", "A technician is handling your request.", "Info", "/Maintenance/Index");
-                }
+            var staffList = await GetAvailableStaffAsync();
+            var targetStaff = staffList.FirstOrDefault(u => u.Id == staffId);
+            
+            if (targetStaff == null || !targetStaff.isActive)
+            {
+                return false;
             }
+
+            request.assignedTo = staffId;
+            request.status = "In Progress";
+            await _repository.UpdateAsync(request);
+
+            if (request.studentId.HasValue)
+            {
+                await _notificationService.SendNotificationToStudentAsync(
+                    request.studentId.Value, "Staff Assigned", "A technician is handling your request.", "Info", "/Maintenance/Index");
+            }
+            return true;
         }
 
         public async Task AddFeedbackAsync(int requestId, int rating, string feedback)
@@ -118,7 +122,16 @@ namespace DormMS.Web.Services
         public async Task<IEnumerable<User>> GetAvailableStaffAsync()
         {
             var staffRoles = await _repository.GetStaffUsersAsync();
-            return staffRoles.Select(ur => ur.User).Distinct().ToList();
+            return staffRoles.Select(ur => ur.User)
+                             .Where(u => u.isActive)
+                             .Distinct()
+                             .ToList();
+        }
+
+        public async Task<Room?> GetStudentRoomAsync(int studentId)
+        {
+            return await _repository.GetRoomByStudentIdAsync(studentId);
         }
     }
 }
+

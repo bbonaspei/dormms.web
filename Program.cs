@@ -1,4 +1,4 @@
-using DormMS.Web.Data;
+﻿using DormMS.Web.Data;
 using DormMS.Web.Interfaces;
 using DormMS.Web.Repositories;
 using DormMS.Web.Services;
@@ -7,11 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. VERİTABANI BAĞLANTISI
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. REPOSITORY KAYITLARI (Katmanlı Mimari Uyumlu)
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
@@ -19,15 +17,14 @@ builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
 builder.Services.AddScoped<IAllocationRepository, AllocationRepository>();
 builder.Services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
 
-// RAPORDA İSTENEN EKSİK REPOSITORY'LER (GÜNCELLENDİ)
 builder.Services.AddScoped<IFeeRepository, FeeRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IPenaltyRepository, PenaltyRepository>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 builder.Services.AddScoped<IStudentFeeRepository, StudentFeeRepository>();
 builder.Services.AddScoped<IAuditRepository, AuditRepository>();
+builder.Services.AddScoped<IStaffRepository, StaffRepository>();
 
-// 3. SERVİS KAYITLARI
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
@@ -39,8 +36,9 @@ builder.Services.AddScoped<IFinancialService, FinancialService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IStaffService, StaffService>();
+builder.Services.AddScoped<IPenaltyService, PenaltyService>();
 
-// 4. AUTHENTICATION (Cookie-Based)
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -50,7 +48,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
     });
 
-// 5. SWAGGER DOKÜMANTASYONU (Raporda Söz Verildiği Gibi)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -66,7 +63,6 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// 6. HTTP REQUEST PIPELINE
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

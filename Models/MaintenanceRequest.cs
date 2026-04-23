@@ -6,7 +6,7 @@ namespace DormMS.Web.Models
     [Table("Maintenance_requests")]
     public class MaintenanceRequest
     {
-        // YENİ EKLENDİ: Sınıf oluşurken durum KESİNLİKLE Pending başlar
+
         public MaintenanceRequest()
         {
             status = "Pending";
@@ -62,3 +62,4 @@ namespace DormMS.Web.Models
         public string? studentFeedback { get; set; }
     }
 }
+

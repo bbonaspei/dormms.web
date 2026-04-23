@@ -36,7 +36,6 @@ namespace DormMS.Web.Controllers
             var student = await _studentService.GetStudentByIdAsync(id);
             if (student == null) return NotFound();
 
-            // Sadece yetkili personeller veya öğrencinin kendisi görebilir
             if (!User.IsInRole("Admin") && !User.IsInRole("Manager") && !User.IsInRole("DormManager"))
             {
                 var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -47,6 +46,9 @@ namespace DormMS.Web.Controllers
             }
 
             ViewBag.Documents = await _context.StudentDocuments.Where(d => d.studentId == id).ToListAsync();
+
+            ViewBag.HasActiveAllocation = await _context.Allocations
+                .AnyAsync(a => a.studentId == id && a.isCurrent && (a.status == "Confirmed" || a.status == "Checked-In" || a.status == "Pending"));
             return View(student);
         }
 
@@ -74,7 +76,6 @@ namespace DormMS.Web.Controllers
             var student = await _studentService.GetStudentByIdAsync(id);
             if (student == null) return NotFound();
 
-            // Rapor verilerini hazırla
             string content = $"STUDENT RECORD - {DateTime.Now}\n" +
                              $"==============================\n" +
                              $"Name: {student.User?.firstName} {student.User?.lastName}\n" +
@@ -111,7 +112,6 @@ namespace DormMS.Web.Controllers
         {
             if (id != student.id) return NotFound();
 
-            // Sadece bir Admin her şeyi (username dahil) değiştirebilir
             bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager");
 
             if (!isAdmin)
@@ -127,7 +127,7 @@ namespace DormMS.Web.Controllers
             ModelState.Remove("User");
             if (ModelState.IsValid)
             {
-                // USERNAME GÜNCELLEME (Geliştirilmiş - Veritabanına yansıması için)
+
                 if (isAdmin && !string.IsNullOrEmpty(newUsername))
                 {
                     var user = await _context.Users.FindAsync(student.userId);
@@ -145,13 +145,12 @@ namespace DormMS.Web.Controllers
             }
             return View(student);
         }
-        // StudentsController.cs içine ekle/güncelle
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadDoc(int studentId, string docType, IFormFile file)
         {
-            // SECURITY: Students can only upload to their own record
+
             if (!User.IsInRole("Admin") && !User.IsInRole("Manager") && !User.IsInRole("DormManager"))
             {
                 var student = await _context.Students.FindAsync(studentId);
@@ -164,12 +163,12 @@ namespace DormMS.Web.Controllers
 
             if (file != null && file.Length > 0)
             {
-                // Servis üzerinden dosyayı hem klasöre kaydet hem DB'ye mühürle
+
                 var result = await _documentService.UploadDocumentAsync(studentId, docType, file);
 
                 if (result)
                 {
-                    // AUDIT LOG: Belge yüklendi
+
                     await _audit.LogActionAsync("UPLOAD", "Document", studentId, null, $"Document {docType} uploaded.");
                 }
             }
@@ -177,14 +176,12 @@ namespace DormMS.Web.Controllers
             return RedirectToAction("Details", new { id = studentId });
         }
 
-        // YENİ: Dosya İndirme Metodu
         [HttpGet]
         public async Task<IActionResult> DownloadDoc(int id)
         {
             var document = await _context.StudentDocuments.Include(d => d.Student).FirstOrDefaultAsync(d => d.id == id);
             if (document == null) return NotFound();
 
-            // SECURITY: Students can only download their own docs
             if (!User.IsInRole("Admin") && !User.IsInRole("Manager") && !User.IsInRole("DormManager"))
             {
                 var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -212,7 +209,6 @@ namespace DormMS.Web.Controllers
 
             int studentId = document.studentId;
 
-            // Delete physical file
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", document.filePath.TrimStart('/'));
             if (System.IO.File.Exists(path))
             {
@@ -227,7 +223,7 @@ namespace DormMS.Web.Controllers
 
             return RedirectToAction("Details", new { id = studentId });
         }
-        // YENI: Silme Metodu (Sadece Admin/DormManager için) - İlişkili verileri de temizler
+
         [Authorize(Roles = "Admin,DormManager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -240,10 +236,10 @@ namespace DormMS.Web.Controllers
 
             try 
             {
-                // 1. İlişkili verileri temizle (Hata payı yüksek tabloları tek tek dene)
+
                 async Task TryCleanup(Func<Task> action, string label) {
                     try { await action(); } 
-                    catch { /* Tablo yoksa veya başka hata varsa pas geç */ }
+                    catch {  }
                 }
 
                 await TryCleanup(async () => {
@@ -288,7 +284,6 @@ namespace DormMS.Web.Controllers
                 var userRoles = _context.UserRoles.Where(ur => ur.UserId == userId);
                 _context.UserRoles.RemoveRange(userRoles);
 
-                // 2. Ana kayıtları sil
                 _context.Students.Remove(student);
                 
                 var user = await _context.Users.FindAsync(userId);
@@ -306,3 +301,4 @@ namespace DormMS.Web.Controllers
         }
     }
 }
+

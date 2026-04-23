@@ -20,32 +20,27 @@ namespace DormMS.Web.Controllers
             _audit = audit;
         }
 
-        // KESİN ÇÖZÜM: Kullanıcı "Students" tablosunda var mı diye bakıyoruz.
         private async Task<Student?> GetCurrentStudentAsync()
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdStr)) return null;
 
             int userId = int.Parse(userIdStr);
-            return await _service.GetStudentProfileAsync(userId); // Eğer null dönerse öğrencidir DEĞİLDİR (Admindir).
+            return await _service.GetStudentProfileAsync(userId);
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            // 1. Giriş yapan kullanıcının User tablosundaki ID'sini alıyoruz
+
             var userIdStr = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
             int userId = string.IsNullOrEmpty(userIdStr) ? 0 : int.Parse(userIdStr);
 
-            // 2. KARTLARI BOYAMAK VE BUTONLARI GİZLEMEK İÇİN BU ID'Yİ VIEW'A GÖNDERİYORUZ (KRİTİK)
             ViewBag.CurrentUserId = userId;
 
-            // 3. Kullanıcı Öğrenci (Student) mi diye veritabanından kontrol ediyoruz
             var student = await GetCurrentStudentAsync();
             ViewBag.IsStudent = student != null;
 
-            // 4. Öğrenciyse sadece kendi id'sini gönderir (sadece kendi işleri gelir). 
-            // Admin veya Personel ise null gider (bütün işler gelir).
             var activeRequests = await _service.GetActiveRequestsAsync(student?.id);
 
             return View(activeRequests);
@@ -61,7 +56,7 @@ namespace DormMS.Web.Controllers
             return View(archivedRequests);
         }
 
-        [Authorize(Roles = "Admin,Manager,DormManager,Student")] // Staff can see archive but maybe not create? User said "create yapamaz"
+        [Authorize(Roles = "Admin,Manager,DormManager,Student")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -85,7 +80,6 @@ namespace DormMS.Web.Controllers
             {
                 ViewBag.IsStudent = false;
 
-                // 1. Öğrenci isimlerini ve numaralarını projeksiyon yapıyoruz ve isme göre sıralıyoruz
                 var studentList = ((IEnumerable<Student>)data.Students)
                     .Select(s => new { 
                         id = s.id, 
@@ -94,8 +88,14 @@ namespace DormMS.Web.Controllers
                     .OrderBy(s => s.fullName)
                     .ToList();
 
-                // 2. "Admin / General Report" seçeneğini en başa ekliyoruz (studentId = null için)
-                // SelectList'e null eklemek bazen sıkıntılı olabilir, o yüzden View tarafında manuel 'null' göndereceğiz
+                var studentRoomMap = new Dictionary<int, int?>();
+                foreach (var s in (IEnumerable<Student>)data.Students)
+                {
+                    var room = await _service.GetStudentRoomAsync(s.id);
+                    studentRoomMap[s.id] = room?.id;
+                }
+                ViewBag.StudentRoomMapJson = System.Text.Json.JsonSerializer.Serialize(studentRoomMap);
+
                 ViewBag.studentId = new SelectList(studentList, "id", "fullName");
                 ViewBag.roomId = new SelectList(data.Rooms, "id", "roomNumber");
             }
@@ -114,7 +114,6 @@ namespace DormMS.Web.Controllers
 
             var student = await GetCurrentStudentAsync();
 
-            // Eğer öğrenciyse formdaki gizli ID'lere güvenme, arkadan kendin bas (Güvenlik)
             if (student != null)
             {
                 var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -135,7 +134,7 @@ namespace DormMS.Web.Controllers
             }
 
             TempData["Error"] = "Please correct the errors in the form.";
-            return RedirectToAction(nameof(Create)); // Hata varsa GET'e geri yolla ki ViewBag'ler düzgün dolsun
+            return RedirectToAction(nameof(Create));
         }
 
         [HttpGet]
@@ -145,8 +144,7 @@ namespace DormMS.Web.Controllers
             if (request == null) return NotFound();
 
             var student = await GetCurrentStudentAsync();
-            
-            // SECURITY CHECK: If student, they can only view their own requests (or general reports)
+
             if (student != null && request.studentId.HasValue && request.studentId.Value != student.id)
             {
                 return Forbid();
@@ -161,7 +159,7 @@ namespace DormMS.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager,Staff")] // Students cannot assign staff
+        [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> Assign(int id, int staffId)
         {
             if (staffId <= 0)
@@ -169,7 +167,14 @@ namespace DormMS.Web.Controllers
                 TempData["Error"] = "Please select a technician before assigning.";
                 return RedirectToAction(nameof(Details), new { id = id });
             }
-            await _service.AssignStaffAsync(id, staffId);
+            
+            bool success = await _service.AssignStaffAsync(id, staffId);
+            if (!success)
+            {
+                TempData["Error"] = "Assignment failed. The selected staff might be inactive or unavailable.";
+                return RedirectToAction(nameof(Details), new { id = id });
+            }
+
             TempData["Success"] = "Technician assigned and task status updated.";
             return RedirectToAction(nameof(Details), new { id = id });
         }
@@ -180,19 +185,23 @@ namespace DormMS.Web.Controllers
             var request = await _service.GetRequestByIdAsync(requestId);
             if (request == null) return NotFound();
 
-            // SECURITY: Students cannot change status of ANY request
             if (User.IsInRole("Student"))
             {
                 return Forbid();
             }
 
-            // SECURITY CHECK: If Staff, they can only complete tasks ASSIGNED to them
             if (User.IsInRole("Staff") && !User.IsInRole("Admin"))
             {
                 var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 int userId = string.IsNullOrEmpty(userIdStr) ? 0 : int.Parse(userIdStr);
                 if (request.assignedTo != userId) return Forbid();
-                if (newStatus != "Completed") return Forbid(); // Staff can only mark as done
+                if (newStatus != "Completed") return Forbid();
+
+                if (request.Staff != null && !request.Staff.isActive)
+                {
+                    TempData["Error"] = "Access Denied. Your staff account is currently inactive and cannot perform operations.";
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             await _service.UpdateStatusAsync(requestId, newStatus);
@@ -207,8 +216,7 @@ namespace DormMS.Web.Controllers
             if (request == null) return NotFound();
 
             var student = await GetCurrentStudentAsync();
-            
-            // SECURITY CHECK: Students can only delete their own PENDING requests
+
             if (student != null)
             {
                 if (request.studentId != student.id || request.status != "Pending") return Forbid();
@@ -220,3 +228,4 @@ namespace DormMS.Web.Controllers
         }
     }
 }
+

@@ -10,3 +10,4 @@ namespace DormMS.Web.Interfaces
         Task<Allocation?> GetActiveByStudentIdAsync(int studentId);
     }
 }
+

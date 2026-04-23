@@ -1,4 +1,4 @@
-using DormMS.Web.Data;
+﻿using DormMS.Web.Data;
 using DormMS.Web.Interfaces;
 using DormMS.Web.Models;
 using Microsoft.EntityFrameworkCore;
@@ -37,3 +37,4 @@ namespace DormMS.Web.Repositories
         public async Task<bool> SaveChangesAsync() => await _context.SaveChangesAsync() > 0;
     }
 }
+

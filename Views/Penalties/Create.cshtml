@@ -1,0 +1,75 @@
+﻿@model DormMS.Web.Models.Penalty
+
+@{
+    ViewData["Title"] = "Apply Penalty";
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <a asp-action="Index" class="btn-back-premium shadow-sm text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> BACK TO PENALTY LOGS
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg" style="border-radius: 35px; overflow: hidden;">
+                <div class="card-header bg-danger text-white p-5 border-0">
+                    <h2 class="fw-900 mb-0"><i class="bi bi-exclamation-octagon-fill me-3"></i>Apply Penalty</h2>
+                    <p class="opacity-75 mb-0 fw-bold mt-2">Resident disciplinary or financial sanction.</p>
+                </div>
+                <div class="card-body p-5">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="mb-4">
+                            <label class="label-premium">Select Resident</label>
+                            <select asp-for="studentId" class="dorm-input-premium" asp-items="ViewBag.Students">
+                                <option value="">-- Choose Student --</option>
+                            </select>
+                            <span asp-validation-for="studentId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="label-premium">Penalty Category</label>
+                            <select asp-for="penaltyType" class="dorm-input-premium">
+                                <option value="Late Payment">Late Payment</option>
+                                <option value="Property Damage">Property Damage</option>
+                                <option value="Policy Violation">Policy Violation</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="penaltyType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="label-premium">Penalty Amount (TL)</label>
+                            <div class="position-relative">
+                                <span class="position-absolute top-50 start-0 translate-middle-y ms-3 fw-bold text-muted">TL</span>
+                                <input asp-for="amount" class="dorm-input-premium ps-5" type="number" step="0.01" value="0.00" />
+                            </div>
+                            <span asp-validation-for="amount" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="label-premium">Detailed Reason / Description</label>
+                            <textarea asp-for="reason" class="dorm-input-premium" rows="4" placeholder="Explain why this penalty is being applied..."></textarea>
+                            <span asp-validation-for="reason" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-secondary w-50">Cancel</a>
+                            <button type="submit" class="btn-premium w-50 py-3 fs-5 shadow-sm">Confirm & Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+
+

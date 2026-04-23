@@ -8,8 +8,8 @@ namespace DormMS.Web.Interfaces
         Task<Student?> GetByIdAsync(int id);
         Task AddAsync(Student student);
 
-        // EKSİK OLAN VE HATAYA SEBEP OLANLAR:
         Task UpdateAsync(Student student);
         Task DeleteAsync(int id);
     }
 }
+

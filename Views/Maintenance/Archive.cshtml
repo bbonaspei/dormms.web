@@ -75,8 +75,8 @@
 
                             @if (User.IsInRole("Admin"))
                             {
-                                <form asp-action="Delete" asp-route-id="@item.id" method="post" onsubmit="return confirm('WARNING: Permanently delete this archived record?');">
-                                    <button type="submit" class="btn-card-delete" title="Delete Permanently">
+                                <form asp-action="Delete" asp-route-id="@item.id" method="post" class="delete-form">
+                                    <button type="button" class="btn-card-delete delete-btn" title="Delete Permanently">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
@@ -88,3 +88,40 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const form = this.closest('.delete-form');
+                    
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This archived record will be permanently deleted and cannot be recovered!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Yes, Delete it!',
+                        cancelButtonText: 'Cancel',
+                        background: '#ffffff',
+                        borderRadius: '25px',
+                        customClass: {
+                            confirmButton: 'rounded-pill px-4 py-2 fw-bold',
+                            cancelButton: 'rounded-pill px-4 py-2 fw-bold'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}
+
+

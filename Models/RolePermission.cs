@@ -18,3 +18,4 @@ namespace DormMS.Web.Models
         public virtual Permission Permission { get; set; } = null!;
     }
 }
+

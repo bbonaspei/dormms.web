@@ -4,11 +4,10 @@
     ViewData["Title"] = "Campus Infrastructure";
 }
 
-<!-- SweetAlert2 (Tasarım Bütünlüğü İçin) -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container-fluid px-4 mt-5">
-    <!-- Sayfa Başlığı (Oda Sayfasıyla Aynı Stil) -->
+    
     <div class="row align-items-center mb-5">
         <div class="col-md-8">
             <h1 style="color: #312e81; font-weight: 900; font-size: 2.8rem; letter-spacing: -2px; margin-bottom: 0;">
@@ -24,13 +23,12 @@
     </div>
 
     <div class="row g-5">
-        <!-- g-5 ile kartlar arası ferahlatıldı -->
+        
         @foreach (var item in Model)
         {
             <div class="col-xl-4 col-md-6">
                 <div class="room-card-vibrant p-4 h-100 shadow-sm border-0">
 
-                    <!-- Kart Üstü: İkon ve Durum -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="icon-box icon-blue" style="width: 45px; height: 45px; border-radius: 12px;">
                             <i class="bi bi-building-fill fs-4"></i>
@@ -40,7 +38,6 @@
                         </span>
                     </div>
 
-                    <!-- Bina Başlığı ve Kodu -->
                     <div class="mb-4">
                         <h3 class="fw-900 text-dark mb-1">@item.buildingName</h3>
                         <div class="badge bg-light text-primary border fw-bold px-3 py-2" style="font-size: 10px; letter-spacing: 1px;">
@@ -48,7 +45,6 @@
                         </div>
                     </div>
 
-                    <!-- Detay Kutusu -->
                     <div class="p-3 rounded-4 mb-4" style="background: #f8fafc; border: 1px solid #edf2f7;">
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <i class="bi bi-geo-alt-fill text-muted"></i>
@@ -66,9 +62,8 @@
                         </div>
                     </div>
 
-                    <!-- AKSİYON BUTONLARI (ODA SAYFASIYLA TAM UYUMLU) -->
                     <div class="d-flex gap-2 mt-auto">
-                        <!-- SOL: Küçük Silme Butonu -->
+                        
                         <form id="deleteForm-@item.id" asp-action="Delete" asp-route-id="@item.id" method="post" style="width: 25%;">
                             @Html.AntiForgeryToken()
                             <button type="button" class="btn-card-delete-mini w-100" onclick="confirmDelete(@item.id)" title="Remove Building">
@@ -76,8 +71,6 @@
                             </button>
                         </form>
 
-                        <!-- ESKİ HALİ: <a href="#" class="btn-card-details-wide ..."> -->
-                        <!-- YENİ HALİ: -->
                         <a asp-action="Edit" asp-route-id="@item.id" class="btn-card-details-wide flex-grow-1">
                             <i class="bi bi-pencil-square"></i>
                             Edit Block
@@ -89,7 +82,6 @@
     </div>
 </div>
 
-<!-- Silme Onay Scripti -->
 <script>
     function confirmDelete(id) {
         Swal.fire({
@@ -112,3 +104,5 @@
         })
     }
 </script>
+
+

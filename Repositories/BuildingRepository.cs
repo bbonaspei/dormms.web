@@ -20,6 +20,14 @@ namespace DormMS.Web.Repositories
             var building = await _context.Buildings.FindAsync(id);
             if (building != null) { _context.Buildings.Remove(building); await _context.SaveChangesAsync(); }
         }
+
+        public async Task<bool> IsCodeUniqueAsync(string code, int? excludeId = null)
+        {
+            return !await _context.Buildings
+                .AsNoTracking()
+                .AnyAsync(b => b.buildingCode == code && (excludeId == null || b.id != excludeId));
+        }
         
     }
 }
+
