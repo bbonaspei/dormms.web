@@ -69,7 +69,14 @@ namespace DormMS.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewBag.Roles = new SelectList(_context.Roles.Where(r => r.RoleName != "Student"), "Id", "RoleName");
+            ViewBag.Roles = _context.Roles
+                .Where(r => r.RoleName != "Student")
+                .Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.RoleName == "Staff" ? "Maintenance" : r.RoleName
+                })
+                .ToList();
             return View();
         }
 
@@ -79,13 +86,28 @@ namespace DormMS.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var success = await _staffService.AddStaffAsync(user, roleId);
-                if (success) return RedirectToAction(nameof(Index));
-                
-                ModelState.AddModelError("", "Failed to hire staff member. Please check administrative logs.");
+                var existingUser = await _context.Users.AnyAsync(u => u.username == user.username);
+                if (existingUser)
+                {
+                    ModelState.AddModelError("username", "Identity Conflict: This credentials (username) is already registered in the system.");
+                }
+                else
+                {
+                    var success = await _staffService.AddStaffAsync(user, roleId);
+                    if (success) return RedirectToAction(nameof(Index));
+                    
+                    ModelState.AddModelError("", "Failed to hire staff member. Please check administrative logs.");
+                }
             }
 
-            ViewBag.Roles = new SelectList(_context.Roles.Where(r => r.RoleName != "Student"), "Id", "RoleName");
+            ViewBag.Roles = _context.Roles
+                .Where(r => r.RoleName != "Student")
+                .Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.RoleName == "Staff" ? "Maintenance" : r.RoleName
+                })
+                .ToList();
             return View(user);
         }
 
@@ -95,7 +117,16 @@ namespace DormMS.Web.Controllers
             var staff = await _staffService.GetStaffByIdAsync(id);
             if (staff == null) return NotFound();
 
-            ViewBag.Roles = new SelectList(_context.Roles.Where(r => r.RoleName != "Student"), "Id", "RoleName", staff.UserRoles?.FirstOrDefault()?.RoleId);
+            var selectedRoleId = staff.UserRoles?.FirstOrDefault()?.RoleId;
+            ViewBag.Roles = _context.Roles
+                .Where(r => r.RoleName != "Student")
+                .Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.RoleName == "Staff" ? "Maintenance" : r.RoleName,
+                    Selected = r.Id == selectedRoleId
+                })
+                .ToList();
             return View(staff);
         }
 
@@ -122,7 +153,14 @@ namespace DormMS.Web.Controllers
             }
 
             TempData["Error"] = "Failed to update staff record.";
-            ViewBag.Roles = new SelectList(_context.Roles.Where(r => r.RoleName != "Student"), "Id", "RoleName");
+            ViewBag.Roles = _context.Roles
+                .Where(r => r.RoleName != "Student")
+                .Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.RoleName == "Staff" ? "Maintenance" : r.RoleName
+                })
+                .ToList();
             return View(user);
         }
 

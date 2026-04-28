@@ -138,7 +138,14 @@
                                 <label class="info-label-pro">Current Housing Unit</label>
                                 <h3 class="fw-900 m-0 text-dark">
                                     <i class="bi bi-house-door-fill me-2 text-primary"></i>
-                                    @(Model.Room != null ? "Room " + Model.Room.roomNumber : "Waiting for Assignment")
+                                    @{
+                                        var displayRoom = Model.Room?.roomNumber;
+                                        if (string.IsNullOrEmpty(displayRoom) && ViewBag.ActiveAllocation != null)
+                                        {
+                                            displayRoom = ViewBag.ActiveAllocation.Room?.roomNumber;
+                                        }
+                                    }
+                                    @(string.IsNullOrEmpty(displayRoom) ? "Waiting for Assignment" : "Room " + displayRoom)
                                 </h3>
                             </div>
                             @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DormManager"))

@@ -47,8 +47,12 @@ namespace DormMS.Web.Controllers
 
             ViewBag.Documents = await _context.StudentDocuments.Where(d => d.studentId == id).ToListAsync();
 
-            ViewBag.HasActiveAllocation = await _context.Allocations
-                .AnyAsync(a => a.studentId == id && a.isCurrent && (a.status == "Confirmed" || a.status == "Checked-In" || a.status == "Pending"));
+            var activeAllocation = await _context.Allocations
+                .Include(a => a.Room)
+                .FirstOrDefaultAsync(a => a.studentId == id && a.isCurrent && (a.status == "Confirmed" || a.status == "Checked-In" || a.status == "Pending"));
+            
+            ViewBag.ActiveAllocation = activeAllocation;
+            ViewBag.HasActiveAllocation = activeAllocation != null;
             return View(student);
         }
 
@@ -63,9 +67,17 @@ namespace DormMS.Web.Controllers
             ModelState.Remove("User");
             if (ModelState.IsValid)
             {
-                await _studentService.EnrollNewStudentAsync(student, firstName, lastName, email);
-                TempData["Success"] = "Resident enrolled successfully!";
-                return RedirectToAction(nameof(Index));
+                var existingUser = await _context.Users.AnyAsync(u => u.username == student.studentId);
+                if (existingUser)
+                {
+                    ModelState.AddModelError("studentId", "Identity Conflict: This Student ID is already linked to an existing account.");
+                }
+                else
+                {
+                    await _studentService.EnrollNewStudentAsync(student, firstName, lastName, email);
+                    TempData["Success"] = "Resident enrolled successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
             }
             return View(student);
         }
